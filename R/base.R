@@ -8,8 +8,11 @@
 #'
 #' @importFrom methods new
 #' @importFrom oce handleFlags setFlags subset summary
-#' @docType package
+#'
 #' @name oceglider
+#' @docType package
+#' @keywords internal
+"_PACKAGE"
 NULL
 
 #' A class to hold glider information

@@ -2,6 +2,7 @@
 % Please edit documentation in R/base.R
 \docType{package}
 \name{oceglider}
+\alias{oceglider-package}
 \alias{oceglider}
 \title{oceglider: A Package for Processing Ocean Glider Data}
 \description{
@@ -11,3 +12,21 @@ chance that the functions provided here (a) will fail on
 other types and (b) function names and arguments will change
 as more datasets are examined by the author.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item Report bugs at \url{https://github.com/dankelley/oceglider}
+}
+
+}
+\author{
+\strong{Maintainer}: Dan Kelley \email{dan.kelley@dal.ca} (\href{https://orcid.org/0000-0001-7808-5911}{ORCID})
+
+Authors:
+\itemize{
+  \item Clark Richards \email{clark.richards@gmail.com} (\href{https://orcid.org/0000-0002-7833-206X}{ORCID})
+  \item Chantelle Layton \email{layton.chantelle@gmail.com} (\href{https://orcid.org/0000-0002-3199-5763}{ORCID})
+}
+
+}
+\keyword{internal}

@@ -68,8 +68,8 @@ if (file.exists("~/slocum.csv")) {
 }
 \seealso{
 Other functions to read glider data: 
-\code{\link{read.glider.netcdf.ioos}()},
 \code{\link{read.glider.netcdf}()},
+\code{\link{read.glider.netcdf.ioos}()},
 \code{\link{read.glider.seaexplorer.delayed}()},
 \code{\link{read.glider.seaexplorer.realtime}()},
 \code{\link{read.glider.slocum.netcdf}()}
