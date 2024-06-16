@@ -18,7 +18,7 @@ read.glider.slocum.netcdf(
     = "v", vxi = "glider_record/m_initial_water_vx", vyi =
     "glider_record/m_initial_water_vy", vy = "glider_record/m_water_vy", vx =
     "glider_record/m_water_vx", id = "profile_id"),
-  debug
+  debug = 0
 )
 }
 \arguments{

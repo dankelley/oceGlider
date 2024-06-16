@@ -52,19 +52,21 @@ g <- read.glider.netcdf("~/Dropbox/glider_dfo.nc")
 g <- subset(g, time > as.POSIXct("2018-01-01"))
 # Remove any observation with bad salinity
 g <- subset(g, is.finite(g[["salinity"]]))
-plot(g, which="map")
+plot(g, which = "map")
 ctd <- as.ctd(g[["salinity"]], g[["temperature"]], g[["pressure"]],
-              longitude=g[["longitude"]], latitude=g[["latitude"]])
-plotTS(ctd, useSmoothScatter=TRUE)
+    longitude = g[["longitude"]], latitude = g[["latitude"]]
+)
+plotTS(ctd, useSmoothScatter = TRUE)
 
 # Slocum data,from Dalhousie CEOTR rdapp (April 2019)
 g <- read.glider.netcdf("~/Dropbox/glider_erdapp.nc")
 # Remove any observation with bad salinity
 g <- subset(g, is.finite(g[["salinity"]]))
-plot(g, which="map")
+plot(g, which = "map")
 ctd <- as.ctd(g[["salinity"]], g[["temperature"]], g[["pressure"]],
-              latitude=g[["latitude"]], longitude=g[["longitude"]])
-plotTS(ctd, useSmoothScatter=TRUE)
+    latitude = g[["latitude"]], longitude = g[["longitude"]]
+)
+plotTS(ctd, useSmoothScatter = TRUE)
 }
 
 }

@@ -57,11 +57,11 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #'
 #' @examples
 #' library(oceglider)
-#' directory <- system.file("extdata/seaexplorer/sub", package="oceglider")
-#' g <- read.glider.seaexplorer.realtime(directory, progressBar=FALSE)
-#' plot(g, which="navState")
-#' plot(g, which="S")
-#' plot(g, which="T")
+#' directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
+#' g <- read.glider.seaexplorer.realtime(directory, progressBar = FALSE)
+#' plot(g, which = "navState")
+#' plot(g, which = "S")
+#' plot(g, which = "T")
 ## ctd <- as.ctd(g[['salinity']], g[['temperature']], g[['pressure']],
 ##               longitude=g[['longitude']], latitude=g[['latitude']])
 ## plot(ctd)
@@ -84,23 +84,27 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #' @md
 #'
 #' @export
-read.glider.seaexplorer.realtime <- function(directory, yo, level=1, progressBar=interactive, missingValue=9999, debug)
-{
-    if (missing(debug))
-        debug <- getOption("gliderDebug", default=0)
-    if (missing(directory))
-        stop("must provide 'directory', in which glider files reside")
-    if (is.character(progressBar) && progressBar == "shiny") {
-        if (!requireNamespace("shiny", quietly=TRUE))
-            stop("cannot have progressBar=\"shiny\" unless the \"shiny\" package is installed")
+read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressBar = interactive, missingValue = 9999, debug) {
+    if (missing(debug)) {
+        debug <- getOption("gliderDebug", default = 0)
     }
-    gliderDebug(debug, "read.glider.seaexplorer.realtime(\"", directory, "\", ...) {\n", sep="", unindent=1)
+    if (missing(directory)) {
+        stop("must provide 'directory', in which glider files reside")
+    }
+    if (is.character(progressBar) && progressBar == "shiny") {
+        if (!requireNamespace("shiny", quietly = TRUE)) {
+            stop("cannot have progressBar=\"shiny\" unless the \"shiny\" package is installed")
+        }
+    }
+    gliderDebug(debug, "read.glider.seaexplorer.realtime(\"", directory, "\", ...) {\n", sep = "", unindent = 1)
     yoGiven <- !missing(yo)
-    glifiles <- dir(directory, pattern='*gli*', full.names=TRUE)
-    pld1files <- dir(directory, pattern='*.pld1.*', full.names=TRUE)
+    glifiles <- dir(directory, pattern = "*gli*", full.names = TRUE)
+    pld1files <- dir(directory, pattern = "*.pld1.*", full.names = TRUE)
     if (length(glifiles) != length(pld1files)) {
-        warning("There is an unequal number of *gli* files (", length(glifiles),
-            ") and *pld1* files (", length(pld1files), "), but they ought to be paired. This may indicate a problem in the data directory. Try calling this function with debug=2 to see filenames.")
+        warning(
+            "There is an unequal number of *gli* files (", length(glifiles),
+            ") and *pld1* files (", length(pld1files), "), but they ought to be paired. This may indicate a problem in the data directory. Try calling this function with debug=2 to see filenames."
+        )
     }
 
     if (debug > 1) {
@@ -120,26 +124,30 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level=1, progressBar
         yo <- gsub(".*/", "", pld1files) # now just filename
         yo <- gsub("^.*pld1.sub.([0-9]+).*$", "\\1", yo) # now just yo number
         yo <- as.numeric(yo)
-        gliderDebug(debug, "yo=", paste(yo, collapase=" "), "\n", sep="")
+        gliderDebug(debug, "yo=", paste(yo, collapase = " "), "\n", sep = "")
     }
     # Narrow glifiles and pld1files, to just those that match the yo pattern
     keepglifiles <- NULL
     for (y in yo) {
-        found <- grep(paste("\\.",y,"\\.",sep=""), glifiles)
-        if (length(found) == 1)
+        found <- grep(paste("\\.", y, "\\.", sep = ""), glifiles)
+        if (length(found) == 1) {
             keepglifiles <- c(keepglifiles, glifiles[found])
+        }
     }
-    if (!length(keepglifiles))
-        stop("no gli file found for yo=", paste(yo, collapse=" "), sep="")
+    if (!length(keepglifiles)) {
+        stop("no gli file found for yo=", paste(yo, collapse = " "), sep = "")
+    }
     glifiles <- keepglifiles
     keeppld1files <- NULL
     for (y in yo) {
-        found <- grep(paste("\\.",y,"\\.",sep=""), pld1files)
-        if (length(found) == 1)
+        found <- grep(paste("\\.", y, "\\.", sep = ""), pld1files)
+        if (length(found) == 1) {
             keeppld1files <- c(keeppld1files, pld1files[found])
+        }
     }
-    if (!length(keeppld1files))
-        stop("no pld1 file found for yo=", paste(yo, collapse=" "))
+    if (!length(keeppld1files)) {
+        stop("no pld1 file found for yo=", paste(yo, collapse = " "))
+    }
     pld1files <- keeppld1files
 
     if (debug > 1) {
@@ -153,8 +161,8 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level=1, progressBar
     # gli files
     nfiles <- length(glifiles)
     if (is.logical(progressBar) && progressBar) {
-        cat('* Reading', nfiles, ifelse(nfiles==1, 'gli file\n', 'gli files...\n'))
-        pb <- txtProgressBar(0, nfiles, 0, style=3) # start at 0 to allow for a single yo
+        cat("* Reading", nfiles, ifelse(nfiles == 1, "gli file\n", "gli files...\n"))
+        pb <- txtProgressBar(0, nfiles, 0, style = 3) # start at 0 to allow for a single yo
     } else if (is.character(progressBar) && progressBar == "shiny") {
         shiny::setProgress(0, paste("reading", nfiles, "files"))
     }
@@ -166,7 +174,7 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level=1, progressBar
             shiny::incProgress(1 / nfiles)
         }
         gliderDebug(debug, "reading gli file:  ", glifiles[i], "\n")
-        gliData <- utils::read.delim(glifiles[i], sep=";")
+        gliData <- utils::read.delim(glifiles[i], sep = ";")
         gliData$yoNumberNav <- rep(yo[i], dim(gliData)[1])
         gli[[i]] <- gliData
     }
@@ -175,10 +183,10 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level=1, progressBar
     # pld1 files
     nfiles <- length(pld1files)
     if (is.logical(progressBar) && progressBar) {
-        cat('\n')
+        cat("\n")
         flush.console()
-        cat('* Reading', nfiles, ifelse(nfiles==1, 'pld1 file\n', 'pld1 files...\n'))
-        pb <- txtProgressBar(0, nfiles, 0, style=3)
+        cat("* Reading", nfiles, ifelse(nfiles == 1, "pld1 file\n", "pld1 files...\n"))
+        pb <- txtProgressBar(0, nfiles, 0, style = 3)
     } else if (is.character(progressBar) && progressBar == "shiny") {
         shiny::setProgress(0, paste("reading", nfiles, "files"))
     }
@@ -190,14 +198,15 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level=1, progressBar
             shiny::incProgress(1 / nfiles)
         }
         gliderDebug(debug, "reading pld1 file: ", pld1files[i], "?\n")
-        pld1Data <- utils::read.delim(pld1files[i], sep=";")
+        pld1Data <- utils::read.delim(pld1files[i], sep = ";")
         pld1Data$yoNumber <- rep(yo[i], dim(pld1Data)[1])
         pld1[[i]] <- pld1Data
     }
     pld1Data <- do.call(rbind.data.frame, pld1)
     pld1Data$X <- NULL
-    if (is.logical(progressBar) && progressBar)
-        cat('\n')
+    if (is.logical(progressBar) && progressBar) {
+        cat("\n")
+    }
     # change missingValue to NA
     gliData[gliData == missingValue] <- NA
     pld1Data[pld1Data == missingValue] <- NA
@@ -215,16 +224,20 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level=1, progressBar
     res <- new("glider")
     res@metadata$type <- "seaexplorer"
     res@metadata$subtype <- "realtime"
-    res <- initializeFlagScheme(res, name="IOOS",
-        mapping=list(pass=1, not_evaluated=2, suspect=3, fail=4, missing=9))
+    res <- initializeFlagScheme(res,
+        name = "IOOS",
+        mapping = list(pass = 1, not_evaluated = 2, suspect = 3, fail = 4, missing = 9)
+    )
     res@metadata$filename <- paste0(glifiles, ";", pld1files)
-    ##44 https://github.com/dankelley/oceglider/issues/44
-    ##44 res@metadata$yo <- yo
-    res@metadata$dataNamesOriginal <- list(glider=list(), payload1=list())
-    for (name in names(gliData))
+    ## 44 https://github.com/dankelley/oceglider/issues/44
+    ## 44 res@metadata$yo <- yo
+    res@metadata$dataNamesOriginal <- list(glider = list(), payload1 = list())
+    for (name in names(gliData)) {
         res@metadata$dataNamesOriginal$glider[[name]] <- name
-    for (name in names(pld1Data))
+    }
+    for (name in names(pld1Data)) {
         res@metadata$dataNamesOriginal$payload1[[name]] <- name
+    }
 
     gliderDebug(debug, "about to rename items read from the 'gli' file\n")
     # Rename items in glider data.
@@ -233,10 +246,11 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level=1, progressBar
     # ../man-roxygen/seaexplorer_names.R accordingly.
     if ("Timestamp" %in% names(gliData)) {
         # FIXME(DK): reading fractional seconds changes some hard-wired numbers in test_flags.R
-        if (issue40)
-            gliData$Timestamp <- as.POSIXct(gliData$Timestamp, format="%d/%m/%Y %H:%M:%OS", tz="UTC")
-        else
-            gliData$Timestamp <- as.POSIXct(gliData$Timestamp, format="%d/%m/%Y %H:%M:%S", tz="UTC")
+        if (issue40) {
+            gliData$Timestamp <- as.POSIXct(gliData$Timestamp, format = "%d/%m/%Y %H:%M:%OS", tz = "UTC")
+        } else {
+            gliData$Timestamp <- as.POSIXct(gliData$Timestamp, format = "%d/%m/%Y %H:%M:%S", tz = "UTC")
+        }
         names(gliData) <- gsub("Timestamp", "time", names(gliData))
         res@metadata$dataNamesOriginal$glider$time <- "Timestamp"
     }
@@ -288,7 +302,7 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level=1, progressBar
     }
     if ("BallastCmd" %in% names(gliData)) {
         names(gliData) <- gsub("BallastCmd", "ballastCmd", names(gliData))
-        res@metadata$dataNamesOriginal$glider$ballastCmd<- "BallastCmd"
+        res@metadata$dataNamesOriginal$glider$ballastCmd <- "BallastCmd"
     }
     if ("BallastPos" %in% names(gliData)) {
         names(gliData) <- gsub("BallastPos", "ballastPos", names(gliData))
@@ -322,10 +336,11 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level=1, progressBar
     gliderDebug(debug, "about to rename items read from the 'pld1' file\n")
     if ("PLD_REALTIMECLOCK" %in% names(pld1Data)) {
         # FIXME(DK): reading fractional seconds changes some hard-wired numbers in test_flags.R
-        if (issue40)
-            pld1Data$PLD_REALTIMECLOCK <- as.POSIXct(pld1Data$PLD_REALTIMECLOCK, format="%d/%m/%Y %H:%M:%OS", tz="UTC")
-        else
-            pld1Data$PLD_REALTIMECLOCK <- as.POSIXct(pld1Data$PLD_REALTIMECLOCK, format="%d/%m/%Y %H:%M:%S", tz="UTC")
+        if (issue40) {
+            pld1Data$PLD_REALTIMECLOCK <- as.POSIXct(pld1Data$PLD_REALTIMECLOCK, format = "%d/%m/%Y %H:%M:%OS", tz = "UTC")
+        } else {
+            pld1Data$PLD_REALTIMECLOCK <- as.POSIXct(pld1Data$PLD_REALTIMECLOCK, format = "%d/%m/%Y %H:%M:%S", tz = "UTC")
+        }
         names(pld1Data) <- gsub("PLD_REALTIMECLOCK", "time", names(pld1Data))
         res@metadata$dataNamesOriginal$payload1$time <- "PLD_REALTIMECLOCK"
     }
@@ -384,7 +399,7 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level=1, progressBar
         res@metadata$dataNamesOriginal$payload1$pressure <- "GPCTD_PRESSURE"
     }
     if (3 == sum(c("conductivity", "temperature", "pressure") %in% names(pld1Data))) {
-        pld1Data$salinity <- swSCTp(pld1Data$conductivity/4.2914, pld1Data$temperature, pld1Data$pressure)
+        pld1Data$salinity <- swSCTp(pld1Data$conductivity / 4.2914, pld1Data$temperature, pld1Data$pressure)
         res@metadata$dataNamesOriginal$payload1$salinity <- "-"
     }
     if ("GPCTD_DOF" %in% names(pld1Data)) {
@@ -392,29 +407,37 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level=1, progressBar
         res@metadata$dataNamesOriginal$payload1$oxygenFrequency <- "GPCTD_DOF"
     }
 
-    res@data <- list(glider=gliData, payload1=pld1Data)
+    res@data <- list(glider = gliData, payload1 = pld1Data)
     # BOOKMARK START assure that this is echoed in read.glider.seaexplorer.realtime()
     # insert units
     for (stream in names(res@data)) {
         # FIXME: add more units here, if any of them are certain to be known
         res@metadata$units[[stream]] <- list()
         dataNames <- names(res@data[[stream]])
-        if ("salinity" %in% dataNames)
-            res@metadata$units[[stream]]$salinity <- list(unit=expression(), scale="PSS-78") # FIXME: is this modern?
-        if ("temperature" %in% dataNames)
-            res@metadata$units[[stream]]$temperature <- list(unit=expression(degree*C), scale="ITS-90")
-        if ("pressure" %in% dataNames)
-            res@metadata$units[[stream]]$pressure <- list(unit=expression(dbar), scale="")
-        if ("longitude" %in% dataNames)
-            res@metadata$units[[stream]]$longitude <- list(unit=expression(degree*E), scale="")
-        if ("latitude" %in% dataNames)
-            res@metadata$units[[stream]]$latitude <- list(unit=expression(degree*N), scale="")
-        if ("heading" %in% dataNames)
-            res@metadata$units[[stream]]$heading <- list(unit=expression(degree), scale="")
-        if ("pitch" %in% dataNames)
-            res@metadata$units[[stream]]$pitch <- list(unit=expression(degree), scale="")
-        if ("roll" %in% dataNames)
-            res@metadata$units[[stream]]$roll <- list(unit=expression(degree), scale="")
+        if ("salinity" %in% dataNames) {
+            res@metadata$units[[stream]]$salinity <- list(unit = expression(), scale = "PSS-78")
+        } # FIXME: is this modern?
+        if ("temperature" %in% dataNames) {
+            res@metadata$units[[stream]]$temperature <- list(unit = expression(degree * C), scale = "ITS-90")
+        }
+        if ("pressure" %in% dataNames) {
+            res@metadata$units[[stream]]$pressure <- list(unit = expression(dbar), scale = "")
+        }
+        if ("longitude" %in% dataNames) {
+            res@metadata$units[[stream]]$longitude <- list(unit = expression(degree * E), scale = "")
+        }
+        if ("latitude" %in% dataNames) {
+            res@metadata$units[[stream]]$latitude <- list(unit = expression(degree * N), scale = "")
+        }
+        if ("heading" %in% dataNames) {
+            res@metadata$units[[stream]]$heading <- list(unit = expression(degree), scale = "")
+        }
+        if ("pitch" %in% dataNames) {
+            res@metadata$units[[stream]]$pitch <- list(unit = expression(degree), scale = "")
+        }
+        if ("roll" %in% dataNames) {
+            res@metadata$units[[stream]]$roll <- list(unit = expression(degree), scale = "")
+        }
         # set up flags to value 2, which means not-checked
         len <- length(res@data[[stream]][[1]]) # all have same length
         for (name in dataNames) {
@@ -422,12 +445,15 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level=1, progressBar
         }
     }
     # BOOKMARK END
-    gliderDebug(debug, "read.glider.seaexplorer.delayed(\"", directory, "\", ...) {\n", unindent=1)
-    res@processingLog <- processingLogAppend(res@processingLog,
+    gliderDebug(debug, "read.glider.seaexplorer.delayed(\"", directory, "\", ...) {\n", unindent = 1)
+    res@processingLog <- processingLogAppend(
+        res@processingLog,
         paste("read.glider.seaexplorer.realtime(directory=\"", directory, "\",",
-            "yo=c(", paste(yo, collapse=","), "),",
-            "missingValue=", missingValue, ")", sep=""))
-    gliderDebug(debug, "} # read.glider.seaexplorer.realtime()\n", unindent=1)
+            "yo=c(", paste(yo, collapse = ","), "),",
+            "missingValue=", missingValue, ")",
+            sep = ""
+        )
+    )
+    gliderDebug(debug, "} # read.glider.seaexplorer.realtime()\n", unindent = 1)
     res
 }
-

@@ -45,24 +45,28 @@ if (file.exists("~/slocum.csv")) {
     summary(g)
 
     # 1. Plot time-depth trace, colour-coded for temperature
-    par(mar=c(3, 3, 1, 1), mgp=c(2, 0.7, 0)) # thin margins
-    cm <- colormap(z=g[['temperature']])
-    drawPalette(colormap=cm, cex.axis=3/4)
+    par(mar = c(3, 3, 1, 1), mgp = c(2, 0.7, 0)) # thin margins
+    cm <- colormap(z = g[["temperature"]])
+    drawPalette(colormap = cm, cex.axis = 3 / 4)
     t <- g[["time"]]
     p <- g[["depth"]]
-    plot(t, p, ylim=rev(range(p)), xlab="Time", ylab="Pressure [dbar]",
-         col=cm$zcol, cex=1/2, pch=20)
-    mtext(paste("Temperature, from", t[1]), cex=3/4)
+    plot(t, p,
+        ylim = rev(range(p)), xlab = "Time", ylab = "Pressure [dbar]",
+        col = cm$zcol, cex = 1 / 2, pch = 20
+    )
+    mtext(paste("Temperature, from", t[1]), cex = 3 / 4)
 
     # 2. Plot distance-depth trace, colour-coded for temperature
-    dist <- geodDist(g[["longitude"]],g[["latitude"]],alongPath=TRUE)
-    par(mar=c(3, 3, 1, 1), mgp=c(2, 0.7, 0)) # thin margins
-    cm <- colormap(z=g[["temperature"]])
-    drawPalette(colormap=cm, cex.axis=3/4)
+    dist <- geodDist(g[["longitude"]], g[["latitude"]], alongPath = TRUE)
+    par(mar = c(3, 3, 1, 1), mgp = c(2, 0.7, 0)) # thin margins
+    cm <- colormap(z = g[["temperature"]])
+    drawPalette(colormap = cm, cex.axis = 3 / 4)
     p <- g[["depth"]]
-    plot(dist, p, ylim=rev(range(p)), xlab="Distance [km]", ylab="Pressure [dbar]",
-         col=cm$zcol, cex=1/2, pch=20)
-    mtext(paste("Temperature, from", t[1]), cex=3/4)
+    plot(dist, p,
+        ylim = rev(range(p)), xlab = "Distance [km]", ylab = "Pressure [dbar]",
+        col = cm$zcol, cex = 1 / 2, pch = 20
+    )
+    mtext(paste("Temperature, from", t[1]), cex = 3 / 4)
 }
 
 }

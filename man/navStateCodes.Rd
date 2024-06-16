@@ -55,15 +55,15 @@ see pages 1-24 of reference 1.)
 }
 \examples{
 # Use codes to identify upcasts, at least roughly (note the stray points)
-directory <- system.file("extdata/seaexplorer/raw", package="oceglider")
-g <- read.glider.seaexplorer.delayed(directory, progressBar=FALSE)
+directory <- system.file("extdata/seaexplorer/raw", package = "oceglider")
+g <- read.glider.seaexplorer.delayed(directory, progressBar = FALSE)
 ns <- navStateCodes(g)
-plot(g, which="p")
+plot(g, which = "p")
 ga <- subset(g, navState == ns$ascending)
-points(ga[["time"]], ga[["pressure"]], col=3, pch=20)
+points(ga[["time"]], ga[["pressure"]], col = 3, pch = 20)
 giu <- subset(g, navState == ns$inflecting_upwards)
-points(giu[["time"]], giu[["pressure"]], col=2, pch=20)
-mtext(" red=inflecting_upwards; green=ascending", side=3, line=-1, adj=0)
+points(giu[["time"]], giu[["pressure"]], col = 2, pch = 20)
+mtext(" red=inflecting_upwards; green=ascending", side = 3, line = -1, adj = 0)
 
 }
 \references{

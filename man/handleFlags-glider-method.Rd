@@ -84,19 +84,19 @@ illustrated in the \dQuote{Examples} section.
 }
 \examples{
 library(oceglider)
-directory <- system.file("extdata/seaexplorer/raw", package="oceglider")
-g <- read.glider.seaexplorer.delayed(directory, progressBar=FALSE)
+directory <- system.file("extdata/seaexplorer/raw", package = "oceglider")
+g <- read.glider.seaexplorer.delayed(directory, progressBar = FALSE)
 
 # The histogram motivates a crude limit for anomalously low salinity.
-par(mfrow=c(1, 2), mar=c(3, 3, 1, 1), mgp=c(2, 0.75, 0))
-hist(g[["salinity"]], breaks=100, xlab="Original Salinity", main="")
-abline(v=31, col=2)
+par(mfrow = c(1, 2), mar = c(3, 3, 1, 1), mgp = c(2, 0.75, 0))
+hist(g[["salinity"]], breaks = 100, xlab = "Original Salinity", main = "")
+abline(v = 31, col = 2)
 
 # Flag value 3 means 'suspect' in the IOOS scheme [1, table]; other
 # flags are pass=1, not_evaluated=2 (the default as read), fail=4, and missing=9.
-g2 <- setFlags(g, "salinity", g[["salinity"]]<31, 3)
+g2 <- setFlags(g, "salinity", g[["salinity"]] < 31, 3)
 g3 <- handleFlags(g2, c(3, 4, 9)) # use default action, which is "NA"
-hist(g3[["salinity"]], breaks=100, xlab="Trimmed Salinity", main="")
+hist(g3[["salinity"]], breaks = 100, xlab = "Trimmed Salinity", main = "")
 
 }
 \references{

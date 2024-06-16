@@ -31,18 +31,20 @@ be written with units fully specified.
 }
 \examples{
 library(oceglider)
-directory <- system.file("extdata/seaexplorer/raw", package="oceglider")
+directory <- system.file("extdata/seaexplorer/raw", package = "oceglider")
 g <- read.glider.seaexplorer.delayed(directory)
 data <- g[["payload"]]
-units <- list(temperature=list(unit=expression(degree*C), scale="ITS-90"),
-     salinity=list(unit=expression(), scale="PSS-78"),
-     pressure=list(unit=expression(dbar), scale=""),
-     longitude=list(unit=expression(degree*E), scale=""),
-     latitude=list(unit=expression(degree*N), scale=""))
+units <- list(
+    temperature = list(unit = expression(degree * C), scale = "ITS-90"),
+    salinity = list(unit = expression(), scale = "PSS-78"),
+    pressure = list(unit = expression(dbar), scale = ""),
+    longitude = list(unit = expression(degree * E), scale = ""),
+    latitude = list(unit = expression(degree * N), scale = "")
+)
 gg <- as.glider("seaexplorer", data, units)
-par(mfrow=c(2, 1))
-plot(g, which="p")
-plot(gg, which="p")
+par(mfrow = c(2, 1))
+plot(g, which = "p")
+plot(gg, which = "p")
 
 }
 \author{

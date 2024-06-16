@@ -39,15 +39,15 @@
 #' @return An oceglider object.
 #'
 #' @examples
-#'\dontrun{
+#' \dontrun{
 #'
 #' # Example 1. remove wild salinities
 #' library(oceglider)
 #' g <- read.glider(filename)
 #' gg <- subset(g, 0 < salinity & salinity < 40)
-#' par(mfrow=c(2, 1))
-#' hist(g[["salinity"]], main="S original")
-#' hist(gg[["salinity"]], main="S cleaned")
+#' par(mfrow = c(2, 1))
+#' hist(g[["salinity"]], main = "S original")
+#' hist(gg[["salinity"]], main = "S cleaned")
 #'
 #' # Example 2. remove short yos
 #' gg <- subset(g, yolength > 4)
@@ -57,7 +57,7 @@
 #'
 #' # Example 4. retain only descending portions of yos
 #' gdescending <- subset(g, "descending")
-#'}
+#' }
 #'
 #' @author Dan Kelley
 #'
@@ -71,18 +71,20 @@
 #' into this.  DK 2019-03-28.
 #'
 #' @md
-setMethod(f="subset",
-    signature="glider",
-    definition=function(x, subset, ...) {
-        if (missing(subset))
+setMethod(
+    f = "subset",
+    signature = "glider",
+    definition = function(x, subset, ...) {
+        if (missing(subset)) {
             stop("must give 'subset'")
+        }
         dots <- list(...)
-        debug <- if ("debug" %in% names(dots)) dots$debug else getOption("gliderDebug",0)
-        gliderDebug(debug, "subset,glider-method() {\n", unindent=1)
-        subsetString <- paste(deparse(substitute(subset)), collapse=" ")
-        gliderDebug(debug, "subsetString: \"", subsetString, "\"\n", sep="")
+        debug <- if ("debug" %in% names(dots)) dots$debug else getOption("gliderDebug", 0)
+        gliderDebug(debug, "subset,glider-method() {\n", unindent = 1)
+        subsetString <- paste(deparse(substitute(subset)), collapse = " ")
+        gliderDebug(debug, "subsetString: \"", subsetString, "\"\n", sep = "")
         xtype <- x@metadata$type # direct lookup, to guard against 'type' being in data
-        gliderDebug(debug, "object type: \"", xtype, "\"\n", sep="")
+        gliderDebug(debug, "object type: \"", xtype, "\"\n", sep = "")
         if (is.character(substitute(subset))) {
             gliderDebug(debug, "handling a character-valued subset\n")
             # subset is a character string
@@ -115,15 +117,17 @@ setMethod(f="subset",
             gliderDebug(debug, "subset is not a character value\n")
             if (1 == length(grep("yolength", subsetString))) {
                 gliderDebug(debug, "subset relates to yolength\n")
-                if (xtype != "seaexplorer")
+                if (xtype != "seaexplorer") {
                     stop("subset by 'yolength' only works for seaexplorer objects (please report)")
-                if (!"payload1" %in% names(x@data))
-                    stop("In subset,glider-method() : only works for 'raw' datasets, not for 'sub' ones; contact package authors, if you need to handle sub data", call.=FALSE)
+                }
+                if (!"payload1" %in% names(x@data)) {
+                    stop("In subset,glider-method() : only works for 'raw' datasets, not for 'sub' ones; contact package authors, if you need to handle sub data", call. = FALSE)
+                }
                 s <- split(x@data$payload1, x[["yoNumber"]])
                 # warning removed for issue (https://github.com/dankelley/oceglider/issues/41)
                 # warning("In subset,glider-method() : only subsetting 'payload1'; contact package authors, if your data have other streams", call.=FALSE)
                 thisYolength <- as.integer(lapply(s, function(ss) length(ss[["pressure"]])))
-                keepYo <- eval(substitute(subset), list(yolength=thisYolength))
+                keepYo <- eval(substitute(subset), list(yolength = thisYolength))
                 # message("sum(keepYo)=", sum(keepYo), " length(keepYo)=", length(keepYo))
                 res <- x
                 # 44 https://github.com/dankelley/oceglider/issues/44
@@ -156,10 +160,13 @@ setMethod(f="subset",
                 }
             }
         }
-        res@processingLog <- processingLogAppend(res@processingLog,
-            paste(deparse(match.call(call=sys.call(sys.parent(1)))),
-                sep="", collapse=""))
-        gliderDebug(debug, "} # subset,glider-method\n", sep="", unindent=1)
+        res@processingLog <- processingLogAppend(
+            res@processingLog,
+            paste(deparse(match.call(call = sys.call(sys.parent(1)))),
+                sep = "", collapse = ""
+            )
+        )
+        gliderDebug(debug, "} # subset,glider-method\n", sep = "", unindent = 1)
         res
-    })
-
+    }
+)

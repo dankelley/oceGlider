@@ -17,20 +17,23 @@ NULL
 
 #' A class to hold glider information
 #' @export
-glider <- setClass("glider", contains="oce")
+glider <- setClass("glider", contains = "oce")
 
-setMethod(f="initialize",
-    signature="glider",
-    definition=function(.Object, filename) {
-        if (!missing(filename))
+setMethod(
+    f = "initialize",
+    signature = "glider",
+    definition = function(.Object, filename) {
+        if (!missing(filename)) {
             .Object@metadata$filename <- filename
+        }
         .Object@metadata$type <- "?"
         .Object@metadata$subtype <- "?"
         .Object@metadata$level <- NA # unknown at start
         .Object@processingLog$time <- as.POSIXct(Sys.time())
         .Object@processingLog$value <- "create 'glider' object"
         return(.Object)
-    })
+    }
+)
 
 #' Saturation of O2 in sea water
 #'
@@ -42,21 +45,21 @@ setMethod(f="initialize",
 #' @param salinity salinity
 #'
 #' DEK note: the result is in mL/L.
-swSatO2 <- function(temperature, salinity){
+swSatO2 <- function(temperature, salinity) {
     Tk <- 273.15 + temperature * 1.00024
     # constants for Eqn (4) of Weiss 1970
     a1 <- -173.4292
-    a2 <-  249.6339
-    a3 <-  143.3483
-    a4 <-  -21.8492
-    b1 <-   -0.033096
-    b2 <-    0.014259
-    b3 <-   -0.0017000
+    a2 <- 249.6339
+    a3 <- 143.3483
+    a4 <- -21.8492
+    b1 <- -0.033096
+    b2 <- 0.014259
+    b3 <- -0.0017000
     lnC <- a1 +
-        a2*(100/Tk) +
-        a3*log(Tk/100) +
-        a4*(Tk/100) +
-        salinity*(b1 + b2*(Tk/100) + b3*((Tk/100)^2))
+        a2 * (100 / Tk) +
+        a3 * log(Tk / 100) +
+        a4 * (Tk / 100) +
+        salinity * (b1 + b2 * (Tk / 100) + b3 * ((Tk / 100)^2))
     exp(lnC)
 }
 
@@ -94,7 +97,7 @@ swSatO2 <- function(temperature, salinity){
 ## In addition to retrieving data stored in the object, `[[` can also
 ## return the following.
 ##
-##\itemize{
+## \itemize{
 ##
 ## \item the full `data` slot, with e.g. `x[["data"]]`
 ##
@@ -135,7 +138,7 @@ swSatO2 <- function(temperature, salinity){
 ## \item glider object containing just the data for a particular yo,
 ## e.g. `x[["yo",1]]` yields the first yo.
 ##
-##}
+## }
 #'
 #' @param x a glider object, i.e. one inheriting from [glider-class].
 #'
@@ -149,8 +152,8 @@ swSatO2 <- function(temperature, salinity){
 #'
 #' @examples
 #' library(oceglider)
-#' directory <- system.file("extdata/seaexplorer/raw", package="oceglider")
-#' g <- read.glider.seaexplorer.delayed(directory, progressBar=FALSE)
+#' directory <- system.file("extdata/seaexplorer/raw", package = "oceglider")
+#' g <- read.glider.seaexplorer.delayed(directory, progressBar = FALSE)
 #'
 #' # Example 1: look up Absolute Salinity
 #' summary(g[["SA"]])
@@ -164,25 +167,29 @@ swSatO2 <- function(temperature, salinity){
 #' @export
 #'
 #' @md
-setMethod(f="[[",
-    signature(x="glider", i="ANY", j="ANY"),
-    definition=function(x, i, j, ...) {
-        #. message("in [[, i='", i, "'")
-        debug <- getOption("gliderDebug", default=0L)
-        gliderDebug(debug, "glider [[ {\n", unindent=1)
-        if (missing(i))
-            stop("Must name a glider item to retrieve, e.g. '[[\"temperature\"]]'", call.=FALSE)
-        if (length(i) > 1L)
-            stop("can only access one item at a time", call.=FALSE)
-        if (!is.character(i))
-            stop("glider item must be specified by name", call.=FALSE)
-        if (i == "filename")
+setMethod(
+    f = "[[",
+    signature(x = "glider", i = "ANY", j = "ANY"),
+    definition = function(x, i, j, ...) {
+        # . message("in [[, i='", i, "'")
+        debug <- getOption("gliderDebug", default = 0L)
+        gliderDebug(debug, "glider [[ {\n", unindent = 1)
+        if (missing(i)) {
+            stop("Must name a glider item to retrieve, e.g. '[[\"temperature\"]]'", call. = FALSE)
+        }
+        if (length(i) > 1L) {
+            stop("can only access one item at a time", call. = FALSE)
+        }
+        if (!is.character(i)) {
+            stop("glider item must be specified by name", call. = FALSE)
+        }
+        if (i == "filename") {
             return(x@metadata$filename)
-        else if (i == "data")
+        } else if (i == "data") {
             return(x@data)
-        else if (i == "metadata")
+        } else if (i == "metadata") {
             return(x@metadata)
-        else if (i == "yo" && !missing(j)) { # NOTE: not 'yoNumber'
+        } else if (i == "yo" && !missing(j)) { # NOTE: not 'yoNumber'
             lines <- which(x@data$payload1$yoNumber == j)
             x@data$payload1 <- x@data$payload1[lines, ]
             for (f in names(x@metadata$flags$payload1)) {
@@ -191,8 +198,9 @@ setMethod(f="[[",
             return(x)
         }
         type <- x@metadata$type
-        if (is.null(type))
+        if (is.null(type)) {
             stop("'type' is NULL")
+        }
         if (length(grep("Flag$", i))) {
             # returns a list
             where <- "payload1"
@@ -203,31 +211,37 @@ setMethod(f="[[",
             return(type)
         }
         if (i == "sigmaTheta") {
-            return(swSigmaTheta(salinity=x[["salinity"]],
-                    temperature=x[["temperature"]],
-                    pressure=x[["pressure"]],
-                    longitude=x[["longitude"]],
-                    latitude=x[["latitude"]]))
+            return(swSigmaTheta(
+                salinity = x[["salinity"]],
+                temperature = x[["temperature"]],
+                pressure = x[["pressure"]],
+                longitude = x[["longitude"]],
+                latitude = x[["latitude"]]
+            ))
         }
         if (i == "sigma0") {
-            return(swSigma0(salinity=x[["salinity"]],
-                    temperature=x[["temperature"]],
-                    pressure=x[["pressure"]],
-                    longitude=x[["longitude"]],
-                    latitude=x[["latitude"]]))
+            return(swSigma0(
+                salinity = x[["salinity"]],
+                temperature = x[["temperature"]],
+                pressure = x[["pressure"]],
+                longitude = x[["longitude"]],
+                latitude = x[["latitude"]]
+            ))
         }
         if (i == "SA") {
-            return(gsw_SA_from_SP(SP=x[["salinity"]], p=x[["pressure"]],
-                    longitude=x[["longitude"]], latitude=x[["latitude"]]))
+            return(gsw_SA_from_SP(
+                SP = x[["salinity"]], p = x[["pressure"]],
+                longitude = x[["longitude"]], latitude = x[["latitude"]]
+            ))
         }
         if (i == "z") {
-            return(swZ(x[["pressure"]], latitude=mean(x[["latitude"]], na.rm=TRUE)))
+            return(swZ(x[["pressure"]], latitude = mean(x[["latitude"]], na.rm = TRUE)))
         }
         if (i == "CT") {
             t <- x[["temperature"]]
             SP <- x[["salinity"]] # stored as practical salinity
             p <- x[["pressure"]]
-            SA <- gsw_SA_from_SP(SP=SP, p=p, longitude=x[["longitude"]], latitude=x[["latitude"]])
+            SA <- gsw_SA_from_SP(SP = SP, p = p, longitude = x[["longitude"]], latitude = x[["latitude"]])
             return(gsw_CT_from_t(SA, t, p))
         }
         if (i == "spiciness0") {
@@ -239,19 +253,21 @@ setMethod(f="[[",
             # return(gsw::gsw_spiciness0(SA=SA, CT=CT))
             SA <- gsw_SA_from_SP(SP, p, x[["longitude"]], x[["latitude"]])
             CT <- gsw_CT_from_t(SA, t, p)
-            return(gsw_spiciness0(SA=SA, CT=CT))
+            return(gsw_spiciness0(SA = SA, CT = CT))
         }
         if (i == "oxygen") {
             gliderDebug(debug, "seeking \"oxygen\"\n")
             if (identical(x@metadata$type, "seaexplorer")) {
-                gliderDebug(debug, "object type is \"seaexplorer\"\n", sep="")
+                gliderDebug(debug, "object type is \"seaexplorer\"\n", sep = "")
                 dataNames <- names(x@data)
                 # get payload name
                 w <- grep("payload", dataNames)
-                if (length(w) == 0L)
+                if (length(w) == 0L) {
                     stop("sea-explorer object has no payload")
-                if (length(w) > 1L)
+                }
+                if (length(w) > 1L) {
                     stop("sea-explorer object has more than one \"payload\"-type element")
+                }
                 payloadName <- dataNames[w]
                 dataNames <- names(x@data[[payloadName]])
                 if ("oxygen" %in% dataNames) {
@@ -272,11 +288,13 @@ setMethod(f="[[",
                     # This Kelvin temperature is as used in swSatOw.  Note the
                     # non-standard offset and the non-unity factor
                     Tk <- 273.15 + temperature * 1.00024
-                    res <- with(cal$calibrationCoefficients,
+                    res <- with(
+                        cal$calibrationCoefficients,
                         Soc * (oxygenFrequency + Foffset) *
-                            (1.0 + A*T + B*T^2 + C*T^3) *
-                            swSatO2(temperature=temperature, salinity=salinity)
-                        * exp(Enom*pressure/Tk))
+                            (1.0 + A * T + B * T^2 + C * T^3) *
+                            swSatO2(temperature = temperature, salinity = salinity)
+                            * exp(Enom * pressure / Tk)
+                    )
                     return(44.6591 * res) # the factor converts to umol/kg
                 } else {
                     return(NULL)
@@ -288,8 +306,9 @@ setMethod(f="[[",
                 # and I don't have docs on calibration formulae, so I return
                 # NULL in such a case; the user will need to do that work.
                 for (nickname in c("oxygen", "oxygenConcentration", "O2")) {
-                    if (nickname  %in% dataNames)
+                    if (nickname %in% dataNames) {
                         return(x@data[[nickname]])
+                    }
                 }
                 return(NULL)
             } else {
@@ -308,16 +327,20 @@ setMethod(f="[[",
             # will update to handle names as a parameter, but I don't want to
             # make oceglider depend on a non-CRAN version of oce.
             if (all(c("salinity", "temperature", "pressure") %in% dataNames)) {
-                dataNames <- c(dataNames, c("theta", paste("potential", "temperature"), "z",
-                        "depth", "spice", "Rrho", "RrhoSF", "sigmaTheta", "SP",
-                        "density", "N2", paste("sound", "speed")))
+                dataNames <- c(dataNames, c(
+                    "theta", paste("potential", "temperature"), "z",
+                    "depth", "spice", "Rrho", "RrhoSF", "sigmaTheta", "SP",
+                    "density", "N2", paste("sound", "speed")
+                ))
             }
             if (all(c("longitude", "latitude") %in% dataNames)) {
-                dataNames <- c(dataNames, "SR", "Sstar",
+                dataNames <- c(
+                    dataNames, "SR", "Sstar",
                     paste0("sigma", 0:4),
                     "SA", paste("Absolute", "Salinity"),
-                    "CT",  paste("Conservative", "Temperature"),
-                    paste0("spiciness", 0:2))
+                    "CT", paste("Conservative", "Temperature"),
+                    paste0("spiciness", 0:2)
+                )
             }
             # It is possible to compute nitrate from NO2+NO3 and nitrite, if
             # it's not stored in the object already.  This occurs in data(section).
@@ -331,39 +354,41 @@ setMethod(f="[[",
             }
             return(sort(unique(dataNames)))
         }
-        #. message("it is a seaexplorer")
-        if (i == "glider")
+        # . message("it is a seaexplorer")
+        if (i == "glider") {
             return(x@data$glider)
+        }
         if (grepl("payload", i)) {
             dataNames <- names(x@data)
             w <- grep("payload", dataNames)
             if (length(w) > 1L) {
                 stop("cannot handle files with multiple 'payloadN' items")
             } else if (length(w) == 1L) {
-                #message("returning w=",w," i.e. ", dataNames[w])
+                # message("returning w=",w," i.e. ", dataNames[w])
                 return(x@data[[dataNames[w]]])
             } else {
                 return(NULL)
             }
         }
         if (missing(j)) {
-            #. message("j is missing")
+            # . message("j is missing")
             if (i %in% names(x@metadata)) {
-                #. message("i in metadata")
+                # . message("i in metadata")
                 return(x@metadata[[i]])
             } else if (i %in% names(x@data)) {
-                #. message("i in data")
+                # . message("i in data")
                 return(x@data[[i]])
             } else {
-                #. message("returning i from within payload")
-                if (i %in% names(x@data[["payload1"]]))
+                # . message("returning i from within payload")
+                if (i %in% names(x@data[["payload1"]])) {
                     return(x@data$payload1[[i]])
-                else
-                    return(x@data$glider[[i]]) # what if there is no glider?
+                } else {
+                    return(x@data$glider[[i]])
+                } # what if there is no glider?
                 return(x@data$payload[[i]])
             }
         }
-        #. message("j is not missing. j='", j, "'")
+        # . message("j is not missing. j='", j, "'")
         # if (j == "glider")
         #     return(x@data$glider)
         # if (j == "payload")
@@ -373,9 +398,10 @@ setMethod(f="[[",
         # if (j == "payload2")
         #     return(x@data$payload2)
         # stop("type='", type, "' not permitted; it must be 'seaexplorer' or 'slocum'")
-        warning("[[", i, ",", j, "]] not understood, so returning NULL", sep="")
+        warning("[[", i, ",", j, "]] not understood, so returning NULL", sep = "")
         return(NULL)
-    })
+    }
+)
 
 #' Convert a string from snake_case to camelCase
 #'
@@ -397,25 +423,25 @@ setMethod(f="[[",
 #' @md
 #'
 #' @export
-toCamelCase <- function(s)
-{
+toCamelCase <- function(s) {
     s <- strsplit(s, "")[[1]]
     r <- NULL
     n <- length(s)
     i <- 1
     while (i <= n) {
         if (s[i] == "_") {
-            if (i < n)
-                r <- c(r, toupper(s[i+1]))
-            else
+            if (i < n) {
+                r <- c(r, toupper(s[i + 1]))
+            } else {
                 warning("trailing underscores are ignored")
+            }
             i <- i + 2
         } else {
             r <- c(r, s[i])
             i <- i + 1
         }
     }
-    paste(r, collapse="")
+    paste(r, collapse = "")
 }
 
 
@@ -439,8 +465,7 @@ toCamelCase <- function(s)
 #' @md
 #'
 #' @export
-degreeMinute <- function(x)
-{
+degreeMinute <- function(x) {
     s <- sign(x)
     x <- abs(x)
     degree <- floor(x / 100)
@@ -473,13 +498,13 @@ degreeMinute <- function(x)
 #' @md
 #'
 #' @export
-gliderDebug <- function(debug=0, ..., unindent=0)
-{
+gliderDebug <- function(debug = 0, ..., unindent = 0) {
     debug <- if (debug > 4) 4 else max(0, floor(debug + 0.5))
     if (debug > 0) {
         n <- 5 - debug - unindent
-        if (n > 0)
-            cat(paste(rep("  ", n), collapse=""), sep="")
+        if (n > 0) {
+            cat(paste(rep("  ", n), collapse = ""), sep = "")
+        }
         cat(...)
     }
     utils::flush.console()
@@ -509,25 +534,27 @@ gliderDebug <- function(debug=0, ..., unindent=0)
 #' @md
 #'
 #' @export
-urlExists <- function(url, quiet=FALSE)
-{
+urlExists <- function(url, quiet = FALSE) {
     # tack a '/' on the end, if not there already
     urlOrig <- url
-    if (0 == length(grep("/$", url)))
-        url <- paste(url, "/", sep="")
-    if (!requireNamespace("RCurl", quietly=TRUE))
+    if (0 == length(grep("/$", url))) {
+        url <- paste(url, "/", sep = "")
+    }
+    if (!requireNamespace("RCurl", quietly = TRUE)) {
         stop("must install.packages(\"RCurl\") to read this data type")
+    }
     exists <- RCurl::url.exists(url)
     if (exists) {
         return(TRUE)
     } else {
         while (!quiet && TRUE) {
-            w <- which('/'==strsplit(url,'')[[1]])
+            w <- which("/" == strsplit(url, "")[[1]])
             if (length(w) > 1) {
                 url <- strtrim(url, w[length(w) - 1])
                 if (RCurl::url.exists(url)) {
-                    if (!quiet)
-                        cat("'", urlOrig, "' does not exist, but '", url, "' does\n", sep="")
+                    if (!quiet) {
+                        cat("'", urlOrig, "' does not exist, but '", url, "' does\n", sep = "")
+                    }
                     break
                 }
             }
@@ -537,12 +564,12 @@ urlExists <- function(url, quiet=FALSE)
 }
 
 # a helper function to simplify code in read.glider.netcdf()
-getAtt <- function(f, varid=0, attname=NULL, default=NULL)
-{
-    if (is.null(attname))
+getAtt <- function(f, varid = 0, attname = NULL, default = NULL) {
+    if (is.null(attname)) {
         stop("must give attname")
+    }
     # message(attname)
-    t <- try(ncdf4::ncatt_get(f, varid=varid, attname=attname), silent=TRUE)
+    t <- try(ncdf4::ncatt_get(f, varid = varid, attname = attname), silent = TRUE)
     if (inherits(t, "try-error")) {
         NULL
     } else {
@@ -575,7 +602,7 @@ getAtt <- function(f, varid=0, attname=NULL, default=NULL)
 #' @author Dan Kelley
 #'
 #' @examples
-#'\dontrun{
+#' \dontrun{
 #' library(oceglider)
 #'
 #' # NOTE: these files are of order 100Meg, so they are
@@ -588,20 +615,22 @@ getAtt <- function(f, varid=0, attname=NULL, default=NULL)
 #' g <- subset(g, time > as.POSIXct("2018-01-01"))
 #' # Remove any observation with bad salinity
 #' g <- subset(g, is.finite(g[["salinity"]]))
-#' plot(g, which="map")
+#' plot(g, which = "map")
 #' ctd <- as.ctd(g[["salinity"]], g[["temperature"]], g[["pressure"]],
-#'               longitude=g[["longitude"]], latitude=g[["latitude"]])
-#' plotTS(ctd, useSmoothScatter=TRUE)
+#'     longitude = g[["longitude"]], latitude = g[["latitude"]]
+#' )
+#' plotTS(ctd, useSmoothScatter = TRUE)
 #'
 #' # Slocum data,from Dalhousie CEOTR rdapp (April 2019)
 #' g <- read.glider.netcdf("~/Dropbox/glider_erdapp.nc")
 #' # Remove any observation with bad salinity
 #' g <- subset(g, is.finite(g[["salinity"]]))
-#' plot(g, which="map")
+#' plot(g, which = "map")
 #' ctd <- as.ctd(g[["salinity"]], g[["temperature"]], g[["pressure"]],
-#'               latitude=g[["latitude"]], longitude=g[["longitude"]])
-#' plotTS(ctd, useSmoothScatter=TRUE)
-#'}
+#'     latitude = g[["latitude"]], longitude = g[["longitude"]]
+#' )
+#' plotTS(ctd, useSmoothScatter = TRUE)
+#' }
 #'
 #' @family functions to read glider data
 #' @family functions to read netcdf glider data
@@ -611,27 +640,30 @@ getAtt <- function(f, varid=0, attname=NULL, default=NULL)
 #' @md
 #'
 #' @export
-read.glider.netcdf <- function(file, debug)
-{
-    if (missing(debug))
-        debug <- getOption("gliderDebug", default=0)
-    gliderDebug(debug, "read.glider.netcdf(file=\"", file, "\", ...) {", unindent=1, sep="")
-    if (missing(file))
+read.glider.netcdf <- function(file, debug) {
+    if (missing(debug)) {
+        debug <- getOption("gliderDebug", default = 0)
+    }
+    gliderDebug(debug, "read.glider.netcdf(file=\"", file, "\", ...) {", unindent = 1, sep = "")
+    if (missing(file)) {
         stop("must provide `file'")
-    if (length(file) != 1)
+    }
+    if (length(file) != 1) {
         stop("file must have length 1")
+    }
     capture.output({
         f <- ncdf4::nc_open(file)
     })
     res <- new("glider")
 
     # Next demonstrates how to detect this filetype.
-    instrument <- getAtt(f, attname="instrument", default="?")
-    instrumentManufacturer <- getAtt(f, attname="instrument_manufacturer", default="?")
-    instrumentModel <- getAtt(f, attname="instrument_model", default="?")
-    type <- getAtt(f, attname="platform_type", default="?")
-    if (type == "Slocum Glider")
+    instrument <- getAtt(f, attname = "instrument", default = "?")
+    instrumentManufacturer <- getAtt(f, attname = "instrument_manufacturer", default = "?")
+    instrumentModel <- getAtt(f, attname = "instrument_model", default = "?")
+    type <- getAtt(f, attname = "platform_type", default = "?")
+    if (type == "Slocum Glider") {
         type <- "slocum"
+    }
     res@metadata$type <- type
     data <- list()
     # FIXME get units
@@ -639,19 +671,19 @@ read.glider.netcdf <- function(file, debug)
     dataNames <- names(f$var)
     data$time <- numberAsPOSIXct(as.vector(ncdf4::ncvar_get(f, "time")))
     dataNamesOriginal <- list()
-    #? if (!"time" %in% dataNames)
-    #?     dataNamesOriginal$time <- "-"
+    # ? if (!"time" %in% dataNames)
+    # ?     dataNamesOriginal$time <- "-"
     # Get all variables, except time, which is not listed in f$var
     gliderDebug(debug, "reading and renaming data\n")
-    for (i in seq_along(dataNames))  {
+    for (i in seq_along(dataNames)) {
         newName <- toCamelCase(dataNames[i])
         dataNamesOriginal[[newName]] <- dataNames[i]
         if (dataNames[i] == "time") {
             data[["time"]] <- numberAsPOSIXct(as.vector(ncdf4::ncvar_get(f, "time")))
-            gliderDebug(debug, "i=", i, " ... time converted from integer to POSIXct\n", sep="")
+            gliderDebug(debug, "i=", i, " ... time converted from integer to POSIXct\n", sep = "")
         } else {
             data[[newName]] <- as.vector(ncdf4::ncvar_get(f, dataNames[i]))
-            gliderDebug(debug, "i=", i, " ... data name \"", dataNames[i], "\" converted to \"", newName, "\"\n", sep="")
+            gliderDebug(debug, "i=", i, " ... data name \"", dataNames[i], "\" converted to \"", newName, "\"\n", sep = "")
             dataNames[i] <- newName
         }
     }
@@ -660,8 +692,8 @@ read.glider.netcdf <- function(file, debug)
     res@data$payload1 <- as.data.frame(data)
     # head(res@data$payload1$time)
     res@metadata$filename <- file
-    res@metadata$dataNamesOriginal <- list(payload1=dataNamesOriginal)
-    gliderDebug(debug, "} # read.glider.netcdf", unindent=1, sep="")
+    res@metadata$dataNamesOriginal <- list(payload1 = dataNamesOriginal)
+    gliderDebug(debug, "} # read.glider.netcdf", unindent = 1, sep = "")
     res
 }
 
@@ -687,23 +719,24 @@ read.glider.netcdf <- function(file, debug)
 #' @md
 #'
 #' @export
-read.glider <- function(file, debug, ...)
-{
-    if (missing(debug))
-        debug <- getOption("gliderDebug", default=0)
-    gliderDebug(debug, 'read.glider() {', unindent=1, sep="")
-    if (!is.character(file))
+read.glider <- function(file, debug, ...) {
+    if (missing(debug)) {
+        debug <- getOption("gliderDebug", default = 0)
+    }
+    gliderDebug(debug, "read.glider() {", unindent = 1, sep = "")
+    if (!is.character(file)) {
         stop("'file' must be a character value (or values) giving filename(s)")
+    }
     if (length(file) == 1 && length(grep(".nc$", file))) {
-        res <- read.glider.netcdf(file=file, debug=debug-1, ...)
+        res <- read.glider.netcdf(file = file, debug = debug - 1, ...)
     } else if (0 != length(grep("pld1.sub", file))) {
-        res <- read.glider.seaexplorer.realtime(file, debug=debug-1, ...)
+        res <- read.glider.seaexplorer.realtime(file, debug = debug - 1, ...)
     } else if (0 != length(grep("pld1.raw", file))) {
-        res <- read.glider.seaexplorer.delayed(file, debug=debug-1, ...)
+        res <- read.glider.seaexplorer.delayed(file, debug = debug - 1, ...)
     } else {
         stop("only .nc and .gz files handled")
     }
-    gliderDebug(debug, '} # read.glider()', unindent=1, sep="")
+    gliderDebug(debug, "} # read.glider()", unindent = 1, sep = "")
     res
 }
 
@@ -732,38 +765,40 @@ read.glider <- function(file, debug, ...)
 #'
 #' @examples
 #' library(oceglider)
-#' directory <- system.file("extdata/seaexplorer/raw", package="oceglider")
+#' directory <- system.file("extdata/seaexplorer/raw", package = "oceglider")
 #' g <- read.glider.seaexplorer.delayed(directory)
 #' data <- g[["payload"]]
-#' units <- list(temperature=list(unit=expression(degree*C), scale="ITS-90"),
-#'      salinity=list(unit=expression(), scale="PSS-78"),
-#'      pressure=list(unit=expression(dbar), scale=""),
-#'      longitude=list(unit=expression(degree*E), scale=""),
-#'      latitude=list(unit=expression(degree*N), scale=""))
+#' units <- list(
+#'     temperature = list(unit = expression(degree * C), scale = "ITS-90"),
+#'     salinity = list(unit = expression(), scale = "PSS-78"),
+#'     pressure = list(unit = expression(dbar), scale = ""),
+#'     longitude = list(unit = expression(degree * E), scale = ""),
+#'     latitude = list(unit = expression(degree * N), scale = "")
+#' )
 #' gg <- as.glider("seaexplorer", data, units)
-#' par(mfrow=c(2, 1))
-#' plot(g, which="p")
-#' plot(gg, which="p")
+#' par(mfrow = c(2, 1))
+#' plot(g, which = "p")
+#' plot(gg, which = "p")
 #'
 #' @author Dan Kelley
 #'
 #' @md
 #'
 #' @export
-as.glider <- function(type, data, units)
-{
-    if (missing(type))
+as.glider <- function(type, data, units) {
+    if (missing(type)) {
         stop("'type' must be given")
-    if (missing(data))
+    }
+    if (missing(data)) {
         stop("'data' must be given")
+    }
     res <- new("glider")
     res@metadata$type <- type
     streamname <- "payload1"
-    res@metadata$dataNamesOriginal <- list(names=names(data))
+    res@metadata$dataNamesOriginal <- list(names = names(data))
     res@data[[streamname]] <- data
     if (!missing(units)) {
-        res@metadata$units <- list(payload1=units)
+        res@metadata$units <- list(payload1 = units)
     }
     res
 }
-

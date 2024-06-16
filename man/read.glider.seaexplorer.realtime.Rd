@@ -150,11 +150,11 @@ authors, if you need to handle such files.
 
 \examples{
 library(oceglider)
-directory <- system.file("extdata/seaexplorer/sub", package="oceglider")
-g <- read.glider.seaexplorer.realtime(directory, progressBar=FALSE)
-plot(g, which="navState")
-plot(g, which="S")
-plot(g, which="T")
+directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
+g <- read.glider.seaexplorer.realtime(directory, progressBar = FALSE)
+plot(g, which = "navState")
+plot(g, which = "S")
+plot(g, which = "T")
 
 }
 \references{

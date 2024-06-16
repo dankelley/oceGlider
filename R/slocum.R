@@ -33,25 +33,29 @@
 #'     summary(g)
 #'
 #'     # 1. Plot time-depth trace, colour-coded for temperature
-#'     par(mar=c(3, 3, 1, 1), mgp=c(2, 0.7, 0)) # thin margins
-#'     cm <- colormap(z=g[['temperature']])
-#'     drawPalette(colormap=cm, cex.axis=3/4)
+#'     par(mar = c(3, 3, 1, 1), mgp = c(2, 0.7, 0)) # thin margins
+#'     cm <- colormap(z = g[["temperature"]])
+#'     drawPalette(colormap = cm, cex.axis = 3 / 4)
 #'     t <- g[["time"]]
 #'     p <- g[["depth"]]
-#'     plot(t, p, ylim=rev(range(p)), xlab="Time", ylab="Pressure [dbar]",
-#'          col=cm$zcol, cex=1/2, pch=20)
-#'     mtext(paste("Temperature, from", t[1]), cex=3/4)
+#'     plot(t, p,
+#'         ylim = rev(range(p)), xlab = "Time", ylab = "Pressure [dbar]",
+#'         col = cm$zcol, cex = 1 / 2, pch = 20
+#'     )
+#'     mtext(paste("Temperature, from", t[1]), cex = 3 / 4)
 #'
 #'     # 2. Plot distance-depth trace, colour-coded for temperature
-#'     dist <- geodDist(g[["longitude"]],g[["latitude"]],alongPath=TRUE)
-#'     par(mar=c(3, 3, 1, 1), mgp=c(2, 0.7, 0)) # thin margins
-#'     cm <- colormap(z=g[["temperature"]])
-#'     drawPalette(colormap=cm, cex.axis=3/4)
+#'     dist <- geodDist(g[["longitude"]], g[["latitude"]], alongPath = TRUE)
+#'     par(mar = c(3, 3, 1, 1), mgp = c(2, 0.7, 0)) # thin margins
+#'     cm <- colormap(z = g[["temperature"]])
+#'     drawPalette(colormap = cm, cex.axis = 3 / 4)
 #'     p <- g[["depth"]]
-#'     plot(dist, p, ylim=rev(range(p)), xlab="Distance [km]", ylab="Pressure [dbar]",
-#'          col=cm$zcol, cex=1/2, pch=20)
-#'     mtext(paste("Temperature, from", t[1]), cex=3/4)
-#'}
+#'     plot(dist, p,
+#'         ylim = rev(range(p)), xlab = "Distance [km]", ylab = "Pressure [dbar]",
+#'         col = cm$zcol, cex = 1 / 2, pch = 20
+#'     )
+#'     mtext(paste("Temperature, from", t[1]), cex = 3 / 4)
+#' }
 #'
 #' @family functions for slocum gliders
 #' @family functions to read glider data
@@ -65,37 +69,42 @@
 #' @md
 #'
 #' @export
-read.glider.slocum <- function(file,
-    nameMap=list(conductivity="sci_water_cond",
-        temperature="sci_water_temp",
-        pressure="sci_water_pressure",
-        longitude="lon",
-        latitude="lat",
-        depth="i_depth",
-        debug=getOption("gliderDebug", default=0)))
-{
+read.glider.slocum <- function(
+    file,
+    nameMap = list(
+        conductivity = "sci_water_cond",
+        temperature = "sci_water_temp",
+        pressure = "sci_water_pressure",
+        longitude = "lon",
+        latitude = "lat",
+        depth = "i_depth",
+        debug = getOption("gliderDebug", default = 0)
+    )) {
     debug <- min(1L, max(0L, as.integer(debug))) # make 0L or 1L
-    if (missing(file))
+    if (missing(file)) {
         stop("must provide `file'")
-    if (length(file) != 1)
+    }
+    if (length(file) != 1) {
         stop("file must have length 1")
-    gliderDebug(debug, "read.glider.slocum(file=\"", file, "\", ...) {\n", unindent=1, sep="")
+    }
+    gliderDebug(debug, "read.glider.slocum(file=\"", file, "\", ...) {\n", unindent = 1, sep = "")
     filename <- ""
     if (is.character(file)) {
         filename <- normalizePath(file)
         file <- file(file, "r")
         on.exit(close(file))
     }
-    if (!inherits(file, "connection"))
+    if (!inherits(file, "connection")) {
         stop("argument `file' must be a character string or connection")
+    }
     if (!isOpen(file)) {
         open(file, "r")
         on.exit(close(file))
     }
-    data <- utils::read.csv(filename, header=TRUE)
+    data <- utils::read.csv(filename, header = TRUE)
     names <- names(data)
     nameMapNames <- names(nameMap)
-    gliderDebug(debug, 'original data names: "', paste(names, collapse='", "'), '"\n')
+    gliderDebug(debug, 'original data names: "', paste(names, collapse = '", "'), '"\n')
     rval <- methods::new("glider")
     rval@metadata$type <- "slocum"
     rval@metadata$dataNamesOriginal <- list()
@@ -103,16 +112,19 @@ read.glider.slocum <- function(file,
         if (names[iname] %in% nameMap) {
             newName <- nameMapNames[which(names[iname] == nameMap)]
             rval@metadata$dataNamesOriginal[[newName]] <- names[iname]
-            names[iname] <-  newName
+            names[iname] <- newName
         } else {
             rval@metadata$dataNamesOriginal[[names[iname]]] <- names[iname]
         }
     }
-    gliderDebug(debug, 'new data names: "', paste(names, collapse='", "'), '"\n')
+    gliderDebug(debug, 'new data names: "', paste(names, collapse = '", "'), '"\n')
     names(data) <- names
-    salinity <- with(data,
+    salinity <- with(
+        data,
         oce::swSCTp(conductivity, temperature, pressure,
-            conductivityUnit="S/m", eos="unesco"))
+            conductivityUnit = "S/m", eos = "unesco"
+        )
+    )
     data$salinity <- salinity
     data$time <- oce::numberAsPOSIXct(data$unix_timestamp, "unix")
     rval@data$payload1 <- as.data.frame(data)
@@ -120,4 +132,3 @@ read.glider.slocum <- function(file,
     # FIXME add to dataNamesOriginal as for CTD data type
     rval
 }
-

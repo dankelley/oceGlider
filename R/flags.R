@@ -69,26 +69,26 @@
 #'
 #' @examples
 #' library(oceglider)
-#' directory <- system.file("extdata/seaexplorer/raw", package="oceglider")
-#' g <- read.glider.seaexplorer.delayed(directory, progressBar=FALSE)
+#' directory <- system.file("extdata/seaexplorer/raw", package = "oceglider")
+#' g <- read.glider.seaexplorer.delayed(directory, progressBar = FALSE)
 #'
 #' # The histogram motivates a crude limit for anomalously low salinity.
-#' par(mfrow=c(1, 2), mar=c(3, 3, 1, 1), mgp=c(2, 0.75, 0))
-#' hist(g[["salinity"]], breaks=100, xlab="Original Salinity", main="")
-#' abline(v=31, col=2)
+#' par(mfrow = c(1, 2), mar = c(3, 3, 1, 1), mgp = c(2, 0.75, 0))
+#' hist(g[["salinity"]], breaks = 100, xlab = "Original Salinity", main = "")
+#' abline(v = 31, col = 2)
 #'
 #' # Flag value 3 means 'suspect' in the IOOS scheme [1, table]; other
 #' # flags are pass=1, not_evaluated=2 (the default as read), fail=4, and missing=9.
-#' g2 <- setFlags(g, "salinity", g[["salinity"]]<31, 3)
+#' g2 <- setFlags(g, "salinity", g[["salinity"]] < 31, 3)
 #' g3 <- handleFlags(g2, c(3, 4, 9)) # use default action, which is "NA"
-#' hist(g3[["salinity"]], breaks=100, xlab="Trimmed Salinity", main="")
+#' hist(g3[["salinity"]], breaks = 100, xlab = "Trimmed Salinity", main = "")
 #'
 #' @references
-#'\enumerate{
+#' \enumerate{
 #' \item U.S. Integrated Ocean Observing System.
 #' "Manual for the Use of Real-Time Oceanographic Data Quality Control Flags, Version 1.1,"
 #' 2017. \url{https://cdn.ioos.noaa.gov/media/2017/12/QARTOD-Data-Flags-Manual_Final_version1.1.pdf}.
-#'}
+#' }
 #'
 #' @author Dan Kelley
 #'
@@ -98,23 +98,26 @@
 #'
 #' @md
 setMethod("handleFlags",
-    signature=c(object="glider", flags="ANY", actions="ANY", where="ANY", debug="ANY"),
-    definition=function(object, flags=NULL, actions=NULL, where="payload1", debug=getOption("gliderDebug", 0)) {
+    signature = c(object = "glider", flags = "ANY", actions = "ANY", where = "ANY", debug = "ANY"),
+    definition = function(object, flags = NULL, actions = NULL, where = "payload1", debug = getOption("gliderDebug", 0)) {
         # DEVELOPER 1: alter the next comment to explain your setup
         if (is.null(flags)) {
             flags <- c(3, 4, 9)
-            if (is.null(flags))
+            if (is.null(flags)) {
                 stop("must supply 'flags', or use initializeFlagScheme() on the glider object first")
+            }
         }
         if (is.null(actions)) {
             actions <- list("NA") # DEVELOPER 3: alter this line to suit a new data class
             names(actions) <- names(flags)
         }
-        if (any(names(actions)!=names(flags)))
+        if (any(names(actions) != names(flags))) {
             stop("names of flags and actions must match")
+        }
         # handleFlags(object=object, flags=flags, actions=actions, where=where, debug=debug)
-        handleFlagsInternal(object=object, flags=flags, actions=actions, where=where, debug=debug)
-    })
+        handleFlagsInternal(object = object, flags = flags, actions = actions, where = where, debug = debug)
+    }
+)
 
 
 ## NOT EXPORTED #' Low-level function to handle flags
@@ -144,23 +147,26 @@ setMethod("handleFlags",
 ## NOT EXPORTED #'
 ## NOT EXPORTED #' @export
 ## NOT EXPORTED #' @md
-handleFlagsInternal <- function(object, flags, actions, where, debug)
-{
-    if (missing(debug))
+handleFlagsInternal <- function(object, flags, actions, where, debug) {
+    if (missing(debug)) {
         debug <- 0
-    gliderDebug(debug, "handleFlagsInternal() {\n", sep="", unindent=1)
+    }
+    gliderDebug(debug, "handleFlagsInternal() {\n", sep = "", unindent = 1)
     if (missing(flags)) {
         warning("no flags supplied (internal error; report to developer)")
         return(object)
     }
     # Permit e.g. flags=c(1,3)
-    if (!is.list(flags))
+    if (!is.list(flags)) {
         flags <- list(flags)
-    if (missing(actions))
+    }
+    if (missing(actions)) {
         actions <- "NA"
-    if (missing(where))
-       where <- if (object[["type"]] == "seaexplorer") "payload1" else NULL
-    oce::handleFlagsInternal(object=object, flags=flags, actions=actions, where=where, debug=debug)
+    }
+    if (missing(where)) {
+        where <- if (object[["type"]] == "seaexplorer") "payload1" else NULL
+    }
+    oce::handleFlagsInternal(object = object, flags = flags, actions = actions, where = where, debug = debug)
 }
 
 #' Set data-quality flags within a glider object
@@ -197,38 +203,50 @@ handleFlagsInternal <- function(object, flags, actions, where, debug)
 #' @md
 #'
 #' @export
-setMethod("setFlags",
-    c(object="glider", name="ANY", i="ANY", value="ANY", debug="ANY"),
-    function(object, name=NULL, i=NULL, value=NULL, debug=0) {
-        setFlagsInternaloceglider(object, name, i, value, debug-1)
-    })
+setMethod(
+    "setFlags",
+    c(object = "glider", name = "ANY", i = "ANY", value = "ANY", debug = "ANY"),
+    function(object, name = NULL, i = NULL, value = NULL, debug = 0) {
+        setFlagsInternaloceglider(object, name, i, value, debug - 1)
+    }
+)
 
 
-setFlagsInternaloceglider <- function(object, name=NULL, i=NULL, value=NULL, debug=getOption("gliderDebug", 0))
-{
+setFlagsInternaloceglider <- function(object, name = NULL, i = NULL, value = NULL, debug = getOption("gliderDebug", 0)) {
     gliderDebug(debug, "setFlagsInternaloceglider(object, name='", name, "', value=", value,
-        ", i=c(", paste(head(i), collapse=","), "...), debug=", debug, ") {\n", sep="",
-        unindent=1)
+        ", i=c(", paste(head(i), collapse = ","), "...), debug=", debug, ") {\n",
+        sep = "",
+        unindent = 1
+    )
     res <- object
     # Ensure proper argument setup.
-    if (is.null(name))
+    if (is.null(name)) {
         stop("must supply a name")
-    if (is.null(i))
+    }
+    if (is.null(i)) {
         stop("must supply 'i'")
+    }
     setAll <- length(i) == 1 && i == "all"
-    if (is.null(value))
+    if (is.null(value)) {
         stop("must supply 'value'")
-    if (length(name) > 1)
+    }
+    if (length(name) > 1) {
         stop("must specify one 'name' at a time")
+    }
     where <- "payload1"
     if ("flags" %in% names(object@metadata) && where %in% names(object@metadata$flags)) {
-        if (!(name %in% names(object@metadata$flags[[where]])))
-            stop("object has no flag for \"", name, "\"; try one of: \"", paste(names(object@metadata$flags[[where]]), collapse=" "), "\"")
-        if (is.logical(i) && length(i) != length(res@metadata$flags[[where]][[1]]))
-            stop("length of 'i' (", length(i), ") does not match length of object@data$payload1[[1]] (",
-                 length(res@metadata$flags[[where]][[1]]))
-        if (setAll)
+        if (!(name %in% names(object@metadata$flags[[where]]))) {
+            stop("object has no flag for \"", name, "\"; try one of: \"", paste(names(object@metadata$flags[[where]]), collapse = " "), "\"")
+        }
+        if (is.logical(i) && length(i) != length(res@metadata$flags[[where]][[1]])) {
+            stop(
+                "length of 'i' (", length(i), ") does not match length of object@data$payload1[[1]] (",
+                length(res@metadata$flags[[where]][[1]])
+            )
+        }
+        if (setAll) {
             i <- seq_along(object@data[[where]][[1]])
+        }
         # Permit 'value' to be a character string, if a scheme already
         # exists and 'value' is one of the stated flag names.
         valueOrig <- value
@@ -236,21 +254,27 @@ setFlagsInternaloceglider <- function(object, name=NULL, i=NULL, value=NULL, deb
             if (is.null(res@metadata$flagScheme)) {
                 stop("cannot have character 'value' because initializeFlagScheme() has not been called on object")
             } else {
-                if (value %in% names(res@metadata$flagScheme$mapping))
+                if (value %in% names(res@metadata$flagScheme$mapping)) {
                     value <- res@metadata$flagScheme$mapping[[value]]
-                else
+                } else {
                     stop("value=\"", value, "\" is not defined in the object's flagScheme; try one of: \"",
-                         paste(names(res@metadata$flagScheme$mapping), "\", \""), "\"", sep="")
+                        paste(names(res@metadata$flagScheme$mapping), "\", \""), "\"",
+                        sep = ""
+                    )
+                }
             }
         }
         # Finally, apply the value
         res@metadata$flags[[where]][[name]][i] <- value
     }
-    res@processingLog <- processingLogAppend(res@processingLog,
+    res@processingLog <- processingLogAppend(
+        res@processingLog,
         paste("setFlags(object, name=\"", name, "\",",
-            "i=c(", paste(head(i, collapse=",")), "...),",
-            "value=", valueOrig, ")", collapse="", sep=""))
-    gliderDebug(debug, "} # setFlagsInternaloceglider\n", sep="", unindent=1)
+            "i=c(", paste(head(i, collapse = ",")), "...),",
+            "value=", valueOrig, ")",
+            collapse = "", sep = ""
+        )
+    )
+    gliderDebug(debug, "} # setFlagsInternaloceglider\n", sep = "", unindent = 1)
     res
 }
-

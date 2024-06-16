@@ -62,9 +62,9 @@ into this.  DK 2019-03-28.
 library(oceglider)
 g <- read.glider(filename)
 gg <- subset(g, 0 < salinity & salinity < 40)
-par(mfrow=c(2, 1))
-hist(g[["salinity"]], main="S original")
-hist(gg[["salinity"]], main="S cleaned")
+par(mfrow = c(2, 1))
+hist(g[["salinity"]], main = "S original")
+hist(gg[["salinity"]], main = "S cleaned")
 
 # Example 2. remove short yos
 gg <- subset(g, yolength > 4)

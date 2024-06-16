@@ -1,6 +1,11 @@
+# oceglider 0.1.8
+
+* Change `read.glider.slocum.netcdf()` to default the `debug`
+parameter (issue #101).
+
 # oceglider 0.1.7
 
-* Change to `plot,glider-method()` fix map axis mix-up (issue 98).
+* Change to `plot,glider-method()` fix map axis mix-up (issue #98).
 * Make `[["z"]]` and `[["?"]]` work.
 
 # oceglider 0.1.6

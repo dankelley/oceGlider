@@ -55,40 +55,44 @@
 #' @md
 #'
 #' @export
-read.glider.slocum.netcdf <- function(file,
-    readAll=FALSE,
-    nameMap=list(
-        salinity="glider_record/sci_rbrctd_salinity_00",
-        SA="absolute_salinity",
-        temperature="glider_record/sci_rbrctd_temperature_00",
-        CT="conservative_temperature",
-        pressure="glider_record/sci_rbrctd_seapressure_00", # CJR had pressure here
-        time="glider_record/sci_rbrctd_timestamp",
-        conductivity="glider_record/sci_rbrctd_conductivity_00",
-        #depth="glider_record/sci_rbrctd_depth_00", # CJR read this
-        latitude="glider_record/m_gps_lat",
-        longitude="glider_record/m_gps_lon",
-        profileLat="profile_lat",
-        profileLon="profile_lon",
-        density="density",
-        oxygen="oxygen_concentration",
-        u="u",
-        v="v",
-        vxi="glider_record/m_initial_water_vx",
-        vyi="glider_record/m_initial_water_vy",
-        vy="glider_record/m_water_vy",
-        vx="glider_record/m_water_vx",
-        id="profile_id"),
-    debug)
-{
+read.glider.slocum.netcdf <- function(
+    file,
+    readAll = FALSE,
+    nameMap = list(
+        salinity = "glider_record/sci_rbrctd_salinity_00",
+        SA = "absolute_salinity",
+        temperature = "glider_record/sci_rbrctd_temperature_00",
+        CT = "conservative_temperature",
+        pressure = "glider_record/sci_rbrctd_seapressure_00", # CJR had pressure here
+        time = "glider_record/sci_rbrctd_timestamp",
+        conductivity = "glider_record/sci_rbrctd_conductivity_00",
+        # depth="glider_record/sci_rbrctd_depth_00", # CJR read this
+        latitude = "glider_record/m_gps_lat",
+        longitude = "glider_record/m_gps_lon",
+        profileLat = "profile_lat",
+        profileLon = "profile_lon",
+        density = "density",
+        oxygen = "oxygen_concentration",
+        u = "u",
+        v = "v",
+        vxi = "glider_record/m_initial_water_vx",
+        vyi = "glider_record/m_initial_water_vy",
+        vy = "glider_record/m_water_vy",
+        vx = "glider_record/m_water_vx",
+        id = "profile_id"
+    ),
+    debug = 0) {
     debug <- min(1L, max(0L, as.integer(debug))) # make 0L or 1L
-    if (missing(file))
+    if (missing(file)) {
         stop("must provide `file'")
-    if (length(file) != 1)
+    }
+    if (length(file) != 1) {
         stop("file must have length 1")
-    gliderDebug(debug, "read.glider.slocum.netcdf(file=\"", file, "\", ...) {\n", unindent=1, sep="")
-    if (!requireNamespace("ncdf4", quietly=TRUE))
+    }
+    gliderDebug(debug, "read.glider.slocum.netcdf(file=\"", file, "\", ...) {\n", unindent = 1, sep = "")
+    if (!requireNamespace("ncdf4", quietly = TRUE)) {
         stop("must install.packages(\"ncdf4\") to read this data type")
+    }
     capture.output({ # capture the output to silence warning about missing-value byte length
         f <- ncdf4::nc_open(file)
     })
@@ -116,32 +120,37 @@ read.glider.slocum.netcdf <- function(file,
     dataNames <- c(names(f$var), names(f$dim))
     dataType <- c(rep("var", length(f$var)), rep("dim", length(f$dim)))
     dataNamesOriginal <- list()
-    fixVector <- function(x, fillValue=NULL)
-    {
+    fixVector <- function(x, fillValue = NULL) {
         n <- length(x)
         nan <- is.nan(x)
-        nnan <- sum(nan, na.rm=TRUE)
+        nnan <- sum(nan, na.rm = TRUE)
         if (nnan > 0L) {
-            gliderDebug(debug, "    ", nnan, " (", round(100*nnan/n, 4),
-                "%) of values are NA\n", sep="")
+            gliderDebug(debug, "    ", nnan, " (", round(100 * nnan / n, 4),
+                "%) of values are NA\n",
+                sep = ""
+            )
             x[nan] <- NA
         }
         is9999 <- x == 9999.00
-        nis9999 <- sum(is9999, na.rm=TRUE)
+        nis9999 <- sum(is9999, na.rm = TRUE)
         if (nis9999 > 0L) {
-            gliderDebug(debug, "    ", nis9999, " (", round(100*nis9999/n, 4),
-                "%) of values are 9999, so set to NA\n", sep="")
+            gliderDebug(debug, "    ", nis9999, " (", round(100 * nis9999 / n, 4),
+                "%) of values are 9999, so set to NA\n",
+                sep = ""
+            )
             x[is9999] <- NA
         }
         as.vector(x)
     }
-    if (identical(nameMap, "?"))
+    if (identical(nameMap, "?")) {
         return(dataNames)
+    }
     pb <- NULL
     if (!readAll) {
-        if (length(nameMap) < 1L)
+        if (length(nameMap) < 1L) {
             stop("if readAll is FALSE, then nameMap must contain at least one item")
-        gliderDebug(debug-1, "only reading the ", length(nameMap), " items named in the nameMap argument\n")
+        }
+        gliderDebug(debug - 1, "only reading the ", length(nameMap), " items named in the nameMap argument\n")
         willRead <- unname(unlist(nameMap))
         keep <- names(f$var) %in% willRead
         dataNames <- dataNames[keep]
@@ -151,24 +160,27 @@ read.glider.slocum.netcdf <- function(file,
         # see if it is a remapped name
         w <- which(dataNames[i] == nameMap)
         newName <- if (length(w) > 0) names(nameMap)[w] else toCamelCase(dataNames[i])
-        gliderDebug(debug, "storing netcdf variable \"", dataNames[i], "\" as \"", newName, "\"\n", sep="")
+        gliderDebug(debug, "storing netcdf variable \"", dataNames[i], "\" as \"", newName, "\"\n", sep = "")
         dataNamesOriginal[[newName]] <- dataNames[i]
-        capture.output(d <- try(ncdf4::ncvar_get(f, dataNames[i]), silent=TRUE))
-        capture.output(fillValue <- try(ncdf4::ncatt_get(f, dataNames[i])$"_FillValue", silent=TRUE))
-        if (!inherits(d, "try-error")){
+        capture.output(d <- try(ncdf4::ncvar_get(f, dataNames[i]), silent = TRUE))
+        capture.output(fillValue <- try(ncdf4::ncatt_get(f, dataNames[i])$"_FillValue", silent = TRUE))
+        if (!inherits(d, "try-error")) {
             isTime <- grepl(".*[t,T]ime.*", newName) & !grepl(".*[q,Q]c.*", newName) & !grepl(".*[f,F]lag.*", newName)
             if (isTime) {
                 data[[newName]] <- numberAsPOSIXct(fixVector(d, fillValue = fillValue))
-                gliderDebug(debug, "    converted to POSIXct\n", sep="")
+                gliderDebug(debug, "    converted to POSIXct\n", sep = "")
             } else {
                 if (grepl("^.*Qc$", newName)) {
                     if (!knowFlagScheme) {
                         res@metadata$flagScheme$name <- "IOOS"
                         res@metadata$flagScheme$mapping <- list()
-                        ftypes <- strsplit(ncdf4::ncatt_get(f,
-                                gsub("Qc$", "_qc", newName))$flag_meaning," ")[[1]]
-                        for (i in seq_along(ftypes))
+                        ftypes <- strsplit(ncdf4::ncatt_get(
+                            f,
+                            gsub("Qc$", "_qc", newName)
+                        )$flag_meaning, " ")[[1]]
+                        for (i in seq_along(ftypes)) {
                             res@metadata$flagScheme$mapping[[ftypes[i]]] <- as.numeric(i)
+                        }
                         # recognize, or guess, the good code
                         res@metadata$flagScheme$default <- as.numeric(seq_along(ftypes))
                         w <- which("good_data" == ftypes)
@@ -180,54 +192,55 @@ read.glider.slocum.netcdf <- function(file,
                         }
                         knowFlagScheme <- TRUE
                     }
-                    res@metadata$flags[[gsub("Qc$", "", newName)]] <- fixVector(d, fillValue=fillValue)
+                    res@metadata$flags[[gsub("Qc$", "", newName)]] <- fixVector(d, fillValue = fillValue)
                 } else {
                     # not QC
                     data[[newName]] <- fixVector(d, fillValue = fillValue)
                     # handle units
-                    capture.output(unit <- try(ncdf4::ncatt_get(f, dataNames[i])$units, silent=TRUE))
+                    capture.output(unit <- try(ncdf4::ncatt_get(f, dataNames[i])$units, silent = TRUE))
                     if (!inherits(unit, "try-error") && !is.null(unit) && nchar(trimws(unit)) > 0L) {
-                        if (unit != "1"){
+                        if (unit != "1") {
                             newUnit <- switch(unit,
-                                "Celsius" = list(unit = expression(degree*C), scale="ITS-90"),
-                                "kg m-3" = list(unit = expression(kg/m^3), scale=""),
-                                "ug l-1" = list(unit=expression(mu*g/l), scale=""),
-                                "S m-1" = list(unit=expression(S/m), scale=""),
-                                "degrees_north" = list(unit=expression(degree*N), scale=""),
-                                "degrees_east" = list(unit=expression(degree*E), scale=""),
-                                "m" = list(unit=expression(m), scale=""),
-                                "m-1" = list(unit=expression(m^-1), scale=""), # or should it be 1/m?
-                                "degrees" = list(unit=expression(degree), scale=""),
-                                "m s-1" = list(unit=expression(m/s), scale=""),
-                                "dbar" = list(unit=expression(dbar), scale=""),
-                                "nm" = list(unit=expression(nm), scale=""),
-                                "umol kg-1" = list(unit=expression(mu*mol/kg), scale=""),
-                                "percent" = list(unit=expression("%"), scale=""),
-                                "rad" = list(unit=expression(rad), scale=""),
-                                "mg m-3" = list(unit=expression(mg/m^3), scale=""),
-                                "ppb" = list(unit=expression(ppb), scale=""),
-                                "Hz" = list(unit=expression(Hz), scale=""),
-                                "km" = list(unit=expression(km), scale="")
-                                )
+                                "Celsius" = list(unit = expression(degree * C), scale = "ITS-90"),
+                                "kg m-3" = list(unit = expression(kg / m^3), scale = ""),
+                                "ug l-1" = list(unit = expression(mu * g / l), scale = ""),
+                                "S m-1" = list(unit = expression(S / m), scale = ""),
+                                "degrees_north" = list(unit = expression(degree * N), scale = ""),
+                                "degrees_east" = list(unit = expression(degree * E), scale = ""),
+                                "m" = list(unit = expression(m), scale = ""),
+                                "m-1" = list(unit = expression(m^-1), scale = ""), # or should it be 1/m?
+                                "degrees" = list(unit = expression(degree), scale = ""),
+                                "m s-1" = list(unit = expression(m / s), scale = ""),
+                                "dbar" = list(unit = expression(dbar), scale = ""),
+                                "nm" = list(unit = expression(nm), scale = ""),
+                                "umol kg-1" = list(unit = expression(mu * mol / kg), scale = ""),
+                                "percent" = list(unit = expression("%"), scale = ""),
+                                "rad" = list(unit = expression(rad), scale = ""),
+                                "mg m-3" = list(unit = expression(mg / m^3), scale = ""),
+                                "ppb" = list(unit = expression(ppb), scale = ""),
+                                "Hz" = list(unit = expression(Hz), scale = ""),
+                                "km" = list(unit = expression(km), scale = "")
+                            )
                         } else {
                             # for unit == 1
                             newUnit <- switch(newName,
-                                "salinity" = list(unit=expression(), scale="PSS-78"), # need to check on scale
-                                "backscatter700" = list(unit=expression(), scale=""),
-                                "profileIndex" = list(unit=expression(), scale=""),
-                                "profileDirection" = list(unit=expression(), scale="")
-                                )
+                                "salinity" = list(unit = expression(), scale = "PSS-78"), # need to check on scale
+                                "backscatter700" = list(unit = expression(), scale = ""),
+                                "profileIndex" = list(unit = expression(), scale = ""),
+                                "profileDirection" = list(unit = expression(), scale = "")
+                            )
                         }
-                        if(is.null(newUnit)){
-                            newUnit <- list(unit=expression(), scale="")
-                            gliderDebug(debug-1, "    storing unit as \"", unit, "\"\n", sep="")
+                        if (is.null(newUnit)) {
+                            newUnit <- list(unit = expression(), scale = "")
+                            gliderDebug(debug - 1, "    storing unit as \"", unit, "\"\n", sep = "")
                         }
                         res@metadata$units[[newName]] <- newUnit
                     }
                 }
             }
-            if (newName != dataNames[i])
-                gliderDebug(debug-1, "    renaming \"", newName, "\" for storage\n", sep="")
+            if (newName != dataNames[i]) {
+                gliderDebug(debug - 1, "    renaming \"", newName, "\" for storage\n", sep = "")
+            }
         } else {
             message("Could not read \"", newName, "\", proceeding to next variable\"")
         }
@@ -236,9 +249,8 @@ read.glider.slocum.netcdf <- function(file,
     res@data <- as.data.frame(data) # FIXME: only do if items in list are same length
     res@metadata$filename <- file
     res@metadata$dataNamesOriginal <- dataNamesOriginal[inData]
-    gliderDebug(debug, "} # read.glider.slocum.netcdf\n", unindent=1, sep="")
+    gliderDebug(debug, "} # read.glider.slocum.netcdf\n", unindent = 1, sep = "")
     ncdf4::nc_close(f)
     res@metadata$type <- "slocum"
     res
 }
-
