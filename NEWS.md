@@ -1,3 +1,8 @@
+# oceglider 0.1.9
+
+* Change oxygen calibration.  I think the computation was wrong
+before, but I've not checked and so there is no issue for this.
+
 # oceglider 0.1.8
 
 * Change `read.glider.slocum.netcdf()` to default the `debug`

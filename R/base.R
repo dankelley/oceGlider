@@ -287,17 +287,21 @@ setMethod(
                     salinity <- x@data[[payloadName]]$salinity
                     temperature <- x@data[[payloadName]]$temperature
                     pressure <- x@data[[payloadName]]$pressure
-                    temperatureKelvin <- temperature + 273.16 # I see .15 in some codes
                     # This Kelvin temperature is as used in swSatOw.  Note the
                     # non-standard offset and the non-unity factor
                     Tk <- 273.15 + temperature * 1.00024
-                    res <- with(
-                        cal$calibrationCoefficients,
-                        Soc * (oxygenFrequency + Foffset) *
-                            (1.0 + A * Tk + B * Tk^2 + C * Tk^3) *
-                            swSatO2(temperature = temperature, salinity = salinity)
-                            * exp(Enom * pressure / Tk)
-                    )
+                    cc <- cal$calibrationCoefficients
+                    # NOTE: the calibration formula I have for
+                    # sea-explorer datasets also has something called
+                    # Tau20, but I don't see that below. For details
+                    # on the formula, see
+                    # https://github.com/DFOglider/pilotingApp/blob/glimpseFtp/oxygenCalibrationCoefficients.R
+                    # and emails from Chantelle Layton and Clark
+                    # Richards.
+                    res <- cc$Soc * (oxygenFrequency + cc$Foffset) *
+                        (1.0 + cc$A * Tk + cc$B * Tk^2 + cc$C * Tk^3) *
+                        swSatO2(temperature = temperature, salinity = salinity) *
+                        exp(cc$Enom * pressure / Tk)
                     return(44.6591 * res) # the factor converts to umol/kg
                 } else {
                     return(NULL)
