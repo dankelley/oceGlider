@@ -103,7 +103,9 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
     if (length(glifiles) != length(pld1files)) {
         warning(
             "There is an unequal number of *gli* files (", length(glifiles),
-            ") and *pld1* files (", length(pld1files), "), but they ought to be paired. This may indicate a problem in the data directory. Try calling this function with debug=2 to see filenames."
+            ") and *pld1* files (", length(pld1files), "), but they ought to be",
+            " paired. This may indicate a problem in the data directory.",
+            " Try calling this function with debug=2 to see filenames."
         )
     }
 

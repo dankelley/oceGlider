@@ -121,11 +121,14 @@ setMethod(
                     stop("subset by 'yolength' only works for seaexplorer objects (please report)")
                 }
                 if (!"payload1" %in% names(x@data)) {
-                    stop("In subset,glider-method() : only works for 'raw' datasets, not for 'sub' ones; contact package authors, if you need to handle sub data", call. = FALSE)
+                    stop("In subset,glider-method() : only works for 'raw' datasets,",
+                        " not for 'sub' ones; contact package authors,",
+                        " if you need to handle sub data",
+                        call. = FALSE
+                    )
                 }
                 s <- split(x@data$payload1, x[["yoNumber"]])
                 # warning removed for issue (https://github.com/dankelley/oceglider/issues/41)
-                # warning("In subset,glider-method() : only subsetting 'payload1'; contact package authors, if your data have other streams", call.=FALSE)
                 thisYolength <- as.integer(lapply(s, function(ss) length(ss[["pressure"]])))
                 keepYo <- eval(substitute(subset), list(yolength = thisYolength))
                 # message("sum(keepYo)=", sum(keepYo), " length(keepYo)=", length(keepYo))

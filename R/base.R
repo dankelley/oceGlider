@@ -276,7 +276,10 @@ setMethod(
                 } else if ("oxygenFrequency" %in% dataNames) {
                     gliderDebug(debug, "computing \"oxygen\" from \"oxygenFrequency\"\n")
                     if (!"oxycalib" %in% names(x@metadata)) {
-                        warning("cannot compute oxygen, because metadata lacks an oxycalib item, with which to compute oxygen using data$payload1$oxygenFrequency")
+                        warning(
+                            "cannot compute oxygen, because metadata lacks an",
+                            " oxycalib item, with which to compute oxygen using data$payload1$oxygenFrequency"
+                        )
                         return(NULL)
                     }
                     cal <- x@metadata$oxycalib
@@ -291,7 +294,7 @@ setMethod(
                     res <- with(
                         cal$calibrationCoefficients,
                         Soc * (oxygenFrequency + Foffset) *
-                            (1.0 + A * T + B * T^2 + C * T^3) *
+                            (1.0 + A * Tk + B * Tk^2 + C * Tk^3) *
                             swSatO2(temperature = temperature, salinity = salinity)
                             * exp(Enom * pressure / Tk)
                     )

@@ -8,27 +8,27 @@
 \S4method{plot}{glider}(x, which, col = 1, colorby = NULL, colorbylim, debug, ...)
 }
 \arguments{
-\item{x}{A \code{glider} object, i.e. one inheriting from \linkS4class{glider}.}
+\item{x}{a [glider-class object.}
 
-\item{which}{either an integer or character value specifying which style is
-to be used; see \dQuote{Details}.}
+\item{which}{either an integer or character value specifying which
+style is to be used; see \dQuote{Details}.}
 
 \item{col}{colour to be used for lines or characters. Note that if
-\code{colorby} is provided, then it will be used for point plots, instead
-of \code{col}.}
+\code{colorby} is provided, then it will be used for point plots,
+instead of \code{col}.}
 
-\item{colorby}{character value, ignored for line plots, that
-names a data variable to be indicated on the plot through the colourization
-of individual plotted points (i.e. \code{type="p"} must be governing the plot for
-\code{colorby} to have an effect).
-For example, a form of a temperature section plot
-can be created by plotting glider depth versus time, coloured by temperature.
-For reference, a colour palette (using \code{\link[=oceColorsTurbo]{oceColorsTurbo()}} is displayed
-to the right of the plot.  See Example 3.}
+\item{colorby}{character value, ignored for line plots, that names
+a data variable to be indicated on the plot through the
+colourization of individual plotted points (i.e. \code{type="p"} must be
+governing the plot for \code{colorby} to have an effect). For example, a
+form of a temperature section plot can be created by plotting
+glider depth versus time, coloured by temperature. For reference, a
+colour palette (using \code{\link[=oceColorsTurbo]{oceColorsTurbo()}} is displayed to the right
+of the plot.  See Example 3.}
 
-\item{colorbylim}{optional value, used only if \code{colorby} is provided,
-to set the limits of the colorizing limits.  It does this by being
-provided as the \code{zlim} argument to \code{\link[=colormap]{colormap()}}.}
+\item{colorbylim}{optional value, used only if \code{colorby} is
+provided, to set the limits of the colorizing limits.  It does this
+by being provided as the \code{zlim} argument to \code{\link[=colormap]{colormap()}}.}
 
 \item{debug}{an integer specifying whether debugging information is
 to be printed during processing. If this is not provided, then
@@ -44,23 +44,23 @@ of debugging, but also the depth.}
 \item{...}{ignored.}
 }
 \description{
-This is a limited function that is intended for quick views of a dataset.
-More serious analysis is best done by extracting data and using whatever
-graphical methods best suit the task at hand.
+This is a limited function that is intended for quick views of a
+dataset. More serious analysis is best done by extracting data and
+using whatever graphical methods best suit the task at hand.
 }
 \details{
 The form of the plot is set by the \code{which} argument, as follows.
 
 \itemize{
 
-\item \code{which=0} or \code{which="map"}: plot a map of sampling locations. This
-can be quite slow with the default plot type (using points), so you
-may find it helpful to use \code{plot(g, type="l")} to get a quick
-plot. If you want to change the view, e.g. expanding it so coastline
-are visible, start by drawing a coastline using the \CRANpkg{oce} package,
-and then add dots with \verb{points(g[["longitude"]], g[["latitude"]]}
-or similar.  This method is more flexible than the present
-\code{plot()} function.
+\item \code{which=0} or \code{which="map"}: plot a map of sampling locations.
+This can be quite slow with the default plot type (using points),
+so you may find it helpful to use \code{plot(g, type="l")} to get a
+quick plot. If you want to change the view, e.g. expanding it so
+coastline are visible, start by drawing a coastline using the
+\CRANpkg{oce} package, and then add dots with
+\verb{points(g[["longitude"]], g[["latitude"]]} or similar.  This method
+is more flexible than the present \code{plot()} function.
 
 \item \code{which=1} or \code{which="p"}: time-series plot
 of pressure, produced with \code{\link[oce:oce.plot.ts]{oce::oce.plot.ts()}}.
@@ -71,36 +71,33 @@ of temperature , produced with \code{\link[oce:oce.plot.ts]{oce::oce.plot.ts()}}
 \item \code{which=3} or \code{which="S"}: time-series plot
 of salinity, produced with \code{\link[oce:oce.plot.ts]{oce::oce.plot.ts()}}.
 
-\item \code{which=4} or \code{which="TS"}: temperature-salinity diagram,
-with dots for data produced with \code{\link[oce:plotTS]{oce::plotTS()}}.
+\item \code{which=4} or \code{which="TS"}: temperature-salinity diagram, with
+dots for data produced with \code{\link[oce:plotTS]{oce::plotTS()}}.
 
-\item \code{which=5} or \code{which="navState"}: ignored except
-for seaexplorer data, this means to plot a time-series of the
-navigation state, stored as the \code{navState} item within
-the \code{payload1} element of the \code{data} slot. The meanings
-of the \code{navState} values for \code{seaexplorer} data
-are:
+\item \code{which=5} or \code{which="navState"}: ignored except for
+seaexplorer data, this means to plot a time-series of the
+navigation state, stored as the \code{navState} item within the
+\code{payload1} element of the \code{data} slot. The meanings of the
+\code{navState} values for \code{seaexplorer} data are:
 
 \itemize{
 
 \item \code{105}: glider is not navigating yet
 
-\item \code{115}: glider is surfacing, with ballast and
-centre of gravity being adjusted to put antenna out
-of the water
+\item \code{115}: glider is surfacing, with ballast and centre of
+gravity being adjusted to put antenna out of the water
 
-\item \code{116}: glider is at the surface,
-acquiring a GPS signal, and communicating
+\item \code{116}: glider is at the surface, acquiring a GPS signal, and
+communicating
 
-\item \code{110}: ballast and centre of mass are
-adjusted to cause glider to inflect downward
+\item \code{110}: ballast and centre of mass are adjusted to cause
+glider to inflect downward
 
-\item \code{100}: ballast is in diving position; adjustments
-may be made to adjust pitch and heading
+\item \code{100}: ballast is in diving position; adjustments may be made
+to adjust pitch and heading
 
-\item \code{118}: target depth or altitude has been achieved,
-so ballast and centre of mass are adjusted to inflect glider
-upwards
+\item \code{118}: target depth or altitude has been achieved, so ballast
+and centre of mass are adjusted to inflect glider upwards
 
 \item \code{117}: glider is ascending, with controls being
 adjusted for desired pitch and heading
@@ -108,8 +105,7 @@ adjusted for desired pitch and heading
 }
 
 Lines and notes in the plot border indicate these states, both
-numerically and with phrases, as inferred by
-\code{\link[=navStateCodes]{navStateCodes()}}.
+numerically and with phrases, as inferred by \code{\link[=navStateCodes]{navStateCodes()}}.
 
 }
 }
@@ -118,7 +114,9 @@ library(oceglider)
 
 # Example 1: various plot types
 dirRealtime <- system.file("extdata/seaexplorer/sub", package = "oceglider")
-gr <- read.glider.seaexplorer.realtime(dirRealtime, yo = 100, progressBar = FALSE)
+gr <- read.glider.seaexplorer.realtime(dirRealtime,
+    yo = 100, progressBar = FALSE
+)
 plot(gr, which = "p")
 plot(gr, which = "S")
 plot(gr, which = "T")
@@ -127,7 +125,7 @@ plot(gr, which = "map")
 plot(gr, which = "navState")
 
 # Example 2: colour-code p by chlorophyll
-plot(gr, which = "p", type = "p", colorby = "chlorophyll", pch = 20, cex = 2)
+plot(gr, which = "p", type = "p", colorby = "chlorophyll", pch = 20)
 
 # Example 3: navState and pressure history of some delayed-mode yos,
 # from a deployment in which sampling was supposed to be

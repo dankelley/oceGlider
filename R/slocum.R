@@ -13,7 +13,8 @@
 #' (e.g. `x[["sci_water_temp"]]`) or the more standard
 #' name (e.g. `x[["temperature"]]`).
 #'
-#' @param file A connection or a character string giving the name of the file to load.
+#' @param file A connection or a character string giving the name of the file to
+#' load.
 #'
 #' @param nameMap List used to rename data columns. See \dQuote{Details}.
 #'

@@ -93,7 +93,10 @@ read.glider.netcdf.ioos <- function(file, debug) {
         # check for fillValues (if provided)
         if (!is.null(fillValue)) {
             isFillValue <- x == fillValue
-            gliderDebug(debug, "i=", i, " ... data name \"", dataNames[i], "\" has \"", length(which(isFillValue == TRUE)), "\"", fillValue, " values \n", sep = "")
+            gliderDebug(debug, "i=", i, " ... data name \"", dataNames[i],
+                "\" has \"", length(which(isFillValue == TRUE)), "\"", fillValue, " values \n",
+                sep = ""
+            )
             x[isFillValue] <- NA
         }
         # check for 9999.00 values
@@ -121,7 +124,10 @@ read.glider.netcdf.ioos <- function(file, debug) {
             isTime <- grepl(".*[t,T]ime.*", newName) & !grepl(".*[q,Q]c.*", newName) & !grepl(".*[f,F]lag.*", newName)
             if (isTime) {
                 data[[newName]] <- numberAsPOSIXct(fixVector(d, fillValue = fillValue))
-                gliderDebug(debug, "i=", i, " ... time name \"", dataNames[i], "\" converted to \"", newName, "\" converted from integer to POSIXct\n", sep = "")
+                gliderDebug(debug, "i=", i, " ... time name \"", dataNames[i],
+                    "\" converted to \"", newName, "\" converted from integer to POSIXct\n",
+                    sep = ""
+                )
             } else {
                 # message(newName)
                 if (grepl("^.*Qc$", newName)) {

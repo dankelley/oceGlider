@@ -12,7 +12,8 @@ read.glider.slocum(
 )
 }
 \arguments{
-\item{file}{A connection or a character string giving the name of the file to load.}
+\item{file}{A connection or a character string giving the name of the file to
+load.}
 
 \item{nameMap}{List used to rename data columns. See \dQuote{Details}.}
 
