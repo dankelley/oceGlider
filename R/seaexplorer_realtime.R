@@ -1,4 +1,4 @@
-issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglider/issues/40)
+# vim:textwidth=80:expandtab:shiftwidth=4:softtabstop=4
 
 #' Read real-time SeaExplorer glider data
 #'
@@ -124,14 +124,22 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
     # filename pattern.
     if (!yoGiven) {
         yo <- gsub(".*/", "", pld1files) # now just filename
-        yo <- gsub("^.*pld1.sub.([0-9]+).*$", "\\1", yo) # now just yo number
+        # gliderDebug(debug, "step 1 yo=", paste(yo, collapase = " "), "\n", sep = "")
+        yo <- gsub("^.*.(raw|sub).([0-9]+)\\..*$", "\\2", yo) # now just yo number
+        # gliderDebug(debug, "step 2 yo=", paste(yo, collapase = " "), "\n", sep = "")
         yo <- as.numeric(yo)
-        gliderDebug(debug, "yo=", paste(yo, collapase = " "), "\n", sep = "")
+        # gliderDebug(debug, "step 3 yo=", paste(yo, collapase = " "), "\n", sep = "")
     }
     # Narrow glifiles and pld1files, to just those that match the yo pattern
     keepglifiles <- NULL
+    # message("next is glifiles");print(glifiles)
+    # message("next is yo");print(yo)
     for (y in yo) {
-        found <- grep(paste("\\.", y, "\\.", sep = ""), glifiles)
+        # message("y=",y)
+        pattern <- paste("\\.", y, "\\.", sep = "")
+        # message("pattern ='", pattern, "'")
+        found <- grep(pattern, glifiles)
+        # message("found=", paste(found, collapse = " "))
         if (length(found) == 1) {
             keepglifiles <- c(keepglifiles, glifiles[found])
         }
@@ -243,51 +251,69 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
 
     gliderDebug(debug, "about to rename items read from the 'gli' file\n")
     # Rename items in glider data.
+    nameDict <- data.frame(
+        oname = c(
+            "NavState", "SecurityLevel", "Heading", "Pitch", "Roll",
+            "Depth", "Temperature", "Pa", "DesiredH", "BallastCmd",
+            "BallastPos", "LinCmd", "LinPos", "AngCmd", "AngPos",
+            "Voltage", "Altitude"
+        ),
+        nname = c(
+            "navState", "alarm", "heading", "pitch", "roll",
+            "depth", "temperature", "pressureInternal", "desiredH", "ballastCmd",
+            "ballastPos", "linCmd", "linPos", "angCmd", "angPos",
+            "voltage", "altitude"
+        )
+    )
+    for (row in seq_len(nrow(nameDict))) {
+        nd <- nameDict[row, ]
+        # cat(oce::vectorShow(nd))
+        namesTmp <- names(gliData)
+        if (nd$oname %in% namesTmp) {
+            gname <- getNextName(nd$nname, namesTmp)
+            names(gliData) <- gsub(nd$oname, gname, namesTmp)
+            res@metadata$dataNamesOriginal$glider[[gname]] <- nd$oname
+        }
+    }
+
+
     # FIXME: add more conversions here, and also to the corresponding
     # spot in the .delayed() function. When both are added, adjust
     # ../man-roxygen/seaexplorer_names.R accordingly.
     if ("Timestamp" %in% names(gliData)) {
         # FIXME(DK): reading fractional seconds changes some hard-wired numbers in test_flags.R
-        if (issue40) {
-            gliData$Timestamp <- as.POSIXct(gliData$Timestamp, format = "%d/%m/%Y %H:%M:%OS", tz = "UTC")
-        } else {
-            gliData$Timestamp <- as.POSIXct(gliData$Timestamp, format = "%d/%m/%Y %H:%M:%S", tz = "UTC")
-        }
+        gliData$Timestamp <- as.POSIXct(gliData$Timestamp, format = "%d/%m/%Y %H:%M:%OS", tz = "UTC")
         names(gliData) <- gsub("Timestamp", "time", names(gliData))
         res@metadata$dataNamesOriginal$glider$time <- "Timestamp"
     }
-    if ("NavState" %in% names(gliData)) {
-        names(gliData) <- gsub("NavState", "navState", names(gliData))
-        res@metadata$dataNamesOriginal$glider$navState <- "NavState"
-    }
-    if ("SecurityLevel" %in% names(gliData)) {
-        names(gliData) <- gsub("SecurityLevel", "alarm", names(gliData))
-        res@metadata$dataNamesOriginal$glider$alarm <- "SecurityLevel"
-    }
-    if ("Heading" %in% names(gliData)) {
-        names(gliData) <- gsub("Heading", "heading", names(gliData))
-        res@metadata$dataNamesOriginal$glider$heading <- "Heading"
-    }
-    if ("Pitch" %in% names(gliData)) {
-        names(gliData) <- gsub("Pitch", "pitch", names(gliData))
-        res@metadata$dataNamesOriginal$glider$pitch <- "Pitch"
-    }
-    if ("Roll" %in% names(gliData)) {
-        names(gliData) <- gsub("Roll", "roll", names(gliData))
-        res@metadata$dataNamesOriginal$glider$roll <- "Roll"
-    }
-    if ("Depth" %in% names(gliData)) {
-        names(gliData) <- gsub("Depth", "pressureNav", names(gliData))
-        res@metadata$dataNamesOriginal$glider$pressureNav <- "Depth"
-    }
-    if ("Temperature" %in% names(gliData)) {
-        names(gliData) <- gsub("Temperature", "temperatureInternal", names(gliData))
-        res@metadata$dataNamesOriginal$glider$temperatureInternal <- "Temperature"
-    }
-    if ("Pa" %in% names(gliData)) {
-        names(gliData) <- gsub("Pa", "pressureInternal", names(gliData))
-        res@metadata$dataNamesOriginal$glider$pressureInternal <- "Pa"
-    }
+    # if ("SecurityLevel" %in% names(gliData)) {
+    #    names(gliData) <- gsub("SecurityLevel", "alarm", names(gliData))
+    #    res@metadata$dataNamesOriginal$glider$alarm <- "SecurityLevel"
+    # }
+    # if ("Heading" %in% names(gliData)) {
+    #    names(gliData) <- gsub("Heading", "heading", names(gliData))
+    #    res@metadata$dataNamesOriginal$glider$heading <- "Heading"
+    # }
+    # if ("Pitch" %in% names(gliData)) {
+    #    names(gliData) <- gsub("Pitch", "pitch", names(gliData))
+    #    res@metadata$dataNamesOriginal$glider$pitch <- "Pitch"
+    # }
+    # if ("Roll" %in% names(gliData)) {
+    #    names(gliData) <- gsub("Roll", "roll", names(gliData))
+    #    res@metadata$dataNamesOriginal$glider$roll <- "Roll"
+    # }
+    # if ("Depth" %in% names(gliData)) {
+    #    names(gliData) <- gsub("Depth", "pressureNav", names(gliData))
+    #    res@metadata$dataNamesOriginal$glider$pressureNav <- "Depth"
+    # }
+    # if ("Temperature" %in% names(gliData)) {
+    #    names(gliData) <- gsub("Temperature", "temperatureInternal", names(gliData))
+    #    res@metadata$dataNamesOriginal$glider$temperatureInternal <- "Temperature"
+    # }
+    # if ("Pa" %in% names(gliData)) {
+    #    names(gliData) <- gsub("Pa", "pressureInternal", names(gliData))
+    #    res@metadata$dataNamesOriginal$glider$pressureInternal <- "Pa"
+    # }
     if ("Lat" %in% names(gliData)) {
         gliData$Lat <- degreeMinute(gliData$Lat)
         names(gliData) <- gsub("Lat", "latitude", names(gliData))
@@ -298,117 +324,180 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
         names(gliData) <- gsub("Lon", "longitude", names(gliData))
         res@metadata$dataNamesOriginal$glider$longitude <- "Lon"
     }
-    if ("DesiredH" %in% names(gliData)) {
-        names(gliData) <- gsub("DesiredH", "headingDesired", names(gliData))
-        res@metadata$dataNamesOriginal$glider$headingDesired <- "DesiredH"
-    }
-    if ("BallastCmd" %in% names(gliData)) {
-        names(gliData) <- gsub("BallastCmd", "ballastCmd", names(gliData))
-        res@metadata$dataNamesOriginal$glider$ballastCmd <- "BallastCmd"
-    }
-    if ("BallastPos" %in% names(gliData)) {
-        names(gliData) <- gsub("BallastPos", "ballastPos", names(gliData))
-        res@metadata$dataNamesOriginal$glider$ballastPos <- "BallastPos"
-    }
-    if ("LinCmd" %in% names(gliData)) {
-        names(gliData) <- gsub("LinCmd", "linCmd", names(gliData))
-        res@metadata$dataNamesOriginal$glider$linCmd <- "LinCmd"
-    }
-    if ("LinPos" %in% names(gliData)) {
-        names(gliData) <- gsub("LinPos", "linPos", names(gliData))
-        res@metadata$dataNamesOriginal$glider$linPos <- "LinPos"
-    }
-    if ("AngCmd" %in% names(gliData)) {
-        names(gliData) <- gsub("AngCmd", "angCmd", names(gliData))
-        res@metadata$dataNamesOriginal$glider$angCmd <- "AngCmd"
-    }
-    if ("AngPos" %in% names(gliData)) {
-        names(gliData) <- gsub("AngPos", "angPos", names(gliData))
-        res@metadata$dataNamesOriginal$glider$angPos <- "AngPos"
-    }
-    if ("Voltage" %in% names(gliData)) {
-        names(gliData) <- gsub("Voltage", "voltage", names(gliData))
-        res@metadata$dataNamesOriginal$glider$voltage <- "Voltage"
-    }
-    if ("Altitude" %in% names(gliData)) {
-        names(gliData) <- gsub("Altitude", "altitude", names(gliData))
-        res@metadata$dataNamesOriginal$glider$altitude <- "Altitude"
-    }
+    # if ("DesiredH" %in% names(gliData)) {
+    #    names(gliData) <- gsub("DesiredH", "headingDesired", names(gliData))
+    #    res@metadata$dataNamesOriginal$glider$headingDesired <- "DesiredH"
+    # }
+    # if ("BallastCmd" %in% names(gliData)) {
+    #    names(gliData) <- gsub("BallastCmd", "ballastCmd", names(gliData))
+    #    res@metadata$dataNamesOriginal$glider$ballastCmd <- "BallastCmd"
+    # }
+    # if ("BallastPos" %in% names(gliData)) {
+    #    names(gliData) <- gsub("BallastPos", "ballastPos", names(gliData))
+    #    res@metadata$dataNamesOriginal$glider$ballastPos <- "BallastPos"
+    # }
+    # if ("LinCmd" %in% names(gliData)) {
+    #    names(gliData) <- gsub("LinCmd", "linCmd", names(gliData))
+    #    res@metadata$dataNamesOriginal$glider$linCmd <- "LinCmd"
+    # }
+    # if ("LinPos" %in% names(gliData)) {
+    #    names(gliData) <- gsub("LinPos", "linPos", names(gliData))
+    #    res@metadata$dataNamesOriginal$glider$linPos <- "LinPos"
+    # }
+    # if ("AngCmd" %in% names(gliData)) {
+    #    names(gliData) <- gsub("AngCmd", "angCmd", names(gliData))
+    #    res@metadata$dataNamesOriginal$glider$angCmd <- "AngCmd"
+    # }
+    # if ("AngPos" %in% names(gliData)) {
+    #    names(gliData) <- gsub("AngPos", "angPos", names(gliData))
+    #    res@metadata$dataNamesOriginal$glider$angPos <- "AngPos"
+    # }
+    # if ("Voltage" %in% names(gliData)) {
+    #    names(gliData) <- gsub("Voltage", "voltage", names(gliData))
+    #    res@metadata$dataNamesOriginal$glider$voltage <- "Voltage"
+    # }
+    # if ("Altitude" %in% names(gliData)) {
+    #    names(gliData) <- gsub("Altitude", "altitude", names(gliData))
+    #    res@metadata$dataNamesOriginal$glider$altitude <- "Altitude"
+    # }
     # Rename items in payload1 data.
     gliderDebug(debug, "about to rename items read from the 'pld1' file\n")
-    if ("PLD_REALTIMECLOCK" %in% names(pld1Data)) {
-        # FIXME(DK): reading fractional seconds changes some hard-wired numbers in test_flags.R
-        if (issue40) {
-            pld1Data$PLD_REALTIMECLOCK <- as.POSIXct(pld1Data$PLD_REALTIMECLOCK, format = "%d/%m/%Y %H:%M:%OS", tz = "UTC")
-        } else {
-            pld1Data$PLD_REALTIMECLOCK <- as.POSIXct(pld1Data$PLD_REALTIMECLOCK, format = "%d/%m/%Y %H:%M:%S", tz = "UTC")
-        }
-        names(pld1Data) <- gsub("PLD_REALTIMECLOCK", "time", names(pld1Data))
-        res@metadata$dataNamesOriginal$payload1$time <- "PLD_REALTIMECLOCK"
-    }
-    if ("NAV_RESOURCE" %in% names(pld1Data)) {
-        names(pld1Data) <- gsub("NAV_RESOURCE", "navState", names(pld1Data))
-        res@metadata$dataNamesOriginal$payload1$navState <- "NAV_RESOURCE"
-    }
-    if ("NAV_LONGITUDE" %in% names(pld1Data)) {
-        names(pld1Data) <- gsub("NAV_LONGITUDE", "longitude", names(pld1Data))
-        pld1Data$longitude <- degreeMinute(pld1Data$longitude)
-        res@metadata$dataNamesOriginal$payload1$longitude <- "NAV_LONGITUDE"
-    }
-    if ("NAV_LATITUDE" %in% names(pld1Data)) {
-        names(pld1Data) <- gsub("NAV_LATITUDE", "latitude", names(pld1Data))
-        pld1Data$latitude <- degreeMinute(pld1Data$latitude)
-        res@metadata$dataNamesOriginal$payload1$latitude <- "NAV_LATITUDE"
-    }
-    if ("NAV_DEPTH" %in% names(pld1Data)) {
-        names(pld1Data) <- gsub("NAV_DEPTH", "pressureNav", names(pld1Data))
-        res@metadata$dataNamesOriginal$payload1$pressureNav <- "NAV_DEPTH"
-    }
-    if ("FLBBCD_CHL_COUNT" %in% names(pld1Data)) {
-        names(pld1Data) <- gsub("FLBBCD_CHL_COUNT", "chlorophyllCount", names(pld1Data))
-        res@metadata$dataNamesOriginal$payload1$chlorophyllCount <- "FLBBCD_CHL_COUNT"
-    }
-    if ("FLBBCD_CHL_SCALED" %in% names(pld1Data)) {
-        names(pld1Data) <- gsub("FLBBCD_CHL_SCALED", "chlorophyll", names(pld1Data))
-        res@metadata$dataNamesOriginal$payload1$chlorophyll <- "FLBBCD_CHL_SCALED"
-    }
-    if ("FLBBCD_BB_700_COUNT" %in% names(pld1Data)) {
-        names(pld1Data) <- gsub("FLBBCD_BB_700_COUNT", "backscatterCount", names(pld1Data))
-        res@metadata$dataNamesOriginal$payload1$backscatterCount <- "FLBBCD_BB_700_COUNT"
-    }
-    if ("FLBBCD_BB_700_SCALED" %in% names(pld1Data)) {
-        names(pld1Data) <- gsub("FLBBCD_BB_700_SCALED", "backscatter", names(pld1Data))
-        res@metadata$dataNamesOriginal$payload1$backscatter <- "FLBBCD_BB_700_SCALED"
-    }
-    if ("FLBBCD_CDOM_COUNT" %in% names(pld1Data)) {
-        names(pld1Data) <- gsub("FLBBCD_CDOM_COUNT", "cdomCount", names(pld1Data))
-        res@metadata$dataNamesOriginal$payload1$cdomCount <- "FLBBCD_CDOM_COUNT"
-    }
-    if ("FLBBCD_CDOM_SCALED" %in% names(pld1Data)) {
-        names(pld1Data) <- gsub("FLBBCD_CDOM_SCALED", "cdom", names(pld1Data))
-        res@metadata$dataNamesOriginal$payload1$cdom <- "FLBBCD_CDOM_SCALED"
-    }
-    if ("GPCTD_CONDUCTIVITY" %in% names(pld1Data)) {
-        names(pld1Data) <- gsub("GPCTD_CONDUCTIVITY", "conductivity", names(pld1Data))
-        res@metadata$dataNamesOriginal$payload1$conductivity <- "GPCTD_CONDUCTIVITY"
-    }
-    if ("GPCTD_TEMPERATURE" %in% names(pld1Data)) {
-        names(pld1Data) <- gsub("GPCTD_TEMPERATURE", "temperature", names(pld1Data))
-        res@metadata$dataNamesOriginal$payload1$temperature <- "GPCTD_TEMPERATURE"
-    }
-    if ("GPCTD_PRESSURE" %in% names(pld1Data)) {
-        names(pld1Data) <- gsub("GPCTD_PRESSURE", "pressure", names(pld1Data))
-        res@metadata$dataNamesOriginal$payload1$pressure <- "GPCTD_PRESSURE"
-    }
-    if (3 == sum(c("conductivity", "temperature", "pressure") %in% names(pld1Data))) {
-        pld1Data$salinity <- swSCTp(pld1Data$conductivity / 4.2914, pld1Data$temperature, pld1Data$pressure)
+    # if ("PLD_REALTIMECLOCK" %in% names(pld1Data)) {
+    #    # FIXME(DK): reading fractional seconds changes some hard-wired numbers in test_flags.R
+    #    pld1Data$PLD_REALTIMECLOCK <- as.POSIXct(pld1Data$PLD_REALTIMECLOCK, format = "%d/%m/%Y %H:%M:%OS", tz = "UTC")
+    #    names(pld1Data) <- gsub("PLD_REALTIMECLOCK", "time", names(pld1Data))
+    #    res@metadata$dataNamesOriginal$payload1$time <- "PLD_REALTIMECLOCK"
+    # }
+    # if ("NAV_RESOURCE" %in% names(pld1Data)) {
+    #    names(pld1Data) <- gsub("NAV_RESOURCE", "navState", names(pld1Data))
+    #    res@metadata$dataNamesOriginal$payload1$navState <- "NAV_RESOURCE"
+    # }
+    # if ("NAV_LONGITUDE" %in% names(pld1Data)) {
+    #    names(pld1Data) <- gsub("NAV_LONGITUDE", "longitude", names(pld1Data))
+    #    pld1Data$longitude <- degreeMinute(pld1Data$longitude)
+    #    res@metadata$dataNamesOriginal$payload1$longitude <- "NAV_LONGITUDE"
+    # }
+    # if ("NAV_LATITUDE" %in% names(pld1Data)) {
+    #    names(pld1Data) <- gsub("NAV_LATITUDE", "latitude", names(pld1Data))
+    #    pld1Data$latitude <- degreeMinute(pld1Data$latitude)
+    #    res@metadata$dataNamesOriginal$payload1$latitude <- "NAV_LATITUDE"
+    # }
+    # if ("NAV_DEPTH" %in% names(pld1Data)) {
+    #    names(pld1Data) <- gsub("NAV_DEPTH", "pressureNav", names(pld1Data))
+    #    res@metadata$dataNamesOriginal$payload1$pressureNav <- "NAV_DEPTH"
+    # }
+    # if ("FLBBCD_CHL_COUNT" %in% names(pld1Data)) {
+    #    names(pld1Data) <- gsub("FLBBCD_CHL_COUNT", "chlorophyllCount", names(pld1Data))
+    #    res@metadata$dataNamesOriginal$payload1$chlorophyllCount <- "FLBBCD_CHL_COUNT"
+    # }
+    # if ("FLBBCD_CHL_SCALED" %in% names(pld1Data)) {
+    #    names(pld1Data) <- gsub("FLBBCD_CHL_SCALED", "chlorophyll", names(pld1Data))
+    #    res@metadata$dataNamesOriginal$payload1$chlorophyll <- "FLBBCD_CHL_SCALED"
+    # }
+    # if ("FLBBCD_BB_700_COUNT" %in% names(pld1Data)) {
+    #    names(pld1Data) <- gsub("FLBBCD_BB_700_COUNT", "backscatterCount", names(pld1Data))
+    #    res@metadata$dataNamesOriginal$payload1$backscatterCount <- "FLBBCD_BB_700_COUNT"
+    # }
+    # if ("FLBBCD_BB_700_SCALED" %in% names(pld1Data)) {
+    #    names(pld1Data) <- gsub("FLBBCD_BB_700_SCALED", "backscatter", names(pld1Data))
+    #    res@metadata$dataNamesOriginal$payload1$backscatter <- "FLBBCD_BB_700_SCALED"
+    # }
+    # if ("FLBBCD_CDOM_COUNT" %in% names(pld1Data)) {
+    #    names(pld1Data) <- gsub("FLBBCD_CDOM_COUNT", "cdomCount", names(pld1Data))
+    #    res@metadata$dataNamesOriginal$payload1$cdomCount <- "FLBBCD_CDOM_COUNT"
+    # }
+    # if ("FLBBCD_CDOM_SCALED" %in% names(pld1Data)) {
+    #    names(pld1Data) <- gsub("FLBBCD_CDOM_SCALED", "cdom", names(pld1Data))
+    #    res@metadata$dataNamesOriginal$payload1$cdom <- "FLBBCD_CDOM_SCALED"
+    # }
+    # if ("GPCTD_CONDUCTIVITY" %in% names(pld1Data)) {
+    #    names(pld1Data) <- gsub("GPCTD_CONDUCTIVITY", "conductivity", names(pld1Data))
+    #    res@metadata$dataNamesOriginal$payload1$conductivity <- "GPCTD_CONDUCTIVITY"
+    # }
+    # if ("GPCTD_DOF" %in% names(pld1Data)) {
+    #    names(pld1Data) <- gsub("GPCTD_DOF", "oxygenFrequency", names(pld1Data))
+    #    res@metadata$dataNamesOriginal$payload1$oxygenFrequency <- "GPCTD_DOF"
+    # }
+    # if ("GPCTD_PRESSURE" %in% names(pld1Data)) {
+    #    names(pld1Data) <- gsub("GPCTD_PRESSURE", "pressure", names(pld1Data))
+    #    res@metadata$dataNamesOriginal$payload1$pressure <- "GPCTD_PRESSURE"
+    # }
+    # if ("GPCTD_TEMPERATURE" %in% names(pld1Data)) {
+    #    names(pld1Data) <- gsub("GPCTD_TEMPERATURE", "temperature", names(pld1Data))
+    #    res@metadata$dataNamesOriginal$payload1$temperature <- "GPCTD_TEMPERATURE"
+    # }
+
+    # Salinity is not in pld1Data in my sample files; anyway, so we compute it.
+    if (3 == sum(c("GPCTD_CONDUCTIVITY", "GPCTD_TEMPERATURE", "GPCTD_PRESSURE") %in% names(pld1Data))) {
+        gliderDebug(debug, "computing salinity from GPCTD_CONDUCTIVITY etc\n")
+        pld1Data$salinity <- swSCTp(
+            pld1Data$GPCTD_CONDUCTIVITY / 4.2914,
+            pld1Data$GPCTD_TEMPERATURE,
+            pld1Data$GPCTD_PRESSURE
+        )
         res@metadata$dataNamesOriginal$payload1$salinity <- "-"
     }
-    if ("GPCTD_DOF" %in% names(pld1Data)) {
-        names(pld1Data) <- gsub("GPCTD_DOF", "oxygenFrequency", names(pld1Data))
-        res@metadata$dataNamesOriginal$payload1$oxygenFrequency <- "GPCTD_DOF"
+    # if (debug > 0) {
+    #    cat("before legato\n")
+    #    print(names(pld1Data))
+    #    print(res@metadata$dataNamesOriginal$payload1)
+    # }
+    # name dictionary (oname = original name, nname = newname)
+    nameDictDefault <- data.frame(
+        oname = c(
+            "NAV_RESOURCE", "NAV_LONGITUDE", "NAV_LATITUDE",
+            "NAV_DEPTH", "FLBBCD_CHL_COUNT", "FLBBCD_CHL_SCALED",
+            "FLBBCD_BB_700_COUNT", "FLBBCD_BB_700_SCALED",
+            "FLBBCD_CDOM_COUNT", "FLBBCD_CDOM_SCALED", "GPCTD_CONDUCTIVITY",
+            "GPCTD_DOF", "GPCTD_PRESSURE", "GPCTD_TEMPERATURE",
+            "PLD_REALTIMECLOCK"
+        ),
+        nname = c(
+            "navState", "longitude", "latitude", "pressureNav",
+            "chlorophyllCount", "chlorophyll", "backscatterCount",
+            "backscatter", "cdomCount", "cdom", "conductivity",
+            "oxygenFrequency", "pressure", "temperature",
+            "time"
+        )
+    )
+    nameDictLegato <- data.frame(
+        oname = paste0("LEGATO_", c(
+            "CONDTEMP", "CONDUCTIVITY", "PRESSURE", "SALINITY",
+            "TEMPERATURE"
+        )),
+        nname = c(
+            "conductivityTemperature", "conductivity", "pressure", "salinity",
+            "temperature"
+        )
+    )
+    nameDict <- rbind(nameDictDefault, nameDictLegato)
+    for (row in seq_len(nrow(nameDict))) {
+        nd <- nameDict[row, ]
+        # cat(oce::vectorShow(nd))
+        # Handle some conversions
+        if (identical(nd$oname, "PLD_REALTIMECLOCK")) {
+            pld1Data$PLD_REALTIMECLOCK <- as.POSIXct(pld1Data$PLD_REALTIMECLOCK,
+                format = "%d/%m/%Y %H:%M:%OS", tz = "UTC"
+            )
+        }
+        if (identical(nd$oname, "NAV_LATITUDE")) {
+            pld1Data$NAV_LATITUDE <- degreeMinute(pld1Data$NAV_LATITUDE)
+        }
+        if (identical(nd$oname, "NAV_LONGITUDE")) {
+            pld1Data$NAV_LONGITUDE <- degreeMinute(pld1Data$NAV_LONGITUDE)
+        }
+        namesTmp <- names(pld1Data)
+        if (nd$oname %in% namesTmp) {
+            gname <- getNextName(nd$nname, namesTmp)
+            names(pld1Data) <- gsub(nd$oname, gname, namesTmp)
+            res@metadata$dataNamesOriginal$payload1[[gname]] <- nd$oname
+        }
     }
-
+    # if (debug > 0) {
+    #    cat("after legato\n")
+    #    print(names(pld1Data))
+    #    print(res@metadata$dataNamesOriginal$payload1)
+    # }
     res@data <- list(glider = gliData, payload1 = pld1Data)
     # BOOKMARK START assure that this is echoed in read.glider.seaexplorer.realtime()
     # insert units

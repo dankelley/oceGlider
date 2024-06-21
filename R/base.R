@@ -35,33 +35,33 @@ setMethod(
     }
 )
 
-#' Saturation of O2 in sea water
-#'
-#' Computes the solubility (saturation) of Oxygen in sea water. Based on the
-#' Matlab function `SW_SATO2` from the CSIRO seawater toolbox.
-#'
-#' @author Chantelle Layton
-#' @param temperature temperature
-#' @param salinity salinity
-#'
-#' DEK note: the result is in mL/L.
-swSatO2 <- function(temperature, salinity) {
-    Tk <- 273.15 + temperature * 1.00024
-    # constants for Eqn (4) of Weiss 1970
-    a1 <- -173.4292
-    a2 <- 249.6339
-    a3 <- 143.3483
-    a4 <- -21.8492
-    b1 <- -0.033096
-    b2 <- 0.014259
-    b3 <- -0.0017000
-    lnC <- a1 +
-        a2 * (100 / Tk) +
-        a3 * log(Tk / 100) +
-        a4 * (Tk / 100) +
-        salinity * (b1 + b2 * (Tk / 100) + b3 * ((Tk / 100)^2))
-    exp(lnC)
-}
+# _ #' Saturation of O2 in sea water
+# _ #'
+# _ #' Computes the solubility (saturation) of Oxygen in sea water. Based on the
+# _ #' Matlab function `SW_SATO2` from the CSIRO seawater toolbox.
+# _ #'
+# _ #' @author Chantelle Layton
+# _ #' @param temperature temperature
+# _ #' @param salinity salinity
+# _ #'
+# _ #' DEK note: the result is in mL/L.
+# _ swSatO2 <- function(temperature, salinity) {
+# _     Tk <- 273.15 + temperature * 1.00024
+# _     # constants for Eqn (4) of Weiss 1970
+# _     a1 <- -173.4292
+# _     a2 <- 249.6339
+# _     a3 <- 143.3483
+# _     a4 <- -21.8492
+# _     b1 <- -0.033096
+# _     b2 <- 0.014259
+# _     b3 <- -0.0017000
+# _     lnC <- a1 +
+# _         a2 * (100 / Tk) +
+# _         a3 * log(Tk / 100) +
+# _         a4 * (Tk / 100) +
+# _         salinity * (b1 + b2 * (Tk / 100) + b3 * ((Tk / 100)^2))
+# _     exp(lnC)
+# _ }
 
 #' Retrieve Part of a glider Object
 #'
@@ -171,8 +171,10 @@ setMethod(
     f = "[[",
     signature(x = "glider", i = "ANY", j = "ANY"),
     definition = function(x, i, j, ...) {
+        dots <- list(...)
+        debug <- if (is.null(dots$debug)) getOption("gliderDebug", default = 0L) else dots$debug
         # . message("in [[, i='", i, "'")
-        debug <- getOption("gliderDebug", default = 0L)
+        # debug <- getOption("gliderDebug", default = 0L)
         gliderDebug(debug, "glider [[ {\n", unindent = 1)
         if (missing(i)) {
             stop("Must name a glider item to retrieve, e.g. '[[\"temperature\"]]'", call. = FALSE)
@@ -183,6 +185,7 @@ setMethod(
         if (!is.character(i)) {
             stop("glider item must be specified by name", call. = FALSE)
         }
+        gliderDebug(debug, "  i = \"", i, "\"\n", sep = "")
         if (i == "filename") {
             return(x@metadata$filename)
         } else if (i == "data") {
@@ -270,6 +273,8 @@ setMethod(
                 }
                 payloadName <- dataNames[w]
                 dataNames <- names(x@data[[payloadName]])
+                message("dataNames--")
+                print(dataNames)
                 if ("oxygen" %in% dataNames) {
                     gliderDebug(debug, "returning \"oxygen\" directly\n")
                     return(x@data[payloadName]$oxygen)
@@ -283,26 +288,36 @@ setMethod(
                         return(NULL)
                     }
                     cal <- x@metadata$oxycalib
+                    message("DAN 1")
+                    print(payloadName)
                     oxygenFrequency <- x@data[[payloadName]]$oxygenFrequency
+                    cat(oce::vectorShow(oxygenFrequency))
                     salinity <- x@data[[payloadName]]$salinity
+                    cat(oce::vectorShow(salinity))
                     temperature <- x@data[[payloadName]]$temperature
+                    cat(oce::vectorShow(temperature))
                     pressure <- x@data[[payloadName]]$pressure
+                    cat(oce::vectorShow(pressure))
+                    cc <- cal$calibrationCoefficients
                     # This Kelvin temperature is as used in swSatOw.  Note the
                     # non-standard offset and the non-unity factor
-                    Tk <- 273.15 + temperature * 1.00024
-                    cc <- cal$calibrationCoefficients
-                    # NOTE: the calibration formula I have for
-                    # sea-explorer datasets also has something called
-                    # Tau20, but I don't see that below. For details
-                    # on the formula, see
-                    # https://github.com/DFOglider/pilotingApp/blob/glimpseFtp/oxygenCalibrationCoefficients.R
-                    # and emails from Chantelle Layton and Clark
-                    # Richards.
-                    res <- cc$Soc * (oxygenFrequency + cc$Foffset) *
-                        (1.0 + cc$A * Tk + cc$B * Tk^2 + cc$C * Tk^3) *
-                        swSatO2(temperature = temperature, salinity = salinity) *
-                        exp(cc$Enom * pressure / Tk)
-                    return(44.6591 * res) # the factor converts to umol/kg
+                    #Tk <- 273.15 + temperature * 1.00024
+                    # _ # NOTE: the calibration formula I have for
+                    # _ # sea-explorer datasets also has something called
+                    # _ # Tau20, but I don't see that below. For details
+                    # _ # on the formula, see
+                    # _ # https://github.com/DFOglider/pilotingApp/blob/glimpseFtp/oxygenCalibrationCoefficients.R
+                    # _ # and emails from Chantelle Layton and Clark
+                    # _ # Richards.
+                    # _ res <- cc$Soc * (oxygenFrequency + cc$Foffset) *
+                    # _     (1.0 + cc$A * temperature + cc$B * temperature^2 + cc$C * temperature^3) *
+                    # _     swSatO2(temperature = temperature, salinity = salinity) *
+                    # _     exp(cc$Enom * pressure / Tk)
+                    # _ res <- 44.6591 * res # the factor converts to umol/kg
+                    return(swOxygenFrequencyToSaturation(
+                        temperature = temperature, salinity = salinity,
+                        pressure = pressure, frequency = oxygenFrequency, cal = cc, unit = "umol/kg"
+                    ))
                 } else {
                     return(NULL)
                 }
@@ -387,8 +402,14 @@ setMethod(
                 return(x@data[[i]])
             } else {
                 # . message("returning i from within payload")
+                message("DANNNN")
+                message("FIXME: look up by original name (storage of which is wrong)")
                 if (i %in% names(x@data[["payload1"]])) {
+                    message("DAN 1")
                     return(x@data$payload1[[i]])
+                } else if (i %in% names(x@data[["glider"]])) {
+                    message("DAN 2")
+                    return(x@data$glider[[i]])
                 } else {
                     return(x@data$glider[[i]])
                 } # what if there is no glider?
@@ -664,9 +685,9 @@ read.glider.netcdf <- function(file, debug) {
     res <- new("glider")
 
     # Next demonstrates how to detect this filetype.
-    instrument <- getAtt(f, attname = "instrument", default = "?")
-    instrumentManufacturer <- getAtt(f, attname = "instrument_manufacturer", default = "?")
-    instrumentModel <- getAtt(f, attname = "instrument_model", default = "?")
+    res@metadata$instrument <- getAtt(f, attname = "instrument", default = "?")
+    res@metadata$instrumentManufacturer <- getAtt(f, attname = "instrument_manufacturer", default = "?")
+    res@metadata$instrumentModel <- getAtt(f, attname = "instrument_model", default = "?")
     type <- getAtt(f, attname = "platform_type", default = "?")
     if (type == "Slocum Glider") {
         type <- "slocum"
@@ -808,4 +829,49 @@ as.glider <- function(type, data, units) {
         res@metadata$units <- list(payload1 = units)
     }
     res
+}
+
+#' Find a Deconflicted Variable Name
+#'
+#' This is used to name the first temperature found as `temperature`,
+#' the second as `temperature2`, etc.
+#'
+#' @return [getNextName] returns a deconflicted version of `name`.
+#'
+#' @param name character value indicating the variable name.
+#' @param existingNames vector of character values of existing
+#' variable names.
+#'
+#' @examples
+#' library(oceglider)
+#' e <- NULL
+#' e <- c(e, getNextName("S", e))
+#' e <- c(e, getNextName("T", e))
+#' e <- c(e, getNextName("S", e))
+#' e <- c(e, getNextName("T", e))
+#' e <- c(e, getNextName("p", e))
+#' print(e)
+#'
+#' @export
+#'
+#' @author Dan Kelley
+getNextName <- function(name, existingNames) {
+    #cat(oce::vectorShow(name))
+    #cat(oce::vectorShow(existingNames))
+    if (!name %in% existingNames) {
+        name
+    } else {
+        # cat("need to deconflict '", name, "'")
+        siblings <- grep(paste0("^", name, "[0-9]*$"), existingNames)
+        if (length(siblings) == 1) {
+            paste0(name, "2")
+        } else {
+            #cat(oce::vectorShow(existingNames[siblings]))
+            numbers <- gsub("^[_a-zA-Z]", "", existingNames[siblings])
+            #cat(oce::vectorShow(numbers))
+            numberNext <- 1L + max(as.integer(numbers), na.rm=TRUE)
+            #cat(oce::vectorShow(numberNext))
+            paste0(name, numberNext)
+        }
+    }
 }

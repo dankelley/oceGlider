@@ -2,22 +2,22 @@
 library(oceglider)
 
 test_that("subset seaexplorer by 'ascending' and descending", {
-    directory <- system.file("extdata/seaexplorer/sub", package="oceglider")
-    expect_silent(g <- read.glider.seaexplorer.realtime(directory, yo=101, progressBar=FALSE))
+    directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
+    expect_silent(g <- read.glider.seaexplorer.realtime(directory, yo = 101, progressBar = FALSE))
     expect_silent(ga <- subset(g, "ascending"))
     expect_silent(gd <- subset(g, "descending"))
 })
 
 test_that("subset seaexplorer by pressure", {
-    directory <- system.file("extdata/seaexplorer/sub", package="oceglider")
-    expect_silent(g <- read.glider.seaexplorer.realtime(directory, yo=101, progressBar=FALSE))
+    directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
+    expect_silent(g <- read.glider.seaexplorer.realtime(directory, yo = 101, progressBar = FALSE))
     deep <- g[["pressure"]] > 20
     deep[is.na(deep)] <- FALSE
     expect_silent(gdeep <- subset(g, pressure > 20))
-    expect_equal(gdeep[["payload1"]], g[["payload1"]][deep,])
+    expect_equal(gdeep[["payload1"]], g[["payload1"]][deep, ])
 })
 
-#context("subset")
+# context("subset")
 # test_that("ascending subset", {
 #           files <- system.file("extdata/seaexplorer/sub",
 #                                c("sea021.49.gli.sub.100.gz",
@@ -33,7 +33,7 @@ test_that("subset seaexplorer by pressure", {
 #           ### expect_true(all(ascending[["payload"]]$NAV_RESOURCE == 117))
 #           ### expect_true(all(ascending[["glider"]]$navState == 117))
 # })
-# 
+#
 # test_that("descending subset", {
 #           files <- system.file("extdata/seaexplorer/sub",
 #                                c("sea024.32.gli.sub.200.gz",
@@ -49,6 +49,6 @@ test_that("subset seaexplorer by pressure", {
 #           ### expect_true(all(descending[["payload"]]$NAV_RESOURCE == 100))
 #           ### expect_true(all(descending[["glider"]]$navState == 100))
 # })
-# 
+#
 # ## FIXME: add a test on length, once we get a longer test dataset
-# 
+#
