@@ -402,10 +402,10 @@ setMethod(
                 gliderDebug(debug, "  returning item from @data\n")
                 return(x@data[[i]])
             } else {
-                if (i %in% names(x@data[["payload1"]])) {
-                    gliderDebug(debug, "  result in @data$payload\n")
+                if (i %in% names(x@data$payload1)) {
+                    gliderDebug(debug, "  result in @data$payload1\n")
                     return(x@data$payload1[[i]])
-                } else if (i %in% names(x@data[["glider"]])) {
+                } else if (i %in% names(x@data$glider)) {
                     gliderDebug(debug, "  result in @data$glider\n")
                     return(x@data$glider[[i]])
                 } else if (i %in% names(x@metadata$dataNamesOriginal$payload1)) {
