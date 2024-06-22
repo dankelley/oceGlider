@@ -31,7 +31,6 @@ test_that("read.glider.seaexplorer.delayed flag names", {
 test_that("read.glider.seaexplorer.realtime flag setting and handling", {
     # This is based on the example given by ?"handleFlags,glider-method"
     directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
-    source("~/git/oceglider/R/seaexplorer_realtime.R")
     expect_silent(g <- read.glider.seaexplorer.realtime(directory))
     # NOTE: this test was more hard-wired before issue40, e.g. it
     # demanded that the number of data read be 2784, but that number
