@@ -288,16 +288,14 @@ setMethod(
                         return(NULL)
                     }
                     cal <- x@metadata$oxycalib
-                    message("DAN 1")
-                    print(payloadName)
                     oxygenFrequency <- x@data[[payloadName]]$oxygenFrequency
-                    cat(oce::vectorShow(oxygenFrequency))
+                    #cat(oce::vectorShow(oxygenFrequency))
                     salinity <- x@data[[payloadName]]$salinity
-                    cat(oce::vectorShow(salinity))
+                    #cat(oce::vectorShow(salinity))
                     temperature <- x@data[[payloadName]]$temperature
-                    cat(oce::vectorShow(temperature))
+                    #cat(oce::vectorShow(temperature))
                     pressure <- x@data[[payloadName]]$pressure
-                    cat(oce::vectorShow(pressure))
+                    #cat(oce::vectorShow(pressure))
                     cc <- cal$calibrationCoefficients
                     # This Kelvin temperature is as used in swSatOw.  Note the
                     # non-standard offset and the non-unity factor
