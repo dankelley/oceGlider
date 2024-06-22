@@ -1,41 +1,36 @@
 # vim:textwidth=80:expandtab:shiftwidth=4:softtabstop=4
 library(oceglider)
+# library(testthat)
 
 test_that("read.glider.seaexplorer.realtime", {
     directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
-    g <- read.glider.seaexplorer.realtime(directory = directory, yo = 2, progressBar = FALSE)
     expect_silent(g <- read.glider.seaexplorer.realtime(directory = directory, yo = 2, progressBar = FALSE))
     expect_output(summary(g), "Input file:")
     expect_equal(c("glider", "payload1"), names(g[["data"]]))
     # dimensionality and names in glider stream
-    expect_equal(dim(g[["glider"]]), c(95, 23)) # the first number works for this particular file
-    gliderNamesExpected <- c(
-        "time", "navState", "alarm", "heading",
-        "pitch", "roll", "pressureNav",
-        "temperatureInternal", "pressureInternal",
-        "latitude", "longitude", "headingDesired",
-        "ballastCmd", "ballastPos", "linCmd",
-        "linPos", "angCmd", "angPos", "voltage",
-        "altitude", "yoNumberNav"
-    )
-    expect_equal(names(g[["glider"]]), gliderNamesExpected)
+    expect_equal(dim(g[["glider"]]), c(95, 23))
+    gliderNamesExpected <- sort(c(
+        "alarm", "altitude", "angCmd", "angPos",
+        "ballastCmd", "ballastPos", "DeadReckoning", "declination", "depth",
+        "desiredH", "heading", "latitude", "linCmd", "linPos", "longitude",
+        "navState", "pitch", "pressureInternal", "roll", "temperature", "time",
+        "voltage", "yoNumberNav"
+    ))
+    expect_equal(sort(names(g[["glider"]])), gliderNamesExpected)
     # dimensionality and names in payload1 stream (and payload nickname)
-    expect_equal(dim(g[["payload1"]]), c(1763, 22)) # the first number works for this particular file
+    # This is partly a check against changes to the built-in file.
+    expect_equal(dim(g[["payload1"]]), c(1763, 22))
     expect_equal(dim(g[["payload"]]), c(1763, 22))
     payloadNamesExpected <- c(
-        "time", "navState", "longitude", "latitude",
-        "pressureNav", "LEGATO_CONDUCTIVITY", "LEGATO_TEMPERATURE",
-        "LEGATO_PRESSURE",
-        "LEGATO_SALINITY",
-        "LEGATO_CONDTEMP",
-        "chlorophyllCount",
-        "chlorophyll", "backscatterCount",
-        "backscatter", "cdomCount", "cdom",
-        "conductivity", "temperature", "pressure",
-        "oxygenFrequency", "yoNumber", "salinity"
+        "backscatter", "backscatterCount", "cdom",
+        "cdomCount", "chlorophyll", "chlorophyllCount", "conductivity",
+        "conductivity2", "conductivityTemperature", "latitude", "longitude",
+        "navState", "oxygenFrequency", "pressure", "pressure2", "pressureNav",
+        "salinity", "salinity2", "temperature", "temperature2", "time",
+        "yoNumber"
     )
-    expect_equal(names(g[["payload1"]]), payloadNamesExpected)
-    expect_equal(names(g[["payload"]]), payloadNamesExpected)
+    expect_equal(sort(names(g[["payload1"]])), payloadNamesExpected)
+    expect_equal(sort(names(g[["payload"]])), payloadNamesExpected)
 })
 
 test_that("read.glider.seaexplorer.delayed", {
@@ -46,15 +41,15 @@ test_that("read.glider.seaexplorer.delayed", {
     # gets added, a developer will notice the change and invent new tests
     # for that component.
     expect_equal(names(g@data), "payload1")
-    payloadNamesExpected <- c(
-        "time", "navState", "longitude", "latitude",
-        "pressureNav", "chlorophyllCount",
-        "chlorophyll", "backscatterCount",
-        "backscatter", "cdomCount", "cdom",
-        "conductivity", "temperature", "pressure",
-        "oxygenFrequency", "yoNumber", "salinity"
-    )
-    expect_equal(names(g@data$payload1), payloadNamesExpected)
-    expect_equal(names(g[["payload1"]]), payloadNamesExpected)
-    expect_equal(names(g[["payload"]]), payloadNamesExpected)
+    sort(names(g[["payload1"]]))
+    payloadNamesExpected <- sort(c(
+        "backscatter", "backscatterCount", "cdom",
+        "cdomCount", "chlorophyll", "chlorophyllCount", "conductivity",
+        "conductivity2", "conductivityTemperature", "latitude", "longitude",
+        "navState", "oxygenFrequency", "pressure", "pressure2", "pressureNav",
+        "salinity", "temperature", "temperature2", "time", "yoNumber"
+    ))
+    expect_equal(sort(names(g@data$payload1)), payloadNamesExpected)
+    expect_equal(sort(names(g[["payload1"]])), payloadNamesExpected)
+    expect_equal(sort(names(g[["payload"]])), payloadNamesExpected)
 })

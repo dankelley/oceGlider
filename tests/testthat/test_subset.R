@@ -3,14 +3,14 @@ library(oceglider)
 
 test_that("subset seaexplorer by 'ascending' and descending", {
     directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
-    expect_silent(g <- read.glider.seaexplorer.realtime(directory, yo = 101, progressBar = FALSE))
+    expect_silent(g <- read.glider.seaexplorer.realtime(directory, yo = 2, progressBar = FALSE))
     expect_silent(ga <- subset(g, "ascending"))
     expect_silent(gd <- subset(g, "descending"))
 })
 
 test_that("subset seaexplorer by pressure", {
     directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
-    expect_silent(g <- read.glider.seaexplorer.realtime(directory, yo = 101, progressBar = FALSE))
+    expect_silent(g <- read.glider.seaexplorer.realtime(directory, yo = 2, progressBar = FALSE))
     deep <- g[["pressure"]] > 20
     deep[is.na(deep)] <- FALSE
     expect_silent(gdeep <- subset(g, pressure > 20))

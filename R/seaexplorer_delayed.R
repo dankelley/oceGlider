@@ -187,96 +187,146 @@ read.glider.seaexplorer.delayed <- function(directory, yo, level = 1, interpolat
         } else if (is.character(progressBar) && progressBar == "shiny") {
             shiny::incProgress(1 / nfiles)
         }
-
         d <- utils::read.delim(files[i], sep = ";", stringsAsFactors = FALSE, row.names = NULL)
         d$yoNumber <- rep(yo[i], dim(d)[1])
         # Rename items in payload1 data.
-        gliderDebug(debug > 3, "i=", i, " (position 1) \n")
-        if ("NAV_RESOURCE" %in% names(d)) {
-            names(d) <- gsub("NAV_RESOURCE", "navState", names(d))
-            res@metadata$dataNamesOriginal$payload1$navState <- "NAV_RESOURCE"
-        }
-        if ("NAV_DEPTH" %in% names(d)) {
-            names(d) <- gsub("NAV_DEPTH", "pressureNav", names(d))
-            res@metadata$dataNamesOriginal$payload1$pressureNav <- "NAV_DEPTH"
-        }
-        if ("NAV_LONGITUDE" %in% names(d)) {
-            names(d) <- gsub("NAV_LONGITUDE", "longitude", names(d))
-            d$longitude <- degreeMinute(d$longitude)
-            res@metadata$dataNamesOriginal$payload1$longitude <- "NAV_LONGITUDE"
-        }
-        if ("NAV_LATITUDE" %in% names(d)) {
-            names(d) <- gsub("NAV_LATITUDE", "latitude", names(d))
-            d$latitude <- degreeMinute(d$latitude)
-            res@metadata$dataNamesOriginal$payload1$latitude <- "NAV_LATITUDE"
-        }
-        gliderDebug(debug > 3, "i=", i, " (position 2) \n")
-        if ("GPCTD_TEMPERATURE" %in% names(d)) {
-            names(d) <- gsub("GPCTD_TEMPERATURE", "temperature", names(d))
-            res@metadata$dataNamesOriginal$payload1$temperature <- "GPCTD_TEMPERATURE"
-        }
-        if ("GPCTD_PRESSURE" %in% names(d)) {
-            names(d) <- gsub("GPCTD_PRESSURE", "pressure", names(d))
-            res@metadata$dataNamesOriginal$payload1$pressure <- "GPCTD_PRESSURE"
-        }
-        if ("GPCTD_CONDUCTIVITY" %in% names(d)) {
-            names(d) <- gsub("GPCTD_CONDUCTIVITY", "conductivity", names(d))
-            res@metadata$dataNamesOriginal$payload1$conductivity <- "GPCTD_CONDUCTIVITY"
-        }
-        if ("GPCTD_DOF" %in% names(d)) {
-            names(d) <- gsub("GPCTD_DOF", "oxygenFrequency", names(d))
-            res@metadata$dataNamesOriginal$payload1$oxygenFrequency <- "GPCTD_DOF"
-        }
-        gliderDebug(debug > 3, "i=", i, " (position 3) \n")
-        if ("FLBBCD_CHL_COUNT" %in% names(d)) {
-            names(d) <- gsub("FLBBCD_CHL_COUNT", "chlorophyllCount", names(d))
-            res@metadata$dataNamesOriginal$payload1$chlorophyllCount <- "FLBBCD_CHL_COUNT"
-        }
-        if ("FLBBCD_CHL_SCALED" %in% names(d)) {
-            names(d) <- gsub("FLBBCD_CHL_SCALED", "chlorophyll", names(d))
-            res@metadata$dataNamesOriginal$payload1$chlorophyll <- "FLBBCD_CHL_SCALED"
-        }
-        if ("FLBBCD_BB_700_COUNT" %in% names(d)) {
-            names(d) <- gsub("FLBBCD_BB_700_COUNT", "backscatterCount", names(d))
-            res@metadata$dataNamesOriginal$payload1$backscatterCount <- "FLBBCD_BB_700_COUNT"
-        }
-        if ("FLBBCD_BB_700_SCALED" %in% names(d)) {
-            names(d) <- gsub("FLBBCD_BB_700_SCALED", "backscatter", names(d))
-            res@metadata$dataNamesOriginal$payload1$backscatter <- "FLBBCD_BB_700_SCALED"
-        }
-        if ("FLBBCD_CDOM_COUNT" %in% names(d)) {
-            names(d) <- gsub("FLBBCD_CDOM_COUNT", "cdomCount", names(d))
-            res@metadata$dataNamesOriginal$payload1$cdomCount <- "FLBBCD_CDOM_COUNT"
-        }
-        gliderDebug(debug > 3, "i=", i, " (position 4) \n")
-        if ("FLBBCD_CDOM_SCALED" %in% names(d)) {
-            names(d) <- gsub("FLBBCD_CDOM_SCALED", "cdom", names(d))
-            res@metadata$dataNamesOriginal$payload1$cdom <- "FLBBCD_CDOM_SCALED"
-        }
-        if ("PLD_REALTIMECLOCK" %in% names(d)) {
-            names(d) <- gsub("PLD_REALTIMECLOCK", "time", names(d))
-            # FIXME(DK): reading fractional seconds changes some hard-wired numbers in test_flags.R
-            if (issue40) {
-                d$time <- as.POSIXct(d$time, format = "%d/%m/%Y %H:%M:%OS", tz = "UTC")
-            } else {
-                d$time <- as.POSIXct(d$time, format = "%d/%m/%Y %H:%M:%S", tz = "UTC")
+        gliderDebug(debug > 3, "i=", i, "  (position 1) \n")
+        #if ("NAV_RESOURCE" %in% names(d)) {
+        #    names(d) <- gsub("NAV_RESOURCE", "navState", names(d))
+        #    res@metadata$dataNamesOriginal$payload1$navState <- "NAV_RESOURCE"
+        #}
+        #if ("NAV_DEPTH" %in% names(d)) {
+        #    names(d) <- gsub("NAV_DEPTH", "pressureNav", names(d))
+        #    res@metadata$dataNamesOriginal$payload1$pressureNav <- "NAV_DEPTH"
+        #}
+        #if ("NAV_LONGITUDE" %in% names(d)) {
+        #    names(d) <- gsub("NAV_LONGITUDE", "longitude", names(d))
+        #    d$longitude <- degreeMinute(d$longitude)
+        #    res@metadata$dataNamesOriginal$payload1$longitude <- "NAV_LONGITUDE"
+        #}
+        #if ("NAV_LATITUDE" %in% names(d)) {
+        #    names(d) <- gsub("NAV_LATITUDE", "latitude", names(d))
+        #    d$latitude <- degreeMinute(d$latitude)
+        #    res@metadata$dataNamesOriginal$payload1$latitude <- "NAV_LATITUDE"
+        #}
+        nameDictDefault <- data.frame(
+            oname = c(
+                "NAV_RESOURCE", "NAV_LONGITUDE", "NAV_LATITUDE",
+                "NAV_DEPTH", "FLBBCD_CHL_COUNT", "FLBBCD_CHL_SCALED",
+                "FLBBCD_BB_700_COUNT", "FLBBCD_BB_700_SCALED",
+                "FLBBCD_CDOM_COUNT", "FLBBCD_CDOM_SCALED", "GPCTD_CONDUCTIVITY",
+                "GPCTD_DOF", "GPCTD_PRESSURE", "GPCTD_TEMPERATURE",
+                "PLD_REALTIMECLOCK"
+            ),
+            nname = c(
+                "navState", "longitude", "latitude", "pressureNav",
+                "chlorophyllCount", "chlorophyll", "backscatterCount",
+                "backscatter", "cdomCount", "cdom", "conductivity",
+                "oxygenFrequency", "pressure", "temperature",
+                "time"
+            )
+        )
+        nameDictLegato <- data.frame(
+            oname = paste0("LEGATO_", c(
+                "CONDTEMP", "CONDUCTIVITY",
+                "PRESSURE", "SALINITY", "TEMPERATURE"
+            )),
+            nname = c(
+                "conductivityTemperature", "conductivity",
+                "pressure", "salinity", "temperature"
+            )
+        )
+        nameDict <- rbind(nameDictDefault, nameDictLegato)
+        for (row in seq_len(nrow(nameDict))) {
+            nd <- nameDict[row, ]
+            gliderDebug(debug > 1, "    rename payload item", nd$oname, "as", nd$nname, "\n")
+            # cat(oce::vectorShow(nd))
+            # Handle some conversions
+            if (identical(nd$oname, "PLD_REALTIMECLOCK")) {
+                d$PLD_REALTIMECLOCK <- as.POSIXct(d$PLD_REALTIMECLOCK,
+                    format = "%d/%m/%Y %H:%M:%OS", tz = "UTC"
+                )
             }
-            res@metadata$dataNamesOriginal$payload1$time <- "-"
+            if (identical(nd$oname, "NAV_LATITUDE")) {
+                d$NAV_LATITUDE <- degreeMinute(d$NAV_LATITUDE)
+            }
+            if (identical(nd$oname, "NAV_LONGITUDE")) {
+                d$NAV_LONGITUDE <- degreeMinute(d$NAV_LONGITUDE)
+            }
+            namesTmp <- names(d)
+            if (nd$oname %in% namesTmp) {
+                gname <- getNextName(nd$nname, namesTmp)
+                names(d) <- gsub(nd$oname, gname, namesTmp)
+                res@metadata$dataNamesOriginal$payload1[[gname]] <- nd$oname
+            }
         }
+        gliderDebug(debug > 1, "  finished renaming\n")
+        #if ("GPCTD_TEMPERATURE" %in% names(d)) {
+        #    names(d) <- gsub("GPCTD_TEMPERATURE", "temperature", names(d))
+        #    res@metadata$dataNamesOriginal$payload1$temperature <- "GPCTD_TEMPERATURE"
+        #}
+        #if ("GPCTD_PRESSURE" %in% names(d)) {
+        #    names(d) <- gsub("GPCTD_PRESSURE", "pressure", names(d))
+        #    res@metadata$dataNamesOriginal$payload1$pressure <- "GPCTD_PRESSURE"
+        #}
+        #if ("GPCTD_CONDUCTIVITY" %in% names(d)) {
+        #    names(d) <- gsub("GPCTD_CONDUCTIVITY", "conductivity", names(d))
+        #    res@metadata$dataNamesOriginal$payload1$conductivity <- "GPCTD_CONDUCTIVITY"
+        #}
+        #if ("GPCTD_DOF" %in% names(d)) {
+        #    names(d) <- gsub("GPCTD_DOF", "oxygenFrequency", names(d))
+        #    res@metadata$dataNamesOriginal$payload1$oxygenFrequency <- "GPCTD_DOF"
+        #}
+        #gliderDebug(debug > 3, "i=", i, " (position 3) \n")
+        #if ("FLBBCD_CHL_COUNT" %in% names(d)) {
+        #    names(d) <- gsub("FLBBCD_CHL_COUNT", "chlorophyllCount", names(d))
+        #    res@metadata$dataNamesOriginal$payload1$chlorophyllCount <- "FLBBCD_CHL_COUNT"
+        #}
+        #if ("FLBBCD_CHL_SCALED" %in% names(d)) {
+        #    names(d) <- gsub("FLBBCD_CHL_SCALED", "chlorophyll", names(d))
+        #    res@metadata$dataNamesOriginal$payload1$chlorophyll <- "FLBBCD_CHL_SCALED"
+        #}
+        #if ("FLBBCD_BB_700_COUNT" %in% names(d)) {
+        #    names(d) <- gsub("FLBBCD_BB_700_COUNT", "backscatterCount", names(d))
+        #    res@metadata$dataNamesOriginal$payload1$backscatterCount <- "FLBBCD_BB_700_COUNT"
+        #}
+        #if ("FLBBCD_BB_700_SCALED" %in% names(d)) {
+        #    names(d) <- gsub("FLBBCD_BB_700_SCALED", "backscatter", names(d))
+        #    res@metadata$dataNamesOriginal$payload1$backscatter <- "FLBBCD_BB_700_SCALED"
+        #}
+        #if ("FLBBCD_CDOM_COUNT" %in% names(d)) {
+        #    names(d) <- gsub("FLBBCD_CDOM_COUNT", "cdomCount", names(d))
+        #    res@metadata$dataNamesOriginal$payload1$cdomCount <- "FLBBCD_CDOM_COUNT"
+        #}
+        #gliderDebug(debug > 3, "i=", i, " (position 4) \n")
+        #if ("FLBBCD_CDOM_SCALED" %in% names(d)) {
+        #    names(d) <- gsub("FLBBCD_CDOM_SCALED", "cdom", names(d))
+        #    res@metadata$dataNamesOriginal$payload1$cdom <- "FLBBCD_CDOM_SCALED"
+        #}
+        #if ("PLD_REALTIMECLOCK" %in% names(d)) {
+        #    names(d) <- gsub("PLD_REALTIMECLOCK", "time", names(d))
+        #    # FIXME(DK): reading fractional seconds changes some hard-wired numbers in test_flags.R
+        #    if (issue40) {
+        #        d$time <- as.POSIXct(d$time, format = "%d/%m/%Y %H:%M:%OS", tz = "UTC")
+        #    } else {
+        #        d$time <- as.POSIXct(d$time, format = "%d/%m/%Y %H:%M:%S", tz = "UTC")
+        #    }
+        #    res@metadata$dataNamesOriginal$payload1$time <- "-"
+        #}
         gliderDebug(debug > 3, "i=", i, " (position 5) \n")
         pld1[[i]] <- d
-        gliderDebug(debug > 3, "i=", i, " (position 6) \n")
+        gliderDebug(debug, "  first stage completed for file", i, "of", nfiles, "\n")
     }
-    gliderDebug(debug > 3, "(position 7) \n")
+    gliderDebug(debug > 3, "  (position 7) \n")
     df <- do.call(rbind.data.frame, pld1)
-    gliderDebug(debug, " (position 8) \n")
+    gliderDebug(debug > 3, "  (position 8) \n")
     df[["X"]] <- NULL # get rid of the weird last column
-    gliderDebug(debug > 3, " (position 9) \n")
+    gliderDebug(debug > 3, "  (position 9) \n")
     if (is.logical(progressBar) && progressBar) {
         cat("\n")
         flush.console()
     }
-    gliderDebug(debug, "Finished reading data \n")
+    gliderDebug(debug, "  data cleanup\n")
     # First remove all duplicated lon/lat
     df$longitude[which(duplicated(df$longitude))] <- NA
     df$latitude[which(duplicated(df$latitude))] <- NA
@@ -400,6 +450,5 @@ read.glider.seaexplorer.delayed <- function(directory, yo, level = 1, interpolat
         res@processingLog,
         paste("read.glider.seaexplorer.delayed(directory=\"", directory, "\", yo=", head(yo, 1), ":", tail(yo, 1), ", level=", level, ")", sep = "")
     )
-    gliderDebug(debug, "read.glider.seaexplorer.delayed(\"", directory, "\", ...) {\n", unindent = 1)
     res
 }
