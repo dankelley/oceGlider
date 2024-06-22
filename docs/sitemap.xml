@@ -28,6 +28,9 @@
     <loc>/reference/degreeMinute.html</loc>
   </url>
   <url>
+    <loc>/reference/getNextName.html</loc>
+  </url>
+  <url>
     <loc>/reference/glider-class.html</loc>
   </url>
   <url>
@@ -83,6 +86,12 @@
   </url>
   <url>
     <loc>/reference/summary-glider-method.html</loc>
+  </url>
+  <url>
+    <loc>/reference/swOxygenFrequencyToSaturation.html</loc>
+  </url>
+  <url>
+    <loc>/reference/swOxygenSolubility.html</loc>
   </url>
   <url>
     <loc>/reference/swSatO2.html</loc>

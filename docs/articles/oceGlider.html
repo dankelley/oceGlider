@@ -84,7 +84,7 @@
       <h1 data-toc-skip>Introduction to oceglider</h1>
                         <h4 data-toc-skip class="author">Dan Kelley (<a href="https://orcid.org/0000-0001-7808-5911" class="external-link uri">https://orcid.org/0000-0001-7808-5911</a>)</h4>
             
-            <h4 data-toc-skip class="date">2024-06-20</h4>
+            <h4 data-toc-skip class="date">2024-06-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/dankelley/oceglider/blob/HEAD/vignettes/oceglider.Rmd" class="external-link"><code>vignettes/oceglider.Rmd</code></a></small>
       <div class="hidden name"><code>oceglider.Rmd</code></div>
@@ -94,146 +94,92 @@
     
     
 <p><strong>Abstract.</strong> This vignette explains the basics of using
-the oceglider package. It is a work in progress, because the functions
-provided by this package are under active development.</p>
+the <code>oceglider</code> package. It is a work in progress, because
+the functions provided by this package are under active development.</p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>This package is intended to make it easier for analysts to work with
-data acquired by ocean gliders. There is a wide variety of glider types
-and of file formats, and the purpose of this vignette is to acquaint the
-reader with a particular type (the seaexplorer from Alseamar) and
-particular approach (using data files produced by the glider
-itself).</p>
-<p>Rather than simply state what might be best practices, I will present
-a sort of illustrated diary, showing how I worked my way through a small
-sample dataset that is provided with the package.</p>
+<p>The <code>oceglider</code> package is intended to make it easier for
+analysts to work with data acquired by ocean gliders. There is a wide
+variety of glider types and file formats, and discussing them all is
+beyond the scope of this document, let alone the package. I hope in what
+follows to give a flavour for what is is like to work with a particular
+type (the SeaExplorer glider, from Alseamar) and particular approach
+(using data files produced by the glider itself).</p>
+<p>The form of the document is that of an illustrated diary, touching on
+some elements of working with a small sample dataset that is provided
+with the package.</p>
 </div>
 <div class="section level2">
 <h2 id="data-sources-and-file-organization">Data Sources and file organization<a class="anchor" aria-label="anchor" href="#data-sources-and-file-organization"></a>
 </h2>
 <p>The first step in working with glider data is often to download them
-from a server. The lack of URL conventions for such servers can make
-this a somewhat challenging task to discuss in general terms, and the
-same can be said about the variety of file layouts and file names, both
-across glider types and even within glider types.</p>
-<p>Once data are downloaded, there is an additional task of deciding how
-to organize the data locally. At the time of writing, the developers of
-this package are leaning towards a scheme with directories named
-like</p>
-<pre><code>/data/glider/2019/seaexplorer/sea021/m49/raw
-/data/glider/2019/seaexplorer/sea021/m49/sub</code></pre>
-<p>for seaexplorer data. Here, <code>sea021</code> refers to seaexplorer
-glider number owned by a particular institute, and <code>m49</code>
-refers to the mission number. The first of these directories holds “raw”
-data, i.e. the full datasets as downloaded a glider after recovery, and
-the second holds “sub” data, i.e. subsets provided by the glider during
-its transmissions while underway on a mission.</p>
-<p>Examples of some of these data files are stored within this R
-package, and are available using the <code>system.file</code> function,
-as shown throughout this vignette. This should make it easier for
-readers to learn how to use this package.</p>
+from a server. The lack of URL conventions for such servers makes it
+challenging to discuss in general terms. The same can be said of the
+various file layouts. The <code>oceglider</code> package cannot handle
+the wide variety of possibilities. Indeed, whether the code shown here
+will work on new datasets is very much in question.</p>
+<p>The package comes with some sample files that will be used for
+illustration. These files are also used in the help pages that come with
+the package. They stem from extraction of files from the following
+directories on the author’s computer.</p>
+<pre><code>~/data/glider/sea021/M71/raw
+~/data/glider/sea021/M71/sub</code></pre>
+<p>The convention is as follows. The <code>sea021</code> directory
+contains data from a SeaExplorer glider owned by a particular institute,
+and <code>M49</code> directory holds the data from a particular mission.
+The <code>raw</code> directory holds full datasets as downloaded a
+glider after recovery. The <code>sub</code> directory holds subsets
+provided by the glider during its transmissions while underway on a
+mission.</p>
 </div>
 <div class="section level2">
 <h2 id="seaexplorer-gliders">SeaExplorer Gliders<a class="anchor" aria-label="anchor" href="#seaexplorer-gliders"></a>
 </h2>
 <p>This package comes with some sample data files that can be used for
-practice and illustration. For example,</p>
+practice and illustration.</p>
+<div class="section level3">
+<h3 id="reading-datasets">Reading Datasets<a class="anchor" aria-label="anchor" href="#reading-datasets"></a>
+</h3>
+<p>A small dataset provided with the package may be loaded as
+follows.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">oceglider</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: oce</span></span>
 <span><span class="co">#&gt; Loading required package: gsw</span></span>
-<span><span class="va">directory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/seaexplorer/sub"</span>, package<span class="op">=</span><span class="st">"oceglider"</span><span class="op">)</span></span></code></pre></div>
-<p>finds the names of a few selected <code>"sub"</code> files (these are
-files transmitted by the glider when it is underway; think of the “sub”
-as an abbreviation for subset). Reading these files is done with <a href="../help/read.glider.seaexplorer.realtime"><code>read.glider.seaexplorer.realtime</code></a>
-function, e.g.</p>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dankelley.github.io/oce/" class="external-link">oce</a></span><span class="op">)</span> <span class="co"># used in some later things</span></span>
+<span><span class="va">directory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/seaexplorer/sub"</span>, package <span class="op">=</span> <span class="st">"oceglider"</span><span class="op">)</span></span>
+<span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.glider.seaexplorer.delayed.html">read.glider.seaexplorer.delayed</a></span><span class="op">(</span><span class="va">directory</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="pressure-time-plots">Pressure-time Plots<a class="anchor" aria-label="anchor" href="#pressure-time-plots"></a>
+</h3>
+<p>Here is how to plot a time-series of pressure from this dataset</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.glider.seaexplorer.realtime.html">read.glider.seaexplorer.realtime</a></span><span class="op">(</span><span class="va">directory</span><span class="op">)</span></span></code></pre></div>
-<p>(when called interactively, this function will print a progress-bar,
-unless instructed otherwise by setting the argument to .)</p>
-<p>The package also comes with a few <code>"raw"</code> files, which are
-larger datasets downloaded from the glider after recovery. In the
-oceanographic convention, these are called delayed-mode data, so the
-function to read them is called <a href="../help/read.glider.seaexplorer.delayed"><code>read.glider.seaexplorer.delayed</code></a></p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="oceGlider_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+<p>In the plot, notice that the glider is at the surface (the pressure
+indicates the sensor is about 1 m below the surface) for about 10
+minutes, then descends to about 45 m depth, rising more slowly towards
+the surface. This pattern of lowering and then rising is called a “yo”
+in the <code>oceglider</code> package. The first two yos in this dataset
+reached to the surface, while the third only got near the surface.
+During this small sampling, full surfacing was quite common, although
+later in the glider mission there were quite a few more partial yos
+between pairs of full yos.</p>
+</div>
+<div class="section level3">
+<h3 id="navigation-state">Navigation State<a class="anchor" aria-label="anchor" href="#navigation-state"></a>
+</h3>
+<p>This dataset holds something called <code>navState</code> by the
+package. This can be seen in plots like the following. Notice that the
+glider is in the <code>at_surface</code> state at the start of the first
+two yos. (<em>Exercise:</em> to learn how to interpret the format of
+this diagram, try finding the full yos, and compare that with the
+previous diagram.)</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">directory2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/seaexplorer/raw"</span>, package<span class="op">=</span><span class="st">"oceglider"</span><span class="op">)</span></span>
-<span><span class="va">g2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.glider.seaexplorer.delayed.html">read.glider.seaexplorer.delayed</a></span><span class="op">(</span><span class="va">directory2</span>, level<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p>Here is how to plot a time-series of pressure from this dataset:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g2</span>, which<span class="op">=</span><span class="st">"p"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="oceGlider_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
-<p>Here is how to see locations in space:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g2</span>, which<span class="op">=</span><span class="st">"map"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="oceGlider_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
-<p>The points are on a line because <a href="../help/read.glider.seaexplorer.delayed"><code>read.glider.seaexplorer.delayed</code></a>
-interpolates longitude and latitude between surfacings, and this small
-subset of glider data was selected to have a position record at the
-first and last of the sequence.</p>
-<p>It is also noteworthy that some of the spots seem to have only a few
-data. This can be checked with</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">g2</span><span class="op">[[</span><span class="st">"yoNumber"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 100 101 102 103 104 105 106 </span></span>
-<span><span class="co">#&gt; 163   1 173   1 178   1 261</span></span></code></pre></div>
-<p>the result of which show that some <code>yoNumber</code> values
-contain too few data to be considered profiles. There are several ways
-to explore this further, but for the present purpose, let’s make a new
-object that contains only those yos that have more than, say, 5
-points:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">g3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">g2</span>, <span class="va">yolength</span> <span class="op">&gt;=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
-<p>As a check on that idea, note that</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">g3</span><span class="op">[[</span><span class="st">"yoNumber"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 100 102 104 106</span></span></code></pre></div>
-<p>verifies that we got the desired yos.</p>
-<p>Quite often, it will be desirable to work with individual yos. With
-only 3, as in this small test case, we might as well plot them (say as
-temperature profiles). For that, it is helpful to split by yo number,
-and then cycle though the subsets, converting to CTD objects and
-plotting with functions from the package.</p>
-<p>The individual yos can be examined by splitting the
-<code>payload</code> portion:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">payload</span> <span class="op">&lt;-</span> <span class="va">g3</span><span class="op">[[</span><span class="st">"payload"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="va">payload</span>, <span class="va">payload</span><span class="op">$</span><span class="va">yoNumber</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="co"># we happen to know there are 3 significant yos</span></span>
-<span><span class="kw">for</span> <span class="op">(</span><span class="va">ss</span> <span class="kw">in</span> <span class="va">s</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">ctd</span> <span class="op">&lt;-</span> <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/as.ctd.html" class="external-link">as.ctd</a></span><span class="op">(</span>salinity<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"salinity"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        temperature<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        pressure<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"pressure"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        longitude<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"longitude"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        latitude<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"latitude"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span>   <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/plotProfile.html" class="external-link">plotProfile</a></span><span class="op">(</span><span class="va">ctd</span>, xtype<span class="op">=</span><span class="st">"salinity+temperature"</span>, eos<span class="op">=</span><span class="st">"unesco"</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p><img src="oceGlider_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
-<p>In the above, the UNESCO equation of state is used, because the newer
-TEOS10/GSW version requires longitude and latitude information to be
-valid, which is not the case in the present version of the package at
-the end of a dataset, owing to how
-[<code><a href="../reference/read.glider.seaexplorer.delayed.html">read.glider.seaexplorer.delayed()</a></code>]
-(../help/read.glider.seaexplorer.delayed) works.</p>
-<p>There is a problem with the graph just constructed, with a
-spurious-looking line connecting near-surface and deep data. To learn
-more about that, we may use an function to create a “scan” plot, say of
-the last of these <code>ctd</code> objects just created.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://dankelley.github.io/oce/reference/plotScan.html" class="external-link">plotScan</a></span><span class="op">(</span><span class="va">ctd</span>, type<span class="op">=</span><span class="st">"p"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="oceGlider_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
-<p>The scan plot makes it clear that the yo contains near-surface data,
-then skips to depth, and then returns to the surface. A more careful
-examination with</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">s</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"time"</span><span class="op">]</span><span class="op">]</span>, <span class="va">s</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"pressure"</span><span class="op">]</span><span class="op">]</span>, xlab<span class="op">=</span><span class="st">"Time"</span>, ylab<span class="op">=</span><span class="st">"Pressure"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">s</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"time"</span><span class="op">]</span><span class="op">]</span>, <span class="va">s</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"navState"</span><span class="op">]</span><span class="op">]</span>, xlab<span class="op">=</span><span class="st">"Time"</span>, ylab<span class="op">=</span><span class="st">"navState"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="oceGlider_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
-<p>reveals that if the desire was to obtain a simple upcast, we might
-consider subsetting by the value of the <code>navState</code>
-variable.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"navState"</span>, type <span class="op">=</span> <span class="st">"o"</span>, cex <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></code></pre></div>
+<p><img src="oceGlider_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 <p>For reference, the <code>navState</code> values are as follows:</p>
 <ul>
 <li>105 means the glider is not navigating yet;</li>
@@ -247,61 +193,150 @@ is communicating;</li>
 be inflecting upward;</li>
 <li>117 means the glider has ballast set to be ascending.</li>
 </ul>
-<p>For example, a focus on the ascending portions may be accomplished
-with the following.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">g4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">g3</span>, <span class="va">navState</span><span class="op">==</span><span class="fl">117</span><span class="op">)</span></span>
-<span><span class="va">payload</span> <span class="op">&lt;-</span> <span class="va">g4</span><span class="op">[[</span><span class="st">"payload"</span><span class="op">]</span><span class="op">]</span> <span class="co"># or [["payload1"]]</span></span>
+</div>
+<div class="section level3">
+<h3 id="maps">Maps<a class="anchor" aria-label="anchor" href="#maps"></a>
+</h3>
+<p>The following shows how to see locations in space. Note that 1 degree
+of latitude is approximately 111 km, so the total span of the diagram is
+only about half a kilometre.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"map"</span>, cex <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></code></pre></div>
+<p><img src="oceGlider_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+</div>
+<div class="section level3">
+<h3 id="isolating-yos">Isolating Yos<a class="anchor" aria-label="anchor" href="#isolating-yos"></a>
+</h3>
+<p>Quite often, it will be desirable to work with individual yos. With
+only 3, as in this small test case, we might as well plot them (say as
+temperature profiles). For that, it is helpful to split by yo number,
+and then cycle though the subsets, converting to CTD objects and
+plotting with functions from the package.</p>
+<p>The individual yos can be examined by splitting the
+<code>payload</code> portion:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">payload</span> <span class="op">&lt;-</span> <span class="va">g</span><span class="op">[[</span><span class="st">"payload"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="va">payload</span>, <span class="va">payload</span><span class="op">$</span><span class="va">yoNumber</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="co"># we happen to know there are 3 significant yos</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="co"># we happen to know there are 6 yos</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">ss</span> <span class="kw">in</span> <span class="va">s</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">ctd</span> <span class="op">&lt;-</span> <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/as.ctd.html" class="external-link">as.ctd</a></span><span class="op">(</span>salinity<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"salinity"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        temperature<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        pressure<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"pressure"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        longitude<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"longitude"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        latitude<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"latitude"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span>    <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/plotProfile.html" class="external-link">plotProfile</a></span><span class="op">(</span><span class="va">ctd</span>, xtype<span class="op">=</span><span class="st">"salinity+temperature"</span>, eos<span class="op">=</span><span class="st">"unesco"</span><span class="op">)</span></span>
+<span>    <span class="va">ctd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dankelley.github.io/oce/reference/as.ctd.html" class="external-link">as.ctd</a></span><span class="op">(</span></span>
+<span>        salinity <span class="op">=</span> <span class="va">ss</span><span class="op">[[</span><span class="st">"salinity"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>        temperature <span class="op">=</span> <span class="va">ss</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>        pressure <span class="op">=</span> <span class="va">ss</span><span class="op">[[</span><span class="st">"pressure"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>        longitude <span class="op">=</span> <span class="va">ss</span><span class="op">[[</span><span class="st">"longitude"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>        latitude <span class="op">=</span> <span class="va">ss</span><span class="op">[[</span><span class="st">"latitude"</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://dankelley.github.io/oce/reference/plotProfile.html" class="external-link">plotProfile</a></span><span class="op">(</span><span class="va">ctd</span>, xtype <span class="op">=</span> <span class="st">"salinity+temperature"</span>, eos <span class="op">=</span> <span class="st">"unesco"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="oceGlider_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
-<p>These results are not much better! Selecting by <code>navState</code>
-is clearly not sufficient. However, <code>oce</code> provides the
-<code><a href="https://dankelley.github.io/oce/reference/ctdTrim.html" class="external-link">ctdTrim()</a></code> function for isolating the ascent (called
-<code>"upcast"</code> in the CTD context), e.g.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="co"># we happen to know there are 3 significant yos</span></span>
+<p><img src="oceGlider_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<p>Let’s use the navigation state to examine the ascending data.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ga</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">g</span>, <span class="va">navState</span> <span class="op">==</span> <span class="fl">117</span><span class="op">)</span></span>
+<span><span class="va">payload</span> <span class="op">&lt;-</span> <span class="va">ga</span><span class="op">[[</span><span class="st">"payload"</span><span class="op">]</span><span class="op">]</span> <span class="co"># or [["payload1"]]</span></span>
+<span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="va">payload</span>, <span class="va">payload</span><span class="op">$</span><span class="va">yoNumber</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">ss</span> <span class="kw">in</span> <span class="va">s</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">ctd</span> <span class="op">&lt;-</span> <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/as.ctd.html" class="external-link">as.ctd</a></span><span class="op">(</span>salinity<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"salinity"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        temperature<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        pressure<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"pressure"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        longitude<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"longitude"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        latitude<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"latitude"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span>   <span class="va">ctd</span> <span class="op">&lt;-</span> <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/ctdTrim.html" class="external-link">ctdTrim</a></span><span class="op">(</span><span class="va">ctd</span>, <span class="st">"upcast"</span><span class="op">)</span></span>
-<span>   <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/plotProfile.html" class="external-link">plotProfile</a></span><span class="op">(</span><span class="va">ctd</span>, xtype<span class="op">=</span><span class="st">"salinity+temperature"</span>, eos<span class="op">=</span><span class="st">"unesco"</span><span class="op">)</span></span>
+<span>    <span class="va">ctd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dankelley.github.io/oce/reference/as.ctd.html" class="external-link">as.ctd</a></span><span class="op">(</span></span>
+<span>        salinity <span class="op">=</span> <span class="va">ss</span><span class="op">$</span><span class="va">salinity</span>,</span>
+<span>        temperature <span class="op">=</span> <span class="va">ss</span><span class="op">$</span><span class="va">temperature</span>,</span>
+<span>        pressure <span class="op">=</span> <span class="va">ss</span><span class="op">$</span><span class="va">pressure</span>,</span>
+<span>        longitude <span class="op">=</span> <span class="va">ss</span><span class="op">$</span><span class="va">longitude</span>,</span>
+<span>        latitude <span class="op">=</span> <span class="va">ss</span><span class="op">$</span><span class="va">latitude</span></span>
+<span>    <span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://dankelley.github.io/oce/reference/plotProfile.html" class="external-link">plotProfile</a></span><span class="op">(</span><span class="va">ctd</span>,</span>
+<span>        xtype <span class="op">=</span> <span class="st">"salinity+temperature"</span>, eos <span class="op">=</span> <span class="st">"unesco"</span>,</span>
+<span>        type <span class="op">=</span> <span class="st">"p"</span>, cex <span class="op">=</span> <span class="fl">0.5</span></span>
+<span>    <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="oceGlider_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
-<p>This looks reasonable now. Let’s try a waterfall temperature plot,
-with black for the first yo, red for the second, green for the third,
-and blue for the fourth, as explained in the legend.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<p><img src="oceGlider_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+</div>
+<div class="section level3">
+<h3 id="waterfall-plots">Waterfall Plots<a class="anchor" aria-label="anchor" href="#waterfall-plots"></a>
+</h3>
+<p>Let’s try a waterfall temperature plot, with black for the first yo,
+red for the second, and green for the third.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">xlim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">ss</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">ss</span> <span class="op">&lt;-</span> <span class="va">s</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span></span>
-<span>    <span class="va">ctd</span> <span class="op">&lt;-</span> <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/as.ctd.html" class="external-link">as.ctd</a></span><span class="op">(</span>salinity<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"salinity"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        temperature<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        pressure<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"pressure"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        longitude<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"longitude"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        latitude<span class="op">=</span><span class="va">ss</span><span class="op">[[</span><span class="st">"latitude"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span>    <span class="va">ctd</span> <span class="op">&lt;-</span> <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/ctdTrim.html" class="external-link">ctdTrim</a></span><span class="op">(</span><span class="va">ctd</span>, <span class="st">"upcast"</span><span class="op">)</span></span>
+<span>    <span class="va">ctd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dankelley.github.io/oce/reference/as.ctd.html" class="external-link">as.ctd</a></span><span class="op">(</span></span>
+<span>        salinity <span class="op">=</span> <span class="va">ss</span><span class="op">$</span><span class="va">salinity</span>,</span>
+<span>        temperature <span class="op">=</span> <span class="va">ss</span><span class="op">$</span><span class="va">temperature</span>,</span>
+<span>        pressure <span class="op">=</span> <span class="va">ss</span><span class="op">$</span><span class="va">pressure</span>,</span>
+<span>        longitude <span class="op">=</span> <span class="va">ss</span><span class="op">$</span><span class="va">longitude</span>,</span>
+<span>        latitude <span class="op">=</span> <span class="va">ss</span><span class="op">$</span><span class="va">latitude</span></span>
+<span>    <span class="op">)</span></span>
+<span>    <span class="va">ctd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dankelley.github.io/oce/reference/ctdTrim.html" class="external-link">ctdTrim</a></span><span class="op">(</span><span class="va">ctd</span>, <span class="st">"upcast"</span><span class="op">)</span></span>
 <span>    <span class="kw">if</span> <span class="op">(</span><span class="va">i</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
-<span>       <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/plotProfile.html" class="external-link">plotProfile</a></span><span class="op">(</span><span class="va">ctd</span>, xtype<span class="op">=</span><span class="st">"temperature"</span>, eos<span class="op">=</span><span class="st">"unesco"</span><span class="op">)</span></span>
+<span>        <span class="fu"><a href="https://dankelley.github.io/oce/reference/plotProfile.html" class="external-link">plotProfile</a></span><span class="op">(</span><span class="va">ctd</span>,</span>
+<span>            xtype <span class="op">=</span> <span class="st">"temperature"</span>, eos <span class="op">=</span> <span class="st">"unesco"</span>,</span>
+<span>            xlim <span class="op">=</span> <span class="va">xlim</span></span>
+<span>        <span class="op">)</span></span>
 <span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>       <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">ctd</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span>, <span class="va">ctd</span><span class="op">[[</span><span class="st">"pressure"</span><span class="op">]</span><span class="op">]</span>, col<span class="op">=</span><span class="va">i</span><span class="op">)</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">ctd</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span>, <span class="va">ctd</span><span class="op">[[</span><span class="st">"pressure"</span><span class="op">]</span><span class="op">]</span>, col <span class="op">=</span> <span class="va">i</span><span class="op">)</span></span>
 <span>    <span class="op">}</span></span>
 <span><span class="op">}</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"bottomright"</span>, lwd<span class="op">=</span><span class="fl">1</span>, col<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span>,</span>
-<span>    legend<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"yo"</span>,</span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">s</span>,<span class="kw">function</span><span class="op">(</span><span class="va">ss</span><span class="op">)</span> <span class="va">ss</span><span class="op">$</span><span class="va">yoNumber</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="oceGlider_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topleft"</span>,</span>
+<span>    lwd <span class="op">=</span> <span class="fl">1</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span>, cex <span class="op">=</span> <span class="fl">1</span>, bg <span class="op">=</span> <span class="st">"white"</span>,</span>
+<span>    legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">s</span>, <span class="kw">function</span><span class="op">(</span><span class="va">ss</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="va">ss</span><span class="op">$</span><span class="va">time</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"%H:%S"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="oceGlider_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+</div>
+<div class="section level3">
+<h3 id="computing-oxygen">Computing Oxygen<a class="anchor" aria-label="anchor" href="#computing-oxygen"></a>
+</h3>
+<p>A more advanced example concerns oxygen. For SeaExplorer files, this
+is indicated by a variable named <code>GPCTD_DOF</code> (which is
+renamed to <code>oxygenFrequency</code> by the
+[read.seaexplorer.delayed()]), and a conversion process is required to
+get oxygen in umol/kg. This is as follows. First, we must insert
+calibration information into the glider object. (Note: the format
+follows a convention developed by Chantelle Layton at the Canadian
+Department of Fisheries and Oceans, in the project. In fact, the
+computation of oxygen only requires the
+<code>calibrationCoefficients</code> entry.)</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">directory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/seaexplorer/sub"</span>, package <span class="op">=</span> <span class="st">"oceglider"</span><span class="op">)</span></span>
+<span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.glider.seaexplorer.delayed.html">read.glider.seaexplorer.delayed</a></span><span class="op">(</span>directory <span class="op">=</span> <span class="va">directory</span>, progressBar <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dankelley.github.io/oce/reference/oceSetMetadata.html" class="external-link">oceSetMetadata</a></span><span class="op">(</span><span class="va">g</span>, <span class="st">"oxycalib"</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    serialNumber <span class="op">=</span> <span class="st">"43-3336"</span>,</span>
+<span>    model <span class="op">=</span> <span class="st">"SBE43F"</span>,</span>
+<span>    calibrationDate <span class="op">=</span> <span class="st">"20220201"</span>,</span>
+<span>    calibrationCoefficients <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>        Soc <span class="op">=</span> <span class="fl">3.0667e-4</span>,</span>
+<span>        Foffset <span class="op">=</span> <span class="op">-</span><span class="fl">878.86</span>,</span>
+<span>        Tau20 <span class="op">=</span> <span class="fl">1.26</span>,</span>
+<span>        A <span class="op">=</span> <span class="op">-</span><span class="fl">4.6593e-3</span>,</span>
+<span>        B <span class="op">=</span> <span class="fl">1.7954e-4</span>,</span>
+<span>        C <span class="op">=</span> <span class="op">-</span><span class="fl">2.2483e-6</span>,</span>
+<span>        Enom <span class="op">=</span> <span class="fl">0.036</span></span>
+<span>    <span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Once this is done, the <code>[[</code> can compute oxygen, as in the
+following. This plot requires a few steps to complete, especially with
+respect to margins.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dankelley.github.io/oce/reference/colormap.html" class="external-link">colormap</a></span><span class="op">(</span><span class="va">g</span><span class="op">[[</span><span class="st">"oxygen"</span><span class="op">]</span><span class="op">]</span>, col <span class="op">=</span> <span class="va">oceColorsTurbo</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://dankelley.github.io/oce/reference/drawPalette.html" class="external-link">drawPalette</a></span><span class="op">(</span>colormap <span class="op">=</span> <span class="va">cm</span><span class="op">)</span></span>
+<span><span class="va">t</span> <span class="op">&lt;-</span> <span class="va">g</span><span class="op">[[</span><span class="st">"time"</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="va">g</span><span class="op">[[</span><span class="st">"pressure"</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="fu"><a href="https://dankelley.github.io/oce/reference/oce.plot.ts.html" class="external-link">oce.plot.ts</a></span><span class="op">(</span><span class="va">t</span>, <span class="va">p</span>,</span>
+<span>    ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">p</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    type <span class="op">=</span> <span class="st">"p"</span>, col <span class="op">=</span> <span class="va">cm</span><span class="op">$</span><span class="va">zcol</span>,</span>
+<span>    mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="oceGlider_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<p><em>Exercise:</em> Can you think of a physical reason for the low
+surface oxygen in the first of the dataset? How about a
+mechanical/electronic reason? (Hint: I fully omitted the first yo from
+the dataset, because it had what I’ll call startup problems…)</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="next-steps">Next steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
+</h2>
 <p>At this stage, readers will likely have some ideas for doing more
 with this sample dataset, but they ought to bear in mind that aspects of
 the dataset may be quite different from other datasets. It makes sense
