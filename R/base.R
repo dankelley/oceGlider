@@ -175,7 +175,6 @@ setMethod(
         debug <- if (is.null(dots$debug)) getOption("gliderDebug", default = 0L) else dots$debug
         # . message("in [[, i='", i, "'")
         # debug <- getOption("gliderDebug", default = 0L)
-        gliderDebug(debug, "glider [[ {\n", unindent = 1)
         if (missing(i)) {
             stop("Must name a glider item to retrieve, e.g. '[[\"temperature\"]]'", call. = FALSE)
         }
@@ -185,7 +184,10 @@ setMethod(
         if (!is.character(i)) {
             stop("glider item must be specified by name", call. = FALSE)
         }
-        gliderDebug(debug, "  i = \"", i, "\"\n", sep = "")
+        gliderDebug(debug, "glider[[i=\"", i, "\", j=\"",
+            if (missing(j)) "(missing)" else j, ", ...]]\n",
+            sep = "", unindent = 1
+        )
         if (i == "filename") {
             return(x@metadata$filename)
         } else if (i == "data") {
@@ -259,9 +261,7 @@ setMethod(
             return(gsw_spiciness0(SA = SA, CT = CT))
         }
         if (i == "oxygen") {
-            gliderDebug(debug, "seeking \"oxygen\"\n")
             if (identical(x@metadata$type, "seaexplorer")) {
-                gliderDebug(debug, "object type is \"seaexplorer\"\n", sep = "")
                 dataNames <- names(x@data)
                 # get payload name
                 w <- grep("payload", dataNames)
@@ -273,13 +273,13 @@ setMethod(
                 }
                 payloadName <- dataNames[w]
                 dataNames <- names(x@data[[payloadName]])
-                message("dataNames--")
-                print(dataNames)
+                # message("dataNames--")
+                # print(dataNames)
                 if ("oxygen" %in% dataNames) {
-                    gliderDebug(debug, "returning \"oxygen\" directly\n")
+                    gliderDebug(debug, "  accessing \"oxygen\" directly in seaexplorer object\n")
                     return(x@data[payloadName]$oxygen)
                 } else if ("oxygenFrequency" %in% dataNames) {
-                    gliderDebug(debug, "computing \"oxygen\" from \"oxygenFrequency\"\n")
+                    gliderDebug(debug, "  computing \"oxygen\" from \"oxygenFrequency\" in seaexplorer object\n")
                     if (!"oxycalib" %in% names(x@metadata)) {
                         warning(
                             "cannot compute oxygen, because metadata lacks an",
@@ -301,7 +301,7 @@ setMethod(
                     cc <- cal$calibrationCoefficients
                     # This Kelvin temperature is as used in swSatOw.  Note the
                     # non-standard offset and the non-unity factor
-                    #Tk <- 273.15 + temperature * 1.00024
+                    # Tk <- 273.15 + temperature * 1.00024
                     # _ # NOTE: the calibration formula I have for
                     # _ # sea-explorer datasets also has something called
                     # _ # Tau20, but I don't see that below. For details
@@ -322,6 +322,7 @@ setMethod(
                     return(NULL)
                 }
             } else if (identical(x@metadata$type, "slocum")) {
+                gliderDebug(debug, "  analysing \"slocum\" object\n", sep = "")
                 message("FIXME: get oxygen from slocum")
                 dataNames <- names(x@data)
                 # I don't know whether oxygen-frequency can be in such data,
@@ -395,25 +396,29 @@ setMethod(
         if (missing(j)) {
             # . message("j is missing")
             if (i %in% names(x@metadata)) {
-                # . message("i in metadata")
+                gliderDebug(debug, "  returning item from @metadata\n")
                 return(x@metadata[[i]])
             } else if (i %in% names(x@data)) {
-                # . message("i in data")
+                gliderDebug(debug, "  returning item from @data\n")
                 return(x@data[[i]])
             } else {
-                # . message("returning i from within payload")
-                message("DANNNN")
-                message("FIXME: look up by original name (storage of which is wrong)")
                 if (i %in% names(x@data[["payload1"]])) {
-                    message("DAN 1")
+                    gliderDebug(debug, "  result in @data$payload\n")
                     return(x@data$payload1[[i]])
                 } else if (i %in% names(x@data[["glider"]])) {
-                    message("DAN 2")
+                    gliderDebug(debug, "  result in @data$glider\n")
                     return(x@data$glider[[i]])
-                } else {
-                    return(x@data$glider[[i]])
-                } # what if there is no glider?
-                return(x@data$payload[[i]])
+                } else if (i %in% names(x@metadata$dataNamesOriginal$payload1)) {
+                    gliderDebug(debug, "  result in @data$payload1 inferred from original name\n")
+                    iname <- names(which(x@metadata$dataNamesOriginal$payload1 == i))[2]
+                    return(x@data$payload1[[iname]])
+                } else if (i %in% names(x@metadata$dataNamesOriginal$glider)) {
+                    gliderDebug(debug, "  result in @data$glider inferred from original name\n")
+                    iname <- names(which(x@metadata$dataNamesOriginal$glider == i))[2]
+                    return(x@data$glider[[iname]])
+                }
+                gliderDebug(debug, "  cannot find what to return\n")
+                return(NULL)
             }
         }
         # . message("j is not missing. j='", j, "'")
@@ -529,7 +534,7 @@ degreeMinute <- function(x) {
 gliderDebug <- function(debug = 0, ..., unindent = 0) {
     debug <- if (debug > 4) 4 else max(0, floor(debug + 0.5))
     if (debug > 0) {
-        n <- 5 - debug - unindent
+        n <- debug - unindent
         if (n > 0) {
             cat(paste(rep("  ", n), collapse = ""), sep = "")
         }
@@ -856,8 +861,8 @@ as.glider <- function(type, data, units) {
 #'
 #' @author Dan Kelley
 getNextName <- function(name, existingNames) {
-    #cat(oce::vectorShow(name))
-    #cat(oce::vectorShow(existingNames))
+    # cat(oce::vectorShow(name))
+    # cat(oce::vectorShow(existingNames))
     if (!name %in% existingNames) {
         name
     } else {
@@ -866,11 +871,11 @@ getNextName <- function(name, existingNames) {
         if (length(siblings) == 1) {
             paste0(name, "2")
         } else {
-            #cat(oce::vectorShow(existingNames[siblings]))
+            # cat(oce::vectorShow(existingNames[siblings]))
             numbers <- gsub("^[_a-zA-Z]", "", existingNames[siblings])
-            #cat(oce::vectorShow(numbers))
-            numberNext <- 1L + max(as.integer(numbers), na.rm=TRUE)
-            #cat(oce::vectorShow(numberNext))
+            # cat(oce::vectorShow(numbers))
+            numberNext <- 1L + max(as.integer(numbers), na.rm = TRUE)
+            # cat(oce::vectorShow(numberNext))
             paste0(name, numberNext)
         }
     }
