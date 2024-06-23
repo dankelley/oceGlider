@@ -102,9 +102,7 @@ between pairs of full yos.
 
 This dataset holds something called `navState` by the package. This
 can be seen in plots like the following. Notice that the glider is in
-the `at_surface` state at the start of the first two yos. (*Exercise:*
-to learn how to interpret the format of this diagram, try finding the
-full yos, and compare that with the previous diagram.)
+the `at_surface` state at the start of the first two yos.
 
 ```{r dev.args = list(pointsize = 11)}
 plot(g, which = "navState", type = "o", cex = 0.5)
@@ -207,7 +205,8 @@ for (i in seq_along(s)) {
         lines(ctd[["temperature"]], ctd[["pressure"]], col = i)
     }
 }
-legend("topleft", title = "Start Time",
+legend("topleft",
+    title = "Start Time",
     lwd = 1, col = seq_along(s), cex = 0.75, bg = "white",
     legend = sapply(s, function(ss) format(ss$time[[1]], "%H:%S"))
 )
@@ -246,27 +245,20 @@ g@metadata$oxycalib <- list(
 ```
 
 Once this is done, the `[[` can compute oxygen, as in the following.
-This plot requires a few steps to complete, especially with respect to
-margins.
+
+*Exercise:* Ponder the patterns in this plot in an oceanographic
+context. Do you think there might be measurement problems?
 
 
 ```{r dev.args = list(pointsize = 1)}
-cm <- oce::colormap(g[["oxygen"]], col = oce::oceColorsTurbo)
-par(mar = c(2, 3, 1, 1))
-oce::drawPalette(colormap = cm)
-t <- g[["time"]]
-p <- g[["pressure"]]
-oce::oce.plot.ts(t, p,
-    ylim = rev(range(p, na.rm = TRUE)),
-    type = "p", col = cm$zcol,
-    mar = c(2, 3, 1, 4)
-)
+time <- g[["time"]]
+pressure <- g[["pressure"]]
+oxygen <- g[["oxygen"]]
+par(mfrow = c(2, 1))
+oce::oce.plot.ts(time, pressure)
+oce::oce.plot.ts(time, oxygen)
 ```
 
-*Exercise:* Can you think of a physical reason for the low surface
-oxygen in the first of the dataset?  How about a mechanical/electronic
-reason? (Hint: I fully omitted the first yo from the dataset, because
-it had what I'll call startup problems...)
 
 # Next steps
 
