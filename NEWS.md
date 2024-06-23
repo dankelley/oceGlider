@@ -1,3 +1,11 @@
+# oceglider 0.1.10
+
+* Rename flag functions to avoid conflict with oce, e.g. `setFlags()`
+is now `setGliderFlags()` and `initializeFlagScheme()` is now
+`initializeGliderFlagScheme()`. Behind the scenes, object-oriented
+generic function methods have been replaced with conventional
+functions.
+
 # oceglider 0.1.9
 
 * Change oxygen calibration.  I think the computation was wrong

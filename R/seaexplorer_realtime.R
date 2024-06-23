@@ -76,7 +76,7 @@
 #'
 #' @importFrom utils read.delim
 #' @importFrom methods new
-#' @importFrom oce swSCTp processingLogAppend initializeFlagScheme
+#' @importFrom oce swSCTp processingLogAppend
 #' @importFrom shiny incProgress setProgress
 #'
 #' @author Dan Kelley and Clark Richards
@@ -223,10 +223,8 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
     res <- new("glider")
     res@metadata$type <- "seaexplorer"
     res@metadata$subtype <- "realtime"
-    res <- initializeFlagScheme(res,
-        name = "IOOS",
-        mapping = list(pass = 1, not_evaluated = 2, suspect = 3, fail = 4, missing = 9)
-    )
+    # IOOS gives mapping=list(good = 1, not_evaluated = 2, suspect = 3, fail = 4, missing = 9)
+    res <- initializeGliderFlagScheme(res, name = "IOOS")
     res@metadata$filename <- paste0(glifiles, ";", pld1files)
     ## 44 https://github.com/dankelley/oceglider/issues/44
     ## 44 res@metadata$yo <- yo

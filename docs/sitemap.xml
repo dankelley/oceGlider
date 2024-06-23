@@ -40,6 +40,9 @@
     <loc>/reference/handleFlags-glider-method.html</loc>
   </url>
   <url>
+    <loc>/reference/handleGliderFlags.html</loc>
+  </url>
+  <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
@@ -77,6 +80,9 @@
   </url>
   <url>
     <loc>/reference/setFlags-glider-method.html</loc>
+  </url>
+  <url>
+    <loc>/reference/setGliderFlags.html</loc>
   </url>
   <url>
     <loc>/reference/sub-sub-glider-method.html</loc>

@@ -7,10 +7,9 @@ output:
     toc: true
     number_sections: true
     fig_caption: yes
-    fig_width: 5
-    fig_height: 5
+    fig_width: 7
+    fig_height: 4
     dpi: 72
-    dev.args: list(pointsize=11)
 vignette: >
   %\VignetteIndexEntry{Introduction to oceglider}
   %\VignetteEngine{knitr::rmarkdown}
@@ -74,16 +73,18 @@ practice and illustration.
 ## Reading Datasets
 
 A small dataset provided with the package may be loaded as follows.
+
 ```{r}
 library(oceglider)
-library(oce) # used in some later things
 directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
 g <- read.glider.seaexplorer.delayed(directory)
 ```
+
 ## Pressure-time Plots
 
-Here is how to plot a time-series of pressure from this dataset
-```{r}
+Here is how to plot a time-series of pressure from this dataset:
+
+```{r dev.args = list(pointsize = 11)}
 plot(g, which = "p")
 ```
 
@@ -105,7 +106,7 @@ the `at_surface` state at the start of the first two yos. (*Exercise:*
 to learn how to interpret the format of this diagram, try finding the
 full yos, and compare that with the previous diagram.)
 
-```{r}
+```{r dev.args = list(pointsize = 11)}
 plot(g, which = "navState", type = "o", cex = 0.5)
 ```
 
@@ -125,51 +126,52 @@ The following shows how to see locations in space. Note that 1 degree
 of latitude is approximately 111 km, so the total span of the diagram
 is only about half a kilometre.
 
-```{r}
+```{r dev.args = list(pointsize = 11)}
 plot(g, which = "map", cex = 0.5)
 ```
 
 ## Isolating Yos
 
 Quite often, it will be desirable to work with individual yos. With
-only 3, as in this small test case, we might as well plot them (say as
-temperature profiles). For that, it is helpful to split by yo number,
-and then cycle though the subsets, converting to CTD objects and
-plotting with functions from the \CRANpkg{oce} package.
+just a few yos, as in this small test case, we might as well plot them
+all, say as temperature profiles. For that, it is helpful to split by
+yo number, and then cycle though the subsets, converting to CTD
+objects and plotting with functions from the \CRANpkg{oce} package.
 
 The individual yos can be examined by splitting the `payload` portion:
-```{r}
+
+```{r dev.args = list(pointsize = 11)}
 payload <- g[["payload"]]
 s <- split(payload, payload$yoNumber)
 par(mfrow = c(2, 3)) # we happen to know there are 6 yos
 for (ss in s) {
-    ctd <- as.ctd(
+    ctd <- oce::as.ctd(
         salinity = ss[["salinity"]],
         temperature = ss[["temperature"]],
         pressure = ss[["pressure"]],
         longitude = ss[["longitude"]],
         latitude = ss[["latitude"]]
     )
-    plotProfile(ctd, xtype = "salinity+temperature", eos = "unesco")
+    oce::plotProfile(ctd, xtype = "salinity+temperature", eos = "unesco")
 }
 ```
 
 Let's use the navigation state to examine the ascending data.
 
-```{r}
+```{r dev.args = list(pointsize = 11)}
 ga <- subset(g, navState == 117)
 payload <- ga[["payload"]] # or [["payload1"]]
 s <- split(payload, payload$yoNumber)
 par(mfrow = c(2, 3))
 for (ss in s) {
-    ctd <- as.ctd(
+    ctd <- oce::as.ctd(
         salinity = ss$salinity,
         temperature = ss$temperature,
         pressure = ss$pressure,
         longitude = ss$longitude,
         latitude = ss$latitude
     )
-    plotProfile(ctd,
+    oce::plotProfile(ctd,
         xtype = "salinity+temperature", eos = "unesco",
         type = "p", cex = 0.5
     )
@@ -181,30 +183,32 @@ for (ss in s) {
 Let's try a waterfall temperature plot, with black for the first yo,
 red for the second, and green for the third.
 
-```{r}
+```{r dev.args = list(pointsize = 11)}
 par(mfrow = c(1, 1))
-xlim <- range(ss[["temperature"]], na.rm = TRUE)
+# use limits based on all yos, to avoid clipping
+Tlim <- range(sapply(s, \(ss) range(ss[["temperature"]], na.rm = TRUE)))
+plim <- rev(range(sapply(s, \(ss) range(ss[["pressure"]], na.rm = TRUE))))
 for (i in seq_along(s)) {
     ss <- s[[i]]
-    ctd <- as.ctd(
+    ctd <- oce::as.ctd(
         salinity = ss$salinity,
         temperature = ss$temperature,
         pressure = ss$pressure,
         longitude = ss$longitude,
         latitude = ss$latitude
     )
-    ctd <- ctdTrim(ctd, "upcast")
+    ctd <- oce::ctdTrim(ctd, "upcast")
     if (i == 1) {
-        plotProfile(ctd,
+        oce::plotProfile(ctd,
             xtype = "temperature", eos = "unesco",
-            xlim = xlim
+            Tlim = Tlim, plim = plim
         )
     } else {
         lines(ctd[["temperature"]], ctd[["pressure"]], col = i)
     }
 }
-legend("topleft",
-    lwd = 1, col = seq_along(s), cex = 1, bg = "white",
+legend("topleft", title = "Start Time",
+    lwd = 1, col = seq_along(s), cex = 0.75, bg = "white",
     legend = sapply(s, function(ss) format(ss$time[[1]], "%H:%S"))
 )
 ```
@@ -222,10 +226,10 @@ in the \url{https://github.com/DFOglider/pilotingApp} project. In
 fact, the computation of oxygen only requires the
 `calibrationCoefficients` entry.)
 
-```{r}
+```{r dev.args = list(pointsize = 11)}
 directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
 g <- read.glider.seaexplorer.delayed(directory = directory, progressBar = FALSE)
-g <- oceSetMetadata(g, "oxycalib", list(
+g@metadata$oxycalib <- list(
     serialNumber = "43-3336",
     model = "SBE43F",
     calibrationDate = "20220201",
@@ -238,7 +242,7 @@ g <- oceSetMetadata(g, "oxycalib", list(
         C = -2.2483e-6,
         Enom = 0.036
     )
-))
+)
 ```
 
 Once this is done, the `[[` can compute oxygen, as in the following.
@@ -246,13 +250,13 @@ This plot requires a few steps to complete, especially with respect to
 margins.
 
 
-```{r}
-cm <- colormap(g[["oxygen"]], col = oceColorsTurbo)
+```{r dev.args = list(pointsize = 1)}
+cm <- oce::colormap(g[["oxygen"]], col = oce::oceColorsTurbo)
 par(mar = c(2, 3, 1, 1))
-drawPalette(colormap = cm)
+oce::drawPalette(colormap = cm)
 t <- g[["time"]]
 p <- g[["pressure"]]
-oce.plot.ts(t, p,
+oce::oce.plot.ts(t, p,
     ylim = rev(range(p, na.rm = TRUE)),
     type = "p", col = cm$zcol,
     mar = c(2, 3, 1, 4)

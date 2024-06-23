@@ -29,7 +29,11 @@
 #' @author Chantelle Layton and Dan Kelley
 #'
 #' @export
-swOxygenFrequencyToSaturation <- function(temperature, salinity, pressure, frequency, cal,
+swOxygenFrequencyToSaturation <- function(temperature,
+                                          salinity,
+                                          pressure,
+                                          frequency,
+                                          cal,
                                           unit = "ml/l") {
     Tk <- 273.15 + temperature * 1.0002 # convert temperature to units kelvin
     mll <- cal$Soc * (frequency + cal$Foffset) *

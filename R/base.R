@@ -7,7 +7,7 @@
 #' as more datasets are examined by the author.
 #'
 #' @importFrom methods new
-#' @importFrom oce handleFlags setFlags subset summary
+#' @importFrom oce subset summary
 #'
 #' @name oceglider
 #' @docType package
@@ -16,8 +16,21 @@
 NULL
 
 #' A class to hold glider information
+#'
+#' As of 2024-06-23, it is not clear whether the best policy is for
+#' this to inherit from 'oce' or to define itself here.  Doing the
+#' former might seem sensible, since it might reduce the need for code
+#' here, but it seems to cause problems (e.g. inability to build
+#' vignettes in the standard way) that I have trouble understanding.
+#' We ran into similar problems in the argoFloats package too, and
+#' there we decided to define the object fully in the new package. For
+#' now, that's the approach used here also.
+#'
+#' @author Dan Kelley
+#'
 #' @export
-glider <- setClass("glider", contains = "oce")
+glider <- setClass("glider", slots = c(metadata="list", data="list", processingLog="list"))
+#glider <- setClass("glider", contains = "oce")
 
 setMethod(
     f = "initialize",

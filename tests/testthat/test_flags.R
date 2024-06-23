@@ -1,6 +1,6 @@
 # vim:textwidth=80:expandtab:shiftwidth=4:softtabstop=4
 library(oceglider)
-library(testthat)
+# library(testthat)
 
 test_that("read.glider.seaexplorer.realtime flag names", {
     directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
@@ -9,8 +9,8 @@ test_that("read.glider.seaexplorer.realtime flag names", {
         g@metadata$flagScheme,
         list(
             name = "IOOS",
-            mapping = list(pass = 1, not_evaluated = 2, suspect = 3, fail = 4, missing = 9),
-            default = NULL
+            mapping = list(good = 1, not_evaluated = 2, questionable = 3, bad = 4, missing = 9),
+            default = c(3, 4, 9)
         )
     )
 })
@@ -22,8 +22,8 @@ test_that("read.glider.seaexplorer.delayed flag names", {
         g@metadata$flagScheme,
         list(
             name = "IOOS",
-            mapping = list(pass = 1, not_evaluated = 2, suspect = 3, fail = 4, missing = 9),
-            default = NULL
+            mapping = list(good = 1, not_evaluated = 2, questionable = 3, bad = 4, missing = 9),
+            default = c(3, 4, 9)
         )
     )
 })
@@ -39,9 +39,9 @@ test_that("read.glider.seaexplorer.realtime flag setting and handling", {
     n <- length(g[["salinity"]])
     expect_equal(n, sum(g[["salinityFlag"]] == 2))
     lowSalinity <- which(g[["salinity"]] < 31)
-    g2 <- setFlags(g, "salinity", g[["salinity"]] < 31, 3)
+    g2 <- setGliderFlags(g, "salinity", g[["salinity"]] < 31, 3)
     expect_true(all(g2[["salinityFlag"]][lowSalinity] == 3))
-    g3 <- handleFlags(g2, c(3, 4, 9)) # use default action, which is "NA"
+    g3 <- handleGliderFlags(g2)# , c(3, 4, 9)) # use default action, which is "NA"
     expect_true(all(g3[["salinityFlag"]][lowSalinity] == 3))
     expect_true(all(is.na(g3[["salinity"]][lowSalinity])))
 })
@@ -57,9 +57,9 @@ test_that("read.glider.seaexplorer.delayed flag setting and handling", {
     n <- length(g[["salinity"]])
     expect_equal(n, sum(g[["salinityFlag"]] == 2))
     lowSalinity <- which(g[["salinity"]] < 31)
-    g2 <- setFlags(g, "salinity", g[["salinity"]] < 31, 3)
+    g2 <- setGliderFlags(g, "salinity", g[["salinity"]] < 31, 3)
     expect_true(all(g2[["salinityFlag"]][lowSalinity] == 3))
-    g3 <- handleFlags(g2, c(3, 4, 9)) # use default action, which is "NA"
+    g3 <- handleGliderFlags(g2, c(3, 4, 9)) # use default action, which is "NA"
     expect_true(all(g3[["salinityFlag"]][lowSalinity] == 3))
     expect_true(all(is.na(g3[["salinity"]][lowSalinity])))
 })

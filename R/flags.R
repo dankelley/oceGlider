@@ -25,7 +25,7 @@
 #' These numerical values provide a way to edit a dataset in an
 #' convenient and traceable way, through the appropriate setting
 #' of the `flags` and `actions` arguments. Flag values
-#' may be altered with [setFlags,glider-method()], as
+#' may be altered with [setGliderFlags()], as
 #' illustrated in the \dQuote{Examples} section.
 #'
 #' @param object An object of [glider-class].
@@ -79,16 +79,14 @@
 #'
 #' # Flag value 3 means 'suspect' in the IOOS scheme [1, table]; other
 #' # flags are pass=1, not_evaluated=2 (the default as read), fail=4, and missing=9.
-#' g2 <- setFlags(g, "salinity", g[["salinity"]] < 31, 3)
-#' g3 <- handleFlags(g2, c(3, 4, 9)) # use default action, which is "NA"
+#' g2 <- setGliderFlags(g, "salinity", g[["salinity"]] < 31, 3)
+#' g3 <- handleGliderFlags(g2, c(3, 4, 9)) # use default action, which is "NA"
 #' hist(g3[["salinity"]], breaks = 100, xlab = "Trimmed Salinity", main = "")
 #'
 #' @references
-#' \enumerate{
-#' \item U.S. Integrated Ocean Observing System.
-#' "Manual for the Use of Real-Time Oceanographic Data Quality Control Flags, Version 1.1,"
-#' 2017. \url{https://cdn.ioos.noaa.gov/media/2017/12/QARTOD-Data-Flags-Manual_Final_version1.1.pdf}.
-#' }
+#' 1. U.S. Integrated Ocean Observing System.
+#' "Manual for Real-Time Oceanographic Data Quality Control Flags, Version 1.2,"
+#' 2020. \url{https://cdn.ioos.noaa.gov/media/2020/07/QARTOD-Data-Flags-Manual_version1.2final.pdf}.
 #'
 #' @author Dan Kelley
 #'
@@ -97,27 +95,24 @@
 #' @export
 #'
 #' @md
-setMethod("handleFlags",
-    signature = c(object = "glider", flags = "ANY", actions = "ANY", where = "ANY", debug = "ANY"),
-    definition = function(object, flags = NULL, actions = NULL, where = "payload1", debug = getOption("gliderDebug", 0)) {
-        # DEVELOPER 1: alter the next comment to explain your setup
+handleGliderFlags <- function(object, flags = NULL, actions = NULL, where = "payload1", debug = getOption("gliderDebug", 0)) {
+    # DEVELOPER 1: alter the next comment to explain your setup
+    gliderDebug(debug, "handleGliderFlags()function\n", sep = "", unindent = 1)
+    if (is.null(flags)) {
+        flags <- c(3, 4, 9)
         if (is.null(flags)) {
-            flags <- c(3, 4, 9)
-            if (is.null(flags)) {
-                stop("must supply 'flags', or use initializeFlagScheme() on the glider object first")
-            }
+            stop("must supply 'flags', or use initializeGliderFlagScheme() on the glider object first")
         }
-        if (is.null(actions)) {
-            actions <- list("NA") # DEVELOPER 3: alter this line to suit a new data class
-            names(actions) <- names(flags)
-        }
-        if (any(names(actions) != names(flags))) {
-            stop("names of flags and actions must match")
-        }
-        # handleFlags(object=object, flags=flags, actions=actions, where=where, debug=debug)
-        handleFlagsInternal(object = object, flags = flags, actions = actions, where = where, debug = debug)
     }
-)
+    if (is.null(actions)) {
+        actions <- list("NA") # DEVELOPER 3: alter this line to suit a new data class
+        names(actions) <- names(flags)
+    }
+    if (any(names(actions) != names(flags))) {
+        stop("names of flags and actions must match")
+    }
+    handleGliderFlagsInternal(object = object, flags = flags, actions = actions, where = where, debug = debug)
+}
 
 
 ## NOT EXPORTED #' Low-level function to handle flags
@@ -147,26 +142,150 @@ setMethod("handleFlags",
 ## NOT EXPORTED #'
 ## NOT EXPORTED #' @export
 ## NOT EXPORTED #' @md
-handleFlagsInternal <- function(object, flags, actions, where, debug) {
-    if (missing(debug)) {
-        debug <- 0
-    }
-    gliderDebug(debug, "handleFlagsInternal() {\n", sep = "", unindent = 1)
+handleGliderFlagsInternal <- function(object, flags, actions, where = NULL, debug = 0) {
+    gliderDebug(debug, "handleGliderFlagsInternal()\n", sep = "", unindent = 1)
     if (missing(flags)) {
         warning("no flags supplied (internal error; report to developer)")
         return(object)
+    }
+    if (debug > 0L) {
+        cat("  flags=c(", paste(flags, collapse = ","), ")\n", sep = "")
+        cat("  actions=c(", paste(actions, collapse = ","), ")\n", sep = "")
+        cat("  where=\"", where, "\"\n", sep = "")
     }
     # Permit e.g. flags=c(1,3)
     if (!is.list(flags)) {
         flags <- list(flags)
     }
     if (missing(actions)) {
-        actions <- "NA"
+        warning("no actions supplied (internal error; report to developer)")
+        return(object)
     }
-    if (missing(where)) {
-        where <- if (object[["type"]] == "seaexplorer") "payload1" else NULL
+    if (any(names(flags) != names(actions))) {
+        stop("names of flags must match those of actions")
     }
-    oce::handleFlagsInternal(object = object, flags = flags, actions = actions, where = where, debug = debug)
+    gliderDebug(debug, "flags=", paste(as.vector(flags), collapse = ","), "\n", sep = "")
+    oflags <- if (is.null(where)) object@metadata$flags else object@metadata$flags[[where]]
+    odata <- if (is.null(where)) object@data else object@data[[where]]
+    if (length(oflags)) {
+        singleFlag <- is.null(names(oflags)) # TRUE if there is just one flag for all data fields
+        gliderDebug(debug, "singleFlag=", singleFlag, "\n", sep = "")
+        if (singleFlag && (length(actions) > 1 || !is.null(names(actions)))) {
+            stop("if flags is a list of a single unnamed item, actions must be similar")
+        }
+        gliderDebug(debug, "names(odata)=c(\"", paste(names(odata),
+            collapse = "\", \""
+        ), "\")\n", sep = "")
+        if (singleFlag) {
+            gliderDebug(debug, "single flag\n")
+            # apply the same flag to *all* data.
+            actionsThis <- actions[[1]] # FIXME: this seems wrong
+            oflags <- unlist(oflags)
+            gliderDebug(debug, "singleFlag: head(oflags)=c(",
+                paste(head(oflags), collapse = ","), "), to be used for *all* data types.\n",
+                sep = ""
+            )
+            for (name in names(odata)) {
+                gliderDebug(debug, "handling flags for '", name, "'\n", sep = "")
+                dataItemLength <- length(odata[[name]])
+                gliderDebug(debug, "  initially, ", sum(is.na(odata[[name]])), " out of ", dataItemLength, " are NA\n", sep = "")
+                actionNeeded <- oflags %in% if (length(names(flags))) flags[[name]] else flags[[1]]
+                if (is.function(actionsThis)) {
+                    gliderDebug(debug > 1, "  actionsThis is a function\n")
+                    odata[[name]][actionNeeded] <- actionsThis(object)[actionNeeded]
+                } else if (is.character(actionsThis)) {
+                    gliderDebug(debug > 1, "  actionsThis is a string, '", actionsThis, "'\n", sep = "")
+                    gliderDebug(debug > 1, "  head(actionNeeded)=c(", paste(head(actionNeeded), collapse = ","), ")\n", sep = "")
+                    if (actionsThis == "NA") {
+                        odata[[name]][actionNeeded] <- NA
+                    } else {
+                        stop("the only permitted character action is 'NA'")
+                    }
+                } else {
+                    stop("action must be a character string or a function")
+                }
+                gliderDebug(debug, "  after handling flags, ", sum(is.na(odata[[name]])),
+                    " out of ", length(odata[[name]]), " are NA\n",
+                    sep = ""
+                )
+            }
+            gliderDebug(debug, "done handling flags for all data in object\n")
+        } else { # multiple flags: Apply individual flags to corresponding data fields
+            gliderDebug(debug, "multiple flags\n")
+            for (name in names(odata)) {
+                flagsObject <- oflags[[name]]
+                if (length(flagsObject) > 0L) {
+                    gliderDebug(debug, "handling flags for '", name, "'\n", sep = "")
+                    gliderDebug(debug, "  initially, ", sum(is.na(odata[[name]])),
+                        " out of ", length(odata[[name]]), " are NA\n",
+                        sep = ""
+                    )
+                    # if (debug) {
+                    #    tab <- table(flagsObject)
+                    #    if (length(tab) > 0L) {
+                    #        cat("  unique(flagsObject) for ", name, ":\n")
+                    #        print(table(flagsObject))
+                    #    }
+                    # }
+                    if (!is.null(flagsObject)) {
+                        dataItemLength <- length(odata[[name]])
+                        # flagsThis <- oflags[[name]]
+                        # gliderDebug(debug, "before converting to numbers, flagsThis=", paste(flagsThis, collapse=","), "\n")
+                        if (name %in% names(oflags)) {
+                            actionsThis <- if (length(names(actions))) actions[[name]] else actions[[1]]
+                            gliderDebug(debug > 1, "  actionsThis: \"", paste(actionsThis, collapse = ","), "\"\n", sep = "")
+                            actionNeeded <- oflags[[name]] %in% if (length(names(flags))) flags[[name]] else flags[[1]]
+                            gliderDebug(debug > 1, "  head(actionNeeded)=c(", paste(head(actionNeeded), collapse = ","), ")\n", sep = "")
+                            if (any(actionNeeded)) {
+                                #  gliderDebug(debug, "\"", name, "\" has ", dataItemLength, " data, of which ",
+                                #           sum(actionNeeded), " are flagged\n", sep="")
+                                # if (debug > 1) {
+                                #    cat("  actionsThis follows...\n")
+                                #    print(actionsThis)
+                                # }
+                                if (is.function(actionsThis)) {
+                                    odata[[name]][actionNeeded] <- actionsThis(object)[actionNeeded]
+                                } else if (is.character(actionsThis)) {
+                                    if (actionsThis == "NA") {
+                                        odata[[name]][actionNeeded] <- NA
+                                    } else {
+                                        stop("the only permitted character action is 'NA'")
+                                    }
+                                } else {
+                                    stop("action must be a character string or a function")
+                                }
+                            } else {
+                                gliderDebug(debug, "  no action needed, since no \"", name, "\" data are flagged as stated\n", sep = "")
+                            }
+                        }
+                    }
+                    gliderDebug(debug, "  finally, ", sum(is.na(odata[[name]])),
+                        " out of ", length(odata[[name]]), " are NA\n",
+                        sep = ""
+                    )
+                }
+            }
+        } # multiple flags
+    } else {
+        gliderDebug(debug, "object has no flags in metadata\n")
+    }
+    if (is.null(where)) {
+        object@data <- odata
+    } else {
+        object@data[[where]] <- odata
+    }
+    object@processingLog <- processingLogAppend(
+        object@processingLog,
+        paste("handleFlagsInternal(flags=c(",
+            paste(substitute(flags, parent.frame()), collapse = ","),
+            "), actions=c(",
+            paste(substitute(actions, parent.frame()), collapse = ","),
+            "))",
+            collapse = " ", sep = ""
+        )
+    )
+    gliderDebug(debug, "  returning from handleFlagsInternal()\n", sep = "", unindent = 1)
+    object
 }
 
 #' Set data-quality flags within a glider object
@@ -196,24 +315,15 @@ handleFlagsInternal <- function(object, flags, actions, where, debug) {
 #'
 #' @family functions relating to data-quality flags
 #'
-#' @seealso See [handleFlags,glider-method()] for an example of use.
+#' @seealso See [handleGliderFlags()] for an example of use.
 #'
 #' @author Dan Kelley
 #'
 #' @md
 #'
 #' @export
-setMethod(
-    "setFlags",
-    c(object = "glider", name = "ANY", i = "ANY", value = "ANY", debug = "ANY"),
-    function(object, name = NULL, i = NULL, value = NULL, debug = 0) {
-        setFlagsInternaloceglider(object, name, i, value, debug - 1)
-    }
-)
-
-
-setFlagsInternaloceglider <- function(object, name = NULL, i = NULL, value = NULL, debug = getOption("gliderDebug", 0)) {
-    gliderDebug(debug, "setFlagsInternaloceglider(object, name='", name, "', value=", value,
+setGliderFlags <- function(object, name = NULL, i = NULL, value = NULL, debug = getOption("gliderDebug", 0)) {
+    gliderDebug(debug, "setGliderFlags(object, name=\"", name, "\", value=", value,
         ", i=c(", paste(head(i), collapse = ","), "...), debug=", debug, ") {\n",
         sep = "",
         unindent = 1
@@ -252,7 +362,7 @@ setFlagsInternaloceglider <- function(object, name = NULL, i = NULL, value = NUL
         valueOrig <- value
         if (is.character(value)) {
             if (is.null(res@metadata$flagScheme)) {
-                stop("cannot have character 'value' because initializeFlagScheme() has not been called on object")
+                stop("cannot have character 'value' because initializeGliderFlagScheme() has not been called on object")
             } else {
                 if (value %in% names(res@metadata$flagScheme$mapping)) {
                     value <- res@metadata$flagScheme$mapping[[value]]
@@ -269,12 +379,120 @@ setFlagsInternaloceglider <- function(object, name = NULL, i = NULL, value = NUL
     }
     res@processingLog <- processingLogAppend(
         res@processingLog,
-        paste("setFlags(object, name=\"", name, "\",",
+        paste("setGliderFlags(object, name=\"", name, "\",",
             "i=c(", paste(head(i, collapse = ",")), "...),",
             "value=", valueOrig, ")",
             collapse = "", sep = ""
         )
     )
-    gliderDebug(debug, "} # setFlagsInternaloceglider\n", sep = "", unindent = 1)
+    gliderDebug(debug, "} # setGliderFlags\n", sep = "", unindent = 1)
+    res
+}
+
+initializeGliderFlagScheme <- function(object, name = "IOOS", mapping = NULL, default = NULL, update = NULL, debug = 0) {
+    gliderDebug(debug, "initializeGliderFlagScheme(object, name=\"", name, "\", debug=", debug, ") {", sep = "", unindent = 1)
+    res <- object
+    if (!is.null(object@metadata$flagScheme) && !(is.logical(update) && update)) {
+        warning("cannot alter a flagScheme that is already is place")
+    } else {
+        predefined <- c("argo", "BODC", "DFO", "WHP bottle", "WHP CTD", "IOOS")
+        if (name %in% predefined) {
+            if (!is.null(mapping)) {
+                stop("cannot redefine the mapping for existing scheme named \"", name, "\"")
+            }
+            if (name == "argo") {
+                # The argo mapping and default were changed in June 2020,
+                # to accomodate new understanding of argo flags, developed
+                # by Jaimie Harbin for the argoCanada/argoFloats project.  See
+                # https://github.com/ArgoCanada/argoFloats/issues/133
+                # https://github.com/dankelley/oce/issues/1705
+                mapping <- list(
+                    not_assessed = 0,
+                    passed_all_tests = 1,
+                    probably_good = 2,
+                    probably_bad = 3,
+                    bad = 4,
+                    changed = 5,
+                    not_used_6 = 6,
+                    not_used_7 = 7, # until 2020-jun-10, named 'averaged'
+                    estimated = 8, # until 2020-jun-10, named 'interpolated'
+                    missing = 9
+                )
+                if (is.null(default)) {
+                    # until 2020-jun-10, next was more cautious, namely
+                    # default <- c(0, 2, 3, 4, 7, 8, 9) # retain passed_all_tests
+                    default <- c(0, 3, 4, 9)
+                }
+            } else if (name == "BODC") {
+                mapping <- list(
+                    no_quality_control = 0, good = 1, probably_good = 2,
+                    probably_bad = 3, bad = 4, changed = 5, below_detection = 6,
+                    in_excess = 7, interpolated = 8, missing = 9
+                )
+                if (is.null(default)) {
+                    default <- c(0, 2, 3, 4, 5, 6, 7, 8, 9) # retain good
+                }
+            } else if (name == "DFO") {
+                mapping <- list(
+                    no_quality_control = 0, appears_correct = 1, appears_inconsistent = 2,
+                    doubtful = 3, erroneous = 4, changed = 5,
+                    qc_by_originator = 8, missing = 9
+                )
+                if (is.null(default)) {
+                    default <- c(0, 2, 3, 4, 5, 8, 9) # retain appears_correct
+                }
+            } else if (name == "WHP bottle") {
+                mapping <- list(
+                    no_information = 1, no_problems_noted = 2, leaking = 3,
+                    did_not_trip = 4, not_reported = 5, discrepency = 6,
+                    unknown_problem = 7, did_not_trip = 8, no_sample = 9
+                )
+                if (is.null(default)) {
+                    default <- c(1, 3, 4, 5, 6, 7, 8, 9) # retain no_problems_noted
+                }
+            } else if (name == "WHP CTD") {
+                mapping <- list(
+                    not_calibrated = 1, acceptable = 2, questionable = 3,
+                    bad = 4, not_reported = 5, interpolated = 6,
+                    despiked = 7, missing = 9
+                )
+                if (is.null(default)) {
+                    default <- c(1, 3, 4, 5, 6, 7, 9) # retain acceptable
+                }
+            } else if (name == "IOOS") {
+                # U.S. Integrated Ocean Observing System. "Manual for
+                # Real-Time Oceanographic Data Quality Control Flags,
+                # Version 1.2," 2020.
+                # https://cdn.ioos.noaa.gov/media/2020/07/QARTOD-Data-Flags-Manual_version1.2final.pdf.
+                mapping <- list(
+                    good = 1, not_evaluated = 2, questionable = 3,
+                    bad = 4, missing = 9
+                )
+                if (is.null(default)) {
+                    default <- c(3, 4, 9) # retain acceptable
+                }
+            } else {
+                stop("internal coding error in initializeGliderFlagSchemeInternal(); please report to developer")
+            }
+        } else {
+            if (is.null(mapping)) {
+                stop("must supply 'mapping' for new scheme named \"", name, "\"")
+            }
+        }
+        res@metadata$flagScheme <- list(name = name, mapping = mapping, default = default)
+    }
+    res@processingLog <- processingLogAppend(
+        res@processingLog,
+        paste("initializeGliderFlagScheme(object, name=\"", name,
+            "\", mapping=",
+            gsub(" ", "", paste(as.character(deparse(mapping)),
+                sep = "", collapse = ""
+            )),
+            ")",
+            ", default=c(", paste(default, collapse = ","), "))",
+            sep = ""
+        )
+    )
+    gliderDebug(debug, "} # initializeGliderFlagScheme", sep = "", unindent = 1)
     res
 }
