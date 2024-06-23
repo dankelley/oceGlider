@@ -253,6 +253,9 @@ plotting with functions from the package.</p>
 </h3>
 <p>Let’s try a waterfall temperature plot, with black for the first yo,
 red for the second, and green for the third.</p>
+<p><em>Exercise 1:</em> For more context, compare the results of similar
+plots that use specific density anomaly, <code>sigma0</code>, instead of
+<code>pressure</code>, on the y axis.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># use limits based on all yos, to avoid clipping</span></span>
@@ -316,9 +319,9 @@ computation of oxygen only requires the
 <span><span class="op">)</span></span></code></pre></div>
 <p>Once this is done, the <code>[[</code> can compute oxygen, as in the
 following.</p>
-<p><em>Exercise:</em> Ponder the patterns in this plot in an
-oceanographic context. Do you think there might be measurement
-problems?</p>
+<p><em>Exercise 2:</em> Ponder the patterns in this plot in an
+oceanographic context, bearing in mind the possibility of instrumental
+and data-processing problems.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">time</span> <span class="op">&lt;-</span> <span class="va">g</span><span class="op">[[</span><span class="st">"time"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">pressure</span> <span class="op">&lt;-</span> <span class="va">g</span><span class="op">[[</span><span class="st">"pressure"</span><span class="op">]</span><span class="op">]</span></span>

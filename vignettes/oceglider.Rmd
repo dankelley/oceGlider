@@ -7,8 +7,8 @@ output:
     toc: true
     number_sections: true
     fig_caption: yes
-    fig_width: 4
-    fig_height: 3
+    fig_width: 6
+    fig_height: 4
     dpi: 72
 vignette: >
   %\VignetteIndexEntry{Introduction to oceglider}
@@ -181,6 +181,10 @@ for (ss in s) {
 Let's try a waterfall temperature plot, with black for the first yo,
 red for the second, and green for the third.
 
+*Exercise 1:* For more context, compare the results of similar plots
+that use specific density anomaly, `sigma0`, instead of `pressure`, on
+the y axis.
+
 ```{r dev.args = list(pointsize = 11)}
 par(mfrow = c(1, 1))
 # use limits based on all yos, to avoid clipping
@@ -246,11 +250,12 @@ g@metadata$oxycalib <- list(
 
 Once this is done, the `[[` can compute oxygen, as in the following.
 
-*Exercise:* Ponder the patterns in this plot in an oceanographic
-context. Do you think there might be measurement problems?
+*Exercise 2:* Ponder the patterns in this plot in an oceanographic
+context, bearing in mind the possibility of instrumental and
+data-processing problems.
 
 
-```{r dev.args = list(pointsize = 1)}
+```{r dev.args = list(pointsize = 11)}
 time <- g[["time"]]
 pressure <- g[["pressure"]]
 oxygen <- g[["oxygen"]]
@@ -272,14 +277,15 @@ data type).
 
 # References
 
-1. Integrated Ocean Observing System (U.S.). “Manual for Quality Control of
-   Temperature and Salinity Data Observations from Gliders. Version 1.0.”
-   Report. U.S. Department of Commerce, National Oceanic and Atmospheric
-   Administration, National Ocean Service, Integrated Ocean Observing System,
-   U.S. Integrated Ocean Observing System, Glider Data Assembly Center, 2016.
-   https://www.oceanbestpractices.net/handle/11329/289.
+1. Integrated Ocean Observing System (U.S.). “Manual for Quality
+   Control of Temperature and Salinity Data Observations from Gliders.
+Version 1.0.” Report. U.S. Department of Commerce, National Oceanic
+and Atmospheric Administration, National Ocean Service, Integrated
+Ocean Observing System, U.S. Integrated Ocean Observing System, Glider
+Data Assembly Center, 2016.
+https://www.oceanbestpractices.net/handle/11329/289.
 
-2. Integrated Ocean Observing System (U.S.). “NGDAC NetCDF File Format Version
-   2,” March 27, 2019.
-   https://github.com/ioos/ioosngdac/wiki/NGDAC-NetCDF-File-Format-Version-2.
+2. Integrated Ocean Observing System (U.S.). “NGDAC NetCDF File Format
+   Version 2,” March 27, 2019.
+https://github.com/ioos/ioosngdac/wiki/NGDAC-NetCDF-File-Format-Version-2.
 
