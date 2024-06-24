@@ -84,7 +84,7 @@
       <h1 data-toc-skip>Introduction to oceglider</h1>
                         <h4 data-toc-skip class="author">Dan Kelley (<a href="https://orcid.org/0000-0001-7808-5911" class="external-link uri">https://orcid.org/0000-0001-7808-5911</a>)</h4>
             
-            <h4 data-toc-skip class="date">2024-06-23</h4>
+            <h4 data-toc-skip class="date">2024-06-24</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/dankelley/oceglider/blob/HEAD/vignettes/oceglider.Rmd" class="external-link"><code>vignettes/oceglider.Rmd</code></a></small>
       <div class="hidden name"><code>oceglider.Rmd</code></div>
@@ -158,27 +158,20 @@ follows.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="oceglider_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
-<p>In the plot, notice that the glider is at the surface (the pressure
-indicates the sensor is about 1 m below the surface) for about 10
-minutes, then descends to about 45 m depth, rising more slowly towards
-the surface. This pattern of lowering and then rising is called a “yo”
-in the <code>oceglider</code> package. The first two yos in this dataset
-reached to the surface, while the third only got near the surface.
-During this small sampling, full surfacing was quite common, although
-later in the glider mission there were quite a few more partial yos
-between pairs of full yos.</p>
+<p>In the plot, notice that the pressure at the glider is about 2
+decibars for about 10 minutes at the start of the record. Given the
+geometry and sensor setup, this indicates that the glider was at the
+surface. After this period, it descends to about 50 metres (where 1
+metre corresponds to about 1 decibar). Then it ascends, but not to the
+surface. This descent/ascent pair is will be called a “yo” henceforth,
+and the same word is used in some functions provided by the
+<code>oceglider</code> package.</p>
 </div>
 <div class="section level3">
 <h3 id="navigation-state">Navigation State<a class="anchor" aria-label="anchor" href="#navigation-state"></a>
 </h3>
-<p>This dataset holds something called <code>navState</code> by the
-package. This can be seen in plots like the following. Notice that the
-glider is in the <code>at_surface</code> state at the start of the first
-two yos.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"navState"</span>, type <span class="op">=</span> <span class="st">"o"</span>, cex <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></code></pre></div>
-<p><img src="oceglider_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
-<p>For reference, the <code>navState</code> values are as follows:</p>
+<p>SeaExplorer gliders store a record of <code>navState</code>, which is
+stored as a numerical code, as follows.</p>
 <ul>
 <li>105 means the glider is not navigating yet;</li>
 <li>115 means the glider is surfacing in preparation for
@@ -191,6 +184,14 @@ is communicating;</li>
 be inflecting upward;</li>
 <li>117 means the glider has ballast set to be ascending.</li>
 </ul>
+<p>The <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> function provided for <code>oceglider</code>
+objects (as read by <code><a href="../reference/read.glider.seaexplorer.delayed.html">read.glider.seaexplorer.delayed()</a></code> and
+the related <code><a href="../reference/read.glider.seaexplorer.realtime.html">read.glider.seaexplorer.realtime()</a></code> function)
+can be plotted as follows. This information can be quite handy in
+analysing datasets.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"navState"</span>, type <span class="op">=</span> <span class="st">"o"</span>, cex <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></code></pre></div>
+<p><img src="oceglider_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="maps">Maps<a class="anchor" aria-label="anchor" href="#maps"></a>
@@ -319,17 +320,24 @@ computation of oxygen only requires the
 <span><span class="op">)</span></span></code></pre></div>
 <p>Once this is done, the <code>[[</code> can compute oxygen, as in the
 following.</p>
-<p><em>Exercise 2:</em> Ponder the patterns in this plot in an
-oceanographic context, bearing in mind the possibility of instrumental
-and data-processing problems.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">time</span> <span class="op">&lt;-</span> <span class="va">g</span><span class="op">[[</span><span class="st">"time"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">pressure</span> <span class="op">&lt;-</span> <span class="va">g</span><span class="op">[[</span><span class="st">"pressure"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">oxygen</span> <span class="op">&lt;-</span> <span class="va">g</span><span class="op">[[</span><span class="st">"oxygen"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/oce.plot.ts.html" class="external-link">oce.plot.ts</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">pressure</span><span class="op">)</span></span>
+<span><span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/oce.plot.ts.html" class="external-link">oce.plot.ts</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">pressure</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">pressure</span>, na.rm <span class="op">=</span></span>
+<span>    <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/oce.plot.ts.html" class="external-link">oce.plot.ts</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">oxygen</span><span class="op">)</span></span></code></pre></div>
 <p><img src="oceglider_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<p><em>Exercise 2:</em> Ponder the patterns in this plot in an
+oceanographic context.</p>
+<p><em>Exercise 3:</em> Use the <code><a href="https://dankelley.github.io/oce/reference/colormap.html" class="external-link">colormap()</a></code> function from
+the package to set up a colour-coding based on the oxygen record, and
+then plot a pressure-time plot with dots, to display both variables at
+once. Try extending this for a whole dataset. Hint: use
+<code><a href="https://dankelley.github.io/oce/reference/drawPalette.html" class="external-link">drawPalette()</a></code> to draw the colour scale, and be aware that
+you may need to set <code>par(mar)</code> to get a spacing that you
+like.</p>
 </div>
 </div>
 <div class="section level2">

@@ -4,11 +4,11 @@ library(oceglider)
 
 test_that("read.glider.seaexplorer.realtime", {
     directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
-    expect_silent(g <- read.glider.seaexplorer.realtime(directory = directory, yo = 2, progressBar = FALSE))
+    expect_silent(g <- read.glider.seaexplorer.realtime(directory = directory, yo = 3, progressBar = FALSE))
     expect_output(summary(g), "Input file:")
     expect_equal(c("glider", "payload1"), names(g[["data"]]))
     # dimensionality and names in glider stream
-    expect_equal(dim(g[["glider"]]), c(95, 23))
+    expect_equal(dim(g[["glider"]]), c(87, 23))
     gliderNamesExpected <- sort(c(
         "alarm", "altitude", "angCmd", "angPos",
         "ballastCmd", "ballastPos", "DeadReckoning", "declination", "depth",
@@ -19,8 +19,8 @@ test_that("read.glider.seaexplorer.realtime", {
     expect_equal(sort(names(g[["glider"]])), gliderNamesExpected)
     # dimensionality and names in payload1 stream (and payload nickname)
     # This is partly a check against changes to the built-in file.
-    expect_equal(dim(g[["payload1"]]), c(1763, 22))
-    expect_equal(dim(g[["payload"]]), c(1763, 22))
+    expect_equal(dim(g[["payload1"]]), c(1591, 22))
+    expect_equal(dim(g[["payload"]]), c(1591, 22))
     payloadNamesExpected <- c(
         "backscatter", "backscatterCount", "cdom",
         "cdomCount", "chlorophyll", "chlorophyllCount", "conductivity",

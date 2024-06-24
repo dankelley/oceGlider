@@ -23,10 +23,12 @@ oxycalib <- list(
 
 test_that("oxygen computed against previously-computed values", {
     directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
-    expect_silent(g <- read.glider.seaexplorer.realtime(directory = directory, yo = 2, progressBar = FALSE))
+    expect_silent(g <- read.glider.seaexplorer.realtime(directory = directory, yo = 3, progressBar = FALSE))
     g@metadata$oxycalib <- oxycalib
     # consistency check (will fail if dataset is changed or code changes)
-    expect_equal(g[["oxygen"]][1:3], c(345.9181343, 344.6068031, 343.0337206))
+    options(digits = 15)
+    g[["oxygen"]][1:3]
+    expect_equal(g[["oxygen"]][1:3], c(363.265784249780, 363.301998679272, 363.257645877092))
     # test values from the calibration sheet
 })
 
@@ -41,7 +43,7 @@ oxygen temperature salinity pressure oxygenFrequency
 "
     calibrationData <- read.table(text = dataText, header = TRUE)
     directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
-    expect_silent(g <- read.glider.seaexplorer.realtime(directory = directory, yo = 2, progressBar = FALSE))
+    expect_silent(g <- read.glider.seaexplorer.realtime(directory = directory, yo = 3, progressBar = FALSE))
     g@metadata$oxycalib <- oxycalib
     g@data$payload1 <- calibrationData[, 2:5]
     # convert from umol/kg to ml/l

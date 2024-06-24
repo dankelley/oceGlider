@@ -101,7 +101,7 @@
 #' # Example 1: various plot types
 #' dirRealtime <- system.file("extdata/seaexplorer/sub", package = "oceglider")
 #' gr <- read.glider.seaexplorer.realtime(dirRealtime,
-#'     yo = 2, progressBar = FALSE
+#'     yo = 3, progressBar = FALSE
 #' )
 #' plot(gr, which = "p")
 #' plot(gr, which = "S")

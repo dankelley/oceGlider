@@ -4,7 +4,7 @@ library(oceglider)
 
 test_that("read.glider.seaexplorer.realtime flag names", {
     directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
-    expect_silent(g <- read.glider.seaexplorer.realtime(directory = directory, yo = 2, progressBar = FALSE))
+    expect_silent(g <- read.glider.seaexplorer.realtime(directory = directory, yo = 3, progressBar = FALSE))
     expect_equal(
         g@metadata$flagScheme,
         list(
@@ -49,7 +49,7 @@ test_that("read.glider.seaexplorer.realtime flag setting and handling", {
 test_that("read.glider.seaexplorer.delayed flag setting and handling", {
     # This is based on the example given by ?"handleFlags,glider-method"
     directory <- system.file("extdata/seaexplorer/raw", package = "oceglider")
-    expect_silent(g <- read.glider.seaexplorer.delayed(directory))
+    expect_silent(g <- read.glider.seaexplorer.delayed(directory, progressBar = FALSE))
     # NOTE: this test was more hard-wired before issue40, e.g. it
     # demanded that the number of data read be 2784, but that number
     # became 3435 when read.glider.seaexplorer.delayed() was changed to

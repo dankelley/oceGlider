@@ -41,6 +41,7 @@ with the package.
 
 # Data Sources and file organization
 
+
 The first step in working with glider data is often to download them
 from a server. The lack of URL conventions for such servers makes it
 challenging to discuss in general terms. The same can be said of the
@@ -88,27 +89,19 @@ Here is how to plot a time-series of pressure from this dataset:
 plot(g, which = "p")
 ```
 
-In the plot, notice that the glider is at the surface (the pressure
-indicates the sensor is about 1 m below the surface) for about 10
-minutes, then descends to about 45 m depth, rising more slowly towards
-the surface.  This pattern of lowering and then rising is called a
-"yo" in the `oceglider` package. The first two yos in this dataset
-reached to the surface, while the third only got near the surface.
-During this small sampling, full surfacing was quite common, although
-later in the glider mission there were quite a few more partial yos
-between pairs of full yos.
+In the plot, notice that the pressure at the glider is about 2
+decibars for about 10 minutes at the start of the record.  Given the
+geometry and sensor setup, this indicates that the glider was at the
+surface. After this period, it descends to about 50 metres (where 1
+metre corresponds to about 1 decibar).  Then it ascends, but not to
+the surface.  This descent/ascent pair is will be called a "yo"
+henceforth, and the same word is used in some functions provided
+by the `oceglider` package.
 
 ## Navigation State
 
-This dataset holds something called `navState` by the package. This
-can be seen in plots like the following. Notice that the glider is in
-the `at_surface` state at the start of the first two yos.
-
-```{r dev.args = list(pointsize = 11)}
-plot(g, which = "navState", type = "o", cex = 0.5)
-```
-
-For reference, the `navState` values are as follows:
+SeaExplorer gliders store a record of `navState`, which
+is stored as a numerical code, as follows.
 
 * 105 means the glider is not navigating yet;
 * 115 means the glider is surfacing in preparation for communication;
@@ -117,6 +110,15 @@ For reference, the `navState` values are as follows:
 * 100 means the glider has ballast set to be descending;
 * 118 means the glider has ballast adjusted to reduce density, so will be inflecting upward;
 * 117 means the glider has ballast set to be ascending.
+
+The `plot()` function provided for `oceglider` objects (as read by
+`read.glider.seaexplorer.delayed()` and the related
+`read.glider.seaexplorer.realtime()` function) can be plotted as
+follows.  This information can be quite handy in analysing datasets.
+
+```{r dev.args = list(pointsize = 11)}
+plot(g, which = "navState", type = "o", cex = 0.5)
+```
 
 ## Maps
 
@@ -250,20 +252,26 @@ g@metadata$oxycalib <- list(
 
 Once this is done, the `[[` can compute oxygen, as in the following.
 
-*Exercise 2:* Ponder the patterns in this plot in an oceanographic
-context, bearing in mind the possibility of instrumental and
-data-processing problems.
-
 
 ```{r dev.args = list(pointsize = 11)}
 time <- g[["time"]]
 pressure <- g[["pressure"]]
 oxygen <- g[["oxygen"]]
 par(mfrow = c(2, 1))
-oce::oce.plot.ts(time, pressure)
+oce::oce.plot.ts(time, pressure, ylim = rev(range(pressure, na.rm =
+    TRUE)))
 oce::oce.plot.ts(time, oxygen)
 ```
 
+*Exercise 2:* Ponder the patterns in this plot in an oceanographic
+context.
+
+*Exercise 3:* Use the `colormap()` function from the \CRANpkg{oce}
+package to set up a colour-coding based on the oxygen record, and then
+plot a pressure-time plot with dots, to display both variables at
+once.  Try extending this for a whole dataset.  Hint: use
+`drawPalette()` to draw the colour scale, and be aware that you may
+need to set `par(mar)` to get a spacing that you like.
 
 # Next steps
 
