@@ -4,8 +4,10 @@ code is based on `sbeO2Hz2Sat()` in
 https://github.com/DFOglider/pilotingApp, with minor
 modifiations: (1) it has a new name to avoid conflicts, (2) the
 calibration coefficients are collected into a single parameter,
-`cal`, (3) `oxygenFrequency` is renamed `frequency`, and (4) `unit`
-is added, to permit specifying the unit of the return value."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
+`cal`, (3) `oxygenFrequency` is renamed `frequency`, (3) `unit`
+is added, to permit specifying the unit of the return value,
+and (5) the conversion to umol/kg takes into account the density,
+as indicated in Reference 1."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
@@ -73,8 +75,10 @@ code is based on `sbeO2Hz2Sat()` in
 <a href="https://github.com/DFOglider/pilotingApp" class="external-link">https://github.com/DFOglider/pilotingApp</a>, with minor
 modifiations: (1) it has a new name to avoid conflicts, (2) the
 calibration coefficients are collected into a single parameter,
-`cal`, (3) `oxygenFrequency` is renamed `frequency`, and (4) `unit`
-is added, to permit specifying the unit of the return value.</p>
+`cal`, (3) `oxygenFrequency` is renamed `frequency`, (3) `unit`
+is added, to permit specifying the unit of the return value,
+and (5) the conversion to umol/kg takes into account the density,
+as indicated in Reference 1.</p>
     </div>
 
     <div id="ref-usage">
@@ -116,8 +120,9 @@ is called "E nominal" in the calibration sheets.</p></dd>
 <dt>unit</dt>
 <dd><p>character value indicating the desired unit. The
 default is `ml/l` but `umol/kg` is also accepted, the latter being
-computed by multiplying the former by 44.6591 (see Reference 1,
-which uses the mole fraction stated in Reference 2.)</p></dd>
+computed by multiplying the former by `44.6591*1000/(1000+sigma0)`,
+where `sigma0` is seawater potential density anomaly in kg/m^3
+(see Reference 1, which uses the mole fraction stated in Reference 2).</p></dd>
 
 </dl></div>
     <div id="references">

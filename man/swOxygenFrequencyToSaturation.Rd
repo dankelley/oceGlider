@@ -29,8 +29,9 @@ is called "E nominal" in the calibration sheets.}
 
 \item{unit}{character value indicating the desired unit. The
 default is `ml/l` but `umol/kg` is also accepted, the latter being
-computed by multiplying the former by 44.6591 (see Reference 1,
-which uses the mole fraction stated in Reference 2.)}
+computed by multiplying the former by `44.6591*1000/(1000+sigma0)`,
+where `sigma0` is seawater potential density anomaly in kg/m^3
+(see Reference 1, which uses the mole fraction stated in Reference 2).}
 }
 \description{
 The calibration formula comes from SBE calibration sheets. This
@@ -38,8 +39,10 @@ code is based on `sbeO2Hz2Sat()` in
 \url{https://github.com/DFOglider/pilotingApp}, with minor
 modifiations: (1) it has a new name to avoid conflicts, (2) the
 calibration coefficients are collected into a single parameter,
-`cal`, (3) `oxygenFrequency` is renamed `frequency`, and (4) `unit`
-is added, to permit specifying the unit of the return value.
+`cal`, (3) `oxygenFrequency` is renamed `frequency`, (3) `unit`
+is added, to permit specifying the unit of the return value,
+and (5) the conversion to umol/kg takes into account the density,
+as indicated in Reference 1.
 }
 \references{
 1. Thierry, Virginie, Henry Bittig, Denis Gilbert, Taiyo Kobayashi,

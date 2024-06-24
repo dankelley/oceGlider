@@ -26,9 +26,9 @@ test_that("oxygen computed against previously-computed values", {
     expect_silent(g <- read.glider.seaexplorer.realtime(directory = directory, yo = 3, progressBar = FALSE))
     g@metadata$oxycalib <- oxycalib
     # consistency check (will fail if dataset is changed or code changes)
-    options(digits = 15)
-    g[["oxygen"]][1:3]
-    expect_equal(g[["oxygen"]][1:3], c(363.265784249780, 363.301998679272, 363.257645877092))
+    # options(digits = 15)
+    # g[["oxygen"]][1:3]
+    expect_equal(g[["oxygen"]][1:3], c(354.508135471242, 354.543025470803, 354.499770611843))
     # test values from the calibration sheet
 })
 
