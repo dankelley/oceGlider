@@ -23,8 +23,21 @@
 #'
 #' @param unit character value indicating the desired unit. The
 #' default is `ml/l` but `umol/kg` is also accepted, the latter being
-#' computed by multiplying the former by 44.6591. (FIXME: document
-#' the source of this number.)
+#' computed by multiplying the former by 44.6591 (see Reference 1,
+#' which uses the mole fraction stated in Reference 2.)
+#'
+#' @references
+#'
+#' 1. Thierry, Virginie, Henry Bittig, Denis Gilbert, Taiyo Kobayashi,
+#' Sato Kanako, and Claudia Schmid. "Processing Argo Oxygen Data at the
+#' DAC Level (version 2.3.3)". Ifremer, 2022.
+#' \url{https://doi.org/10.13155/39795}.
+#'
+#'
+#' 2. Garcia, Herncin E., and Louis I. Gordon. "Oxygen Solubility in
+#' Seawater: Better Fitting Equations." Limnology and Oceanography 37,
+#' no. 6 (September 1992): 1307–12.
+#' \url{https://doi.org/10.4319/lo.1992.37.6.1307}.
 #'
 #' @author Chantelle Layton and Dan Kelley
 #'
