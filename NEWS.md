@@ -1,10 +1,10 @@
 # oceglider 0.1.10
 
-* Rename flag functions to avoid conflict with oce, e.g. `setFlags()`
-is now `setGliderFlags()` and `initializeFlagScheme()` is now
-`initializeGliderFlagScheme()`. Behind the scenes, object-oriented
-generic function methods have been replaced with conventional
-functions.
+* Rename flag functions to avoid conflict with oce, e.g. the `oce`
+functions named `setFlags()` and `handleFlags()` are replaced with
+`setGliderFlags()` and `handleGliderFlags()` in `oceglider`.
+* Correct the formula used to convert oxygen from ml/l to umol/kg,
+used in `swOxygenFrequencyToSaturation()`.
 
 # oceglider 0.1.9
 
