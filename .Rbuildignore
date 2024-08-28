@@ -15,3 +15,5 @@ Rplot.png
 ^docs$
 ^.*\.pdf$
 _pkgdown.yml
+meetings
+docs
