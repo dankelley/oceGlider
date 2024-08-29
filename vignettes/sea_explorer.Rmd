@@ -135,6 +135,15 @@ there seems to be little need to suggest more quantitative
 methods.  Besides, there is great merit in looking at the data,
 at the earliest opportunity.
 
+# FIXME
+
+1. Move quite a few SeaExplorer-specific things from the
+   general vignette here. Example: navstate
+
+2. Talk about the big nc files
+
+3. When cleaned up, use tmp dir.
+
 # References
 
 1. “Index of

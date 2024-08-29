@@ -19,6 +19,11 @@ vignette: >
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
+# FIXME
+
+1. Move several things from here to the SeaExplorer
+   vignette.
+
 
 **Abstract.** This vignette explains the basics of using the
 `oceglider` package. It is \emph{very much} a work in progress,
