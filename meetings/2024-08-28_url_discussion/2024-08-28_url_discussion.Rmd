@@ -1,6 +1,11 @@
 ---
 title: Glider meeting (CL and DK) to discuss URLs for data
+author: Dan Kelley
 date: 2024-08-28
+fontsize: 12pt
+header-includes:
+    \usepackage{times}
+    \usepackage{microtype}
 ---
 CL and DK met over zoom.
 
@@ -30,5 +35,6 @@ FIXME: try looking at cproof and ioos, similar to above.
 
 ## Other
 
-I guess there are other files, maybe.
+I guess there are other glider types, but I'm drawing a blank
+at the moment...
 
