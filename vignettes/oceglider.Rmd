@@ -258,8 +258,10 @@ time <- g[["time"]]
 pressure <- g[["pressure"]]
 oxygen <- g[["oxygen"]]
 par(mfrow = c(2, 1))
-oce::oce.plot.ts(time, pressure, ylim = rev(range(pressure, na.rm =
-    TRUE)))
+oce::oce.plot.ts(time, pressure, ylim = rev(range(pressure,
+    na.rm =
+        TRUE
+)))
 oce::oce.plot.ts(time, oxygen)
 ```
 

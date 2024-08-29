@@ -1,1 +1,6 @@
 destination: docs
+
+template:
+  bootstrap: 5
+
+url: https://dankelley.github.io/oceglider/

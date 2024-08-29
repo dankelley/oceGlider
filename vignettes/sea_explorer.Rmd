@@ -28,13 +28,17 @@ skeleton.
 
 ## Downloading the files
 
-The below shows how to download a small number of files from the CPROOF server
-at Reference 1. The code worked as of 2024-08-29, but if the server changes,
-the value of `urlbase` in the code will need alteration.
+The below shows how to download a small number of files (just 5) from the
+CPROOF server at Reference 1. The code worked as of 2024-08-29, but if reader
+finds that the server has changed, the solution is to alter the value of
+`urlbase` in line 2 below.
 
 ```{r}
 n <- 5 # number of files to download
-urlbase <- "https://cproof.uvic.ca/gliderdata/deployments/dfo-eva035/dfo-eva035-20231019/delayed_raw/"
+urlbase <- paste0(
+    "https://cproof.uvic.ca/gliderdata/deployments/",
+    "dfo-eva035/dfo-eva035-20231019/delayed_raw/"
+)
 subs <- paste0("sea035.118.gli.sub.", 1:n)
 raws <- paste0("sea035.118.pld1.raw.", 1:n)
 for (i in 1:n) {
@@ -46,6 +50,11 @@ for (i in 1:n) {
     }
 }
 ```
+
+Note that the above is based on the assumption that the server holds the `sub`
+and `pld1` files in the same directory.  If your server holds them in separate
+directories, it should be a simple matter to alter the lines defining `subs`
+and `raws` in the above.
 
 ## Trimming spurious data after power-on
 
@@ -94,7 +103,7 @@ Visual inspection puts the spurious time at somewhere between 1 and 2 hours
 since the first plotted point.  The use of `locator()` can narrow this down
 more precisely, but for illustration, we'll try 1.5 hours.
 
-```{r fig.height=4, fig.width=7, fig.cap="**Figure 2. Raw data, after trimming spurious data in the 1.5 hours following power-on events..**", dev.args=list(pointsize=12)}
+```{r fig.height=4, fig.width=7, fig.cap="**Figure 2. Raw data, after trimming spurious data in the 1.5 hours following power-on events.**", dev.args=list(pointsize=12)}
 library(oce)
 library(oceglider)
 skip <- 1.5 * 3600 # 1.5 hours, in seconds
