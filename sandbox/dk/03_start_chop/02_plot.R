@@ -1,7 +1,8 @@
 library(oce)
 library(oceglider)
 g1 <- read.glider.seaexplorer.delayed(".")
-g2 <- read.glider.seaexplorer.delayed(".", removeTimeSincePowerOn = 18000)
+rtspo <- 1.5 * 3600
+g2 <- read.glider.seaexplorer.delayed(".", removeTimeSincePowerOn = rtspo)
 g2[["time"]][1] - g1[["time"]][1]
 
 if (!interactive()) {

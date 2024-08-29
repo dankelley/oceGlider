@@ -41,6 +41,9 @@ it is in the field.)'><!-- mathjax --><script src="https://cdnjs.cloudflare.com/
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/sea_explorer.html">Handling SeaExplorer Data</a>
+    </li>
+    <li>
       <a href="../articles/slocum_glider.html">Slocum Gliders</a>
     </li>
   </ul></li>
@@ -116,11 +119,13 @@ time stamps (which was the default behaviour before 2019-12-08)</p></dd>
 
 
 <dt id="arg-removetimesincepoweron">removeTimeSincePowerOn<a class="anchor" aria-label="anchor" href="#arg-removetimesincepoweron"></a></dt>
-<dd><p>Amount of time to remove data after
-the CTD is powered on. This is to remove spurious data that can
-occur when the glider doesn't sample every yo, and water
-trapped within the CTD needs to be flushed out before good data
-are obtained.</p></dd>
+<dd><p>numeric value indicating the number of
+seconds of data to trim, after the glider sensors are powered on.
+One way to determine this is to read the whole sequence,
+and then plot say the first 10 minutes of salinity and temperature
+data, looking for a transition between aphysical values, which
+might take the form of zero salinity, followed by a relatively
+rapid ramp-up to values that seem more oceanographic.</p></dd>
 
 
 <dt id="arg-progressbar">progressBar<a class="anchor" aria-label="anchor" href="#arg-progressbar"></a></dt>

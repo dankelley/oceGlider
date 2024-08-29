@@ -29,11 +29,13 @@ be interpolated to the CTD times to obtain a common time base,
 or whether all sensors should simply be interpolated for all
 time stamps (which was the default behaviour before 2019-12-08)}
 
-\item{removeTimeSincePowerOn}{Amount of time to remove data after
-the CTD is powered on. This is to remove spurious data that can
-occur when the glider doesn't sample every yo, and water
-trapped within the CTD needs to be flushed out before good data
-are obtained.}
+\item{removeTimeSincePowerOn}{numeric value indicating the number of
+seconds of data to trim, after the glider sensors are powered on.
+One way to determine this is to read the whole sequence,
+and then plot say the first 10 minutes of salinity and temperature
+data, looking for a transition between aphysical values, which
+might take the form of zero salinity, followed by a relatively
+rapid ramp-up to values that seem more oceanographic.}
 
 \item{progressBar}{either a logical or character value that controls
 whether/how to indicate the progress made in reading and interpreting

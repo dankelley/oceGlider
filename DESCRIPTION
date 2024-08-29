@@ -20,6 +20,6 @@ License: GPL (>= 2)
 Encoding: UTF-8
 BuildVignettes: true
 VignetteBuilder: knitr
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Packaged: Dan Kelley
 Config/testthat/edition: 3

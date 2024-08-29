@@ -78,11 +78,13 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #'     or whether all sensors should simply be interpolated for all
 #'     time stamps (which was the default behaviour before 2019-12-08)
 #'
-#' @param removeTimeSincePowerOn Amount of time to remove data after
-#'     the CTD is powered on. This is to remove spurious data that can
-#'     occur when the glider doesn't sample every yo, and water
-#'     trapped within the CTD needs to be flushed out before good data
-#'     are obtained.
+#' @param removeTimeSincePowerOn numeric value indicating the number of
+#' seconds of data to trim, after the glider sensors are powered on.
+#' One way to determine this is to read the whole sequence,
+#' and then plot say the first 10 minutes of salinity and temperature
+#' data, looking for a transition between aphysical values, which
+#' might take the form of zero salinity, followed by a relatively
+#' rapid ramp-up to values that seem more oceanographic.
 #'
 #' @param progressBar either a logical or character value that controls
 #'     whether/how to indicate the progress made in reading and interpreting
@@ -353,9 +355,10 @@ read.glider.seaexplorer.delayed <- function(directory, yo, level = 1, interpolat
     } else if (level == 1) {
         if (removeTimeSincePowerOn > 0) {
             starts <- c(1, which(diff(df$time) > 60) + 1) # FIXME: should 60s be an argument?
-            dt <- median(diff(as.numeric(df$time[!is.na(df$temperature)])))
+            dt <- median(diff(as.numeric(df$time)))
             ok <- rep(TRUE, length(df$time))
             n <- round(removeTimeSincePowerOn / dt)
+            gliderDebug(debug, sprintf("  for trimming after power on: dt=%.3fs n=%d\n", dt, n))
             for (s in starts) ok[s:(s + n)] <- FALSE
             df <- df[ok, ]
         }

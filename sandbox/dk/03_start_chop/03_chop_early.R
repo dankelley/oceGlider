@@ -2,14 +2,13 @@ library(oce)
 library(oceglider)
 if (!exists("g1")) {
     g1 <- read.glider.seaexplorer.delayed(".")
-    rtspo <- 18000 # by experiment
+    rtspo <- 1.5 * 3600
     g2 <- read.glider.seaexplorer.delayed(".", removeTimeSincePowerOn = rtspo)
 }
 sigma0 <- g1[["sigma0"]]
 SA <- g1[["salinity"]]
 CT <- g1[["temperautre"]]
 time <- g1[["time"]]
-message(sprintf("median(diff(time)) = %.3fs", median(diff(time), na.rm=TRUE)))
 
 sigma0Cutoff <- quantile(sigma0, 0.02, na.rm = TRUE)
 SACutoff <- quantile(SA, 0.02, na.rm = TRUE)

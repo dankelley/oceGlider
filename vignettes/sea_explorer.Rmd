@@ -1,0 +1,137 @@
+---
+title: "Handling SeaExplorer Data"
+author: "Dan Kelley (https://orcid.org/0000-0001-7808-5911)"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+    fig_width: 6
+    fig_height: 4
+    dpi: 72
+vignette: >
+  %\VignetteIndexEntry{Handling SeaExplorer Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+**Abstract.** This vignette explains the basics of working with data from
+SeaExplorer gliders.  It is VERY MUCH a work in progress, not much more than a
+skeleton.
+
+# Raw files
+
+## Downloading the files
+
+The below shows how to download a small number of files from the CPROOF server
+at Reference 1. The code worked as of 2024-08-29, but if the server changes,
+the value of `urlbase` in the code will need alteration.
+
+```{r}
+n <- 5 # number of files to download
+urlbase <- "https://cproof.uvic.ca/gliderdata/deployments/dfo-eva035/dfo-eva035-20231019/delayed_raw/"
+subs <- paste0("sea035.118.gli.sub.", 1:n)
+raws <- paste0("sea035.118.pld1.raw.", 1:n)
+for (i in 1:n) {
+    if (!file.exists(subs[i])) {
+        download.file(paste0(urlbase, subs[i]), subs[i])
+    }
+    if (!file.exists(raws[i])) {
+        download.file(paste0(urlbase, raws[i]), raws[i])
+    }
+}
+```
+
+## Trimming spurious data after power-on
+
+Raw SeaExplorer data files may contain spurious values after the sensors are
+powered on.   This may occur at the start of a deployment, but it may also
+occur later on in the data set, if the glider was set up to power-down the
+sensors from time to time.
+
+To avoid problems with analysis, it makes sense to trim data acquired just
+after power-on events. The `read.glider.seaexplorer.delayed()` function has a
+parameter called `removeTimeSincePowerOn` that does just this. It's value is
+the number of seconds of of data that are to be ignored after power-on events.
+
+There may be statistical ways to determine these spurious data (e.g. looking
+for salinities below a certain fixed threshold, or a certain quantile), but a
+quicker method is to do this by examining plots of data. This is illustrated in
+the following code.
+
+In the plot call, note that the `type` is set to give points. This is required,
+because the default setting of `type="l"` will skip over quite a lot of the
+data because there are so many NA values between valid points.  Indeed, for
+this dataset, 3/4 of the data are NA.
+
+```{r fig.height=4, fig.width=7, fig.cap="**Figure 1. Raw data, without trimming after power-on. Note the spuriously low salinities and odd temperatures before about 20:15 or so.**", dev.args=list(pointsize=11)}
+library(oce)
+library(oceglider)
+g <- read.glider.seaexplorer.delayed(".")
+layout(rbind(c(1, 2), c(3, 2)), widths = c(0.6, 0.4))
+oce.plot.ts(g[["time"]], g[["temperature"]],
+    ylab = "Temperature", type = "p", cex = 0.3
+)
+ctd <- as.ctd(g[["salinity"]], g[["temperature"]], g[["pressure"]])
+plotTS(ctd, eos = "unesco")
+oce.plot.ts(g[["time"]], g[["salinity"]],
+    ylab = "Salinity", type = "p", cex = 0.3
+)
+# locator(1)
+```
+
+Obviously, the salinities are highly spurious at the start.  And, after that,
+there is a ramp-up period that is also suspicious.  Temperature is also odd,
+having a different character of variation before and after the time of spurious
+salinity.  The temperature-salinity diagram is also a good indication that the
+initial data are not representative of the ocean.
+
+Visual inspection puts the spurious time at somewhere between 1 and 2 hours
+since the first plotted point.  The use of `locator()` can narrow this down
+more precisely, but for illustration, we'll try 1.5 hours.
+
+```{r fig.height=4, fig.width=7, fig.cap="**Figure 2. Raw data, after trimming spurious data in the 1.5 hours following power-on events..**", dev.args=list(pointsize=11)}
+library(oce)
+library(oceglider)
+skip <- 1.5 * 3600 # 1.5 hours, in seconds
+g <- read.glider.seaexplorer.delayed(".", removeTimeSincePowerOn = skip)
+layout(rbind(c(1, 2), c(3, 2)), widths = c(0.6, 0.4))
+oce.plot.ts(g[["time"]], g[["temperature"]],
+    ylab = "Temperature", type = "o", cex = 0.3
+)
+ctd <- as.ctd(g[["salinity"]], g[["temperature"]], g[["pressure"]])
+plotTS(ctd, eos = "unesco")
+oce.plot.ts(g[["time"]], g[["salinity"]],
+    ylab = "Salinity", type = "o", cex = 0.3
+)
+```
+
+With this skipping of initial data following the power-up, we have data that
+are of the expected character. The time series plots show an expected pattern
+for a glider that is moving up and down in the water column.  The
+temperature-salinity diagram also looks sensible.
+
+As noted, statistical methods might also be useful in determining
+whether this sort of data trimming is warranted.  For example,
+for this particular dataset, the spuriously fresh water could
+be detected using the `quantile()` function, with a 2 percent
+level as the criterion.  However, that number would need to be
+changed if the whole dataset were to be used.  Given the ease
+with which this kind of work can be done visually, as above,
+there seems to be little need to suggest more quantitative
+methods.  Besides, there is great merit in looking at the data,
+at the earliest opportunity.
+
+# References
+
+1. “Index of
+   /Gliderdata/Deployments/Dfo-Eva035/Dfo-Eva035-20231019/Delayed_raw.”
+   Accessed August 28, 2024.
+   <https://cproof.uvic.ca/gliderdata/deployments/dfo-eva035/dfo-eva035-20231019/delayed_raw/>
+
+
