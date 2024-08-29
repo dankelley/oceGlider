@@ -69,7 +69,7 @@ because the default setting of `type="l"` will skip over quite a lot of the
 data because there are so many NA values between valid points.  Indeed, for
 this dataset, 3/4 of the data are NA.
 
-```{r fig.height=4, fig.width=7, fig.cap="**Figure 1. Raw data, without trimming after power-on. Note the spuriously low salinities and odd temperatures before about 20:15 or so.**", dev.args=list(pointsize=11)}
+```{r fig.height=4, fig.width=7, fig.cap="**Figure 1. Raw data, without trimming after power-on. Note the spuriously low salinities and odd temperatures before about 20:15 or so.**", dev.args=list(pointsize=12)}
 library(oce)
 library(oceglider)
 g <- read.glider.seaexplorer.delayed(".")
@@ -82,7 +82,6 @@ plotTS(ctd, eos = "unesco")
 oce.plot.ts(g[["time"]], g[["salinity"]],
     ylab = "Salinity", type = "p", cex = 0.3
 )
-# locator(1)
 ```
 
 Obviously, the salinities are highly spurious at the start.  And, after that,
@@ -95,7 +94,7 @@ Visual inspection puts the spurious time at somewhere between 1 and 2 hours
 since the first plotted point.  The use of `locator()` can narrow this down
 more precisely, but for illustration, we'll try 1.5 hours.
 
-```{r fig.height=4, fig.width=7, fig.cap="**Figure 2. Raw data, after trimming spurious data in the 1.5 hours following power-on events..**", dev.args=list(pointsize=11)}
+```{r fig.height=4, fig.width=7, fig.cap="**Figure 2. Raw data, after trimming spurious data in the 1.5 hours following power-on events..**", dev.args=list(pointsize=12)}
 library(oce)
 library(oceglider)
 skip <- 1.5 * 3600 # 1.5 hours, in seconds
