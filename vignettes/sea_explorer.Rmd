@@ -24,7 +24,8 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 SeaExplorer gliders.  It is VERY MUCH a work in progress, not much more than a
 skeleton.
 
-# Raw files
+# Raw Files
+
 
 ## Downloading the files
 
@@ -35,18 +36,19 @@ finds that the server has changed, the solution is to alter the value of
 
 ```{r}
 n <- 5 # number of files to download
-urlbase <- paste0(
+urlRaw <- paste0(
     "https://cproof.uvic.ca/gliderdata/deployments/",
-    "dfo-eva035/dfo-eva035-20231019/delayed_raw/"
+    "dfo-eva035/dfo-eva035-20231019/",
+    "delayed_raw/"
 )
 subs <- paste0("sea035.118.gli.sub.", 1:n)
 raws <- paste0("sea035.118.pld1.raw.", 1:n)
 for (i in 1:n) {
     if (!file.exists(subs[i])) {
-        download.file(paste0(urlbase, subs[i]), subs[i])
+        download.file(paste0(urlRaw, subs[i]), subs[i])
     }
     if (!file.exists(raws[i])) {
-        download.file(paste0(urlbase, raws[i]), raws[i])
+        download.file(paste0(urlRaw, raws[i]), raws[i])
     }
 }
 ```
@@ -134,6 +136,41 @@ with which this kind of work can be done visually, as above,
 there seems to be little need to suggest more quantitative
 methods.  Besides, there is great merit in looking at the data,
 at the earliest opportunity.
+
+# Delayed-mode NetCDF Files
+
+```{r}
+urlNC <- paste0(
+    "https://cproof.uvic.ca/gliderdata/deployments/",
+    "dfo-eva035/dfo-eva035-20231019/",
+    "/L0-timeseries/dfo-eva035-20231019_delayed.nc"
+)
+fileNC <- gsub(".*/", "", urlNC)
+# 86.8MB file, so cache it to save O(30) second download.
+if (!file.exists(fileNC)) {
+    download.file(urlNC, fileNC)
+}
+G <- read.glider.netcdf(fileNC)
+par(mfrow = c(1, 2))
+plot(G, which = "map")
+plot(G, which = "p")
+summary(G)
+G[["?"]] # see what we can extract
+str(G@data)
+# colour-code for temperature, just first 2 days
+Q <- quantile(G[["temperature"]], c(0.01, 0.99))
+cm <- colormap(G[["temperature"]], zlim = Q, col = oceColorsTurbo)
+xlim <- G[["time"]][1] + c(0, 8 * 86400)
+# cm <- colormap(G[["temperature"]], col = oceColorsTurbo)
+plot(G,
+    which = "p", type = "p",
+    xlim = xlim,
+    col = cm$zcol, pch = 20,
+    cex = 0.3
+)
+tStop <- G[["time"]] + 3 * 86400
+Gs <- subset(G, time < tStop, debug = 2)
+```
 
 # FIXME
 

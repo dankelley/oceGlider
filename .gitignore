@@ -12,3 +12,6 @@ vignettes/*_files
 *.out
 Rplot.png
 *.pdf
+vignettes/*nc
+vignettes/*sub*
+vignettes/*pld1*

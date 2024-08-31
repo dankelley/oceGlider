@@ -155,11 +155,13 @@ setMethod(
                         res@metadata$flags[["payload1"]][[i]] <- res@metadata$flag[["payload1"]][[i]][keep]
                     }
                 } else {
-                    keep <- eval(substitute(subset), x@data, parent.frame())
+                    where <- "payload1"
+                    gliderDebug(debug, "doing subset with respect to @data$", where, "\n", sep="")
+                    keep <- eval(substitute(subset), x@data[[where]], parent.frame())
                     keep[is.na(keep)] <- FALSE
                     gliderDebug(debug, "keeping", sum(keep), "of", length(keep), "elements\n")
                     res <- x
-                    res@data <- res@data[keep, ]
+                    res@data[[where]] <- res@data[[where]][keep, ]
                 }
             }
         }

@@ -172,10 +172,11 @@ setMethod(
 #' summary(g[["SA"]])
 #'
 #' # Example 2: discover what can be retrieved from this object
+#' # (FIXME: not all of these work)
 #' g[["?"]]
 #'
-#' @importFrom oce swSigmaTheta swSigma0 swSpice swZ
-#' @importFrom gsw gsw_CT_from_t gsw_SA_from_SP gsw_spiciness0
+#' @importFrom oce swSigmaTheta swSigma0 swSigma1 swSigma2 swSigma3 swSpice swZ
+#' @importFrom gsw gsw_CT_from_t gsw_SA_from_SP gsw_sound_speed gsw_spiciness0
 #'
 #' @export
 #'
@@ -246,6 +247,33 @@ setMethod(
                 latitude = x[["latitude"]]
             ))
         }
+        if (i == "sigma1") {
+            return(swSigma1(
+                salinity = x[["salinity"]],
+                temperature = x[["temperature"]],
+                pressure = x[["pressure"]],
+                longitude = x[["longitude"]],
+                latitude = x[["latitude"]]
+            ))
+        }
+        if (i == "sigma2") {
+            return(swSigma2(
+                salinity = x[["salinity"]],
+                temperature = x[["temperature"]],
+                pressure = x[["pressure"]],
+                longitude = x[["longitude"]],
+                latitude = x[["latitude"]]
+            ))
+        }
+        if (i == "sigma3") {
+            return(swSigma3(
+                salinity = x[["salinity"]],
+                temperature = x[["temperature"]],
+                pressure = x[["pressure"]],
+                longitude = x[["longitude"]],
+                latitude = x[["latitude"]]
+            ))
+        }
         if (i == "SA") {
             return(gsw_SA_from_SP(
                 SP = x[["salinity"]], p = x[["pressure"]],
@@ -261,6 +289,14 @@ setMethod(
             p <- x[["pressure"]]
             SA <- gsw_SA_from_SP(SP = SP, p = p, longitude = x[["longitude"]], latitude = x[["latitude"]])
             return(gsw_CT_from_t(SA, t, p))
+        }
+        if (i == "sound speed") {
+            t <- x[["temperature"]]
+            SP <- x[["salinity"]] # stored as practical salinity
+            p <- x[["pressure"]]
+            SA <- gsw_SA_from_SP(SP = SP, p = p, longitude = x[["longitude"]], latitude = x[["latitude"]])
+            CT <- gsw_CT_from_t(SA, t, p)
+            return(gsw_sound_speed(SA, CT, p))
         }
         if (i == "spiciness0") {
             t <- x[["temperature"]]

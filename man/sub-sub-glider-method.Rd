@@ -43,6 +43,7 @@ g <- read.glider.seaexplorer.delayed(directory, progressBar = FALSE)
 summary(g[["SA"]])
 
 # Example 2: discover what can be retrieved from this object
+# (FIXME: not all of these work)
 g[["?"]]
 
 }
