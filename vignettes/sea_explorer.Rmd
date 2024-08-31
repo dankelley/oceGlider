@@ -139,6 +139,11 @@ at the earliest opportunity.
 
 # Delayed-mode NetCDF Files
 
+The first step is to download the data.  This can take a minute or two,
+depending on the connection speed, so the code below skips the downloading
+step, if the file already exists locally.
+
+
 ```{r}
 urlNC <- paste0(
     "https://cproof.uvic.ca/gliderdata/deployments/",
@@ -150,34 +155,100 @@ fileNC <- gsub(".*/", "", urlNC)
 if (!file.exists(fileNC)) {
     download.file(urlNC, fileNC)
 }
-G <- read.glider.netcdf(fileNC)
-par(mfrow = c(1, 2))
-plot(G, which = "map")
-plot(G, which = "p")
-summary(G)
-G[["?"]] # see what we can extract
-str(G@data)
-# colour-code for temperature, just first 2 days
-Q <- quantile(G[["temperature"]], c(0.01, 0.99))
-cm <- colormap(G[["temperature"]], zlim = Q, col = oceColorsTurbo)
-xlim <- G[["time"]][1] + c(0, 8 * 86400)
-# cm <- colormap(G[["temperature"]], col = oceColorsTurbo)
-plot(G,
-    which = "p", type = "p",
-    xlim = xlim,
-    col = cm$zcol, pch = 20,
-    cex = 0.3
-)
-tStop <- G[["time"]] + 3 * 86400
-Gs <- subset(G, time < tStop, debug = 2)
 ```
+
+Next, read the data. This takes only a second or two.
+```{r}
+G <- read.glider.netcdf(fileNC)
+```
+
+A summary is usually helpful, so we start with that.  Note that the original
+names (as stored in the NetCDF file) use snake-case notation (with underlines
+joining words) but that these are converted to camel-case notation (with
+upper-case letters at the start of second and later words). The `[[` notation
+works with either, but we stick here to the oce names, so the code will be
+familiar to users of that package.
+
+```{r}
+summary(G)
+```
+
+Another good way to get an overview is with some plots.  First, let's
+see where the data were acquired.  It helps to set the `type` parameter
+to yield line segments between the data, rather than points, so
+we can more easily see retracing.
+
+```{r}
+plot(G, which = "map", type = "l")
+```
+
+This indicates sampling on the west coast of Canada. The
+first samples were likely on the east, and the glider travelled
+to the southwest, before turning around and retracing its
+route to about 131W.  Presumably it was picked up
+by a ship then.
+
+Let's learn more about the water column by plotting pressure
+versus time.
+
+```{r} plot(G, which = "p") ``` This verifies the assumption that the early
+data were on the shelf.  Note that the device must have been set to return to
+the surface when it got to a depth of 1 kilometre at
+about 2023-10-27.
+
+Let's look at temperature on the continental shelf, by selecting just the first
+week of data.
+
+```R
+Gs <- subset(G, time < G[["time"]][1] + 7*86400)
+temperature <- Gs[["temperature"]]
+Q <- quantile(temperature, c(0.01, 0.99)) # avoid outliers
+cm <- oce::colormap(temperature, 
+                    zlim = Q,
+                    col = oceColorsTurbo)
+par(mar=c(3, 3, 1, 1))
+drawPalette(colormap = cm)
+plot(Gs, which="p", type = "p", col = cm$zcol, mar = c(3, 3, 1, 4))
+plot(Gs, which = "TS")
+```
+
+This is starting to look interesting, isn't it?
+
+But let's not get carried away just yet.  Shouldn't we check to see how much we
+trust the data?  A temperature-salinity plot can help with that.
+
+```{r}
+plot(Gs, which = "TS")
+```
+
+Oh, there is a problem here. Notice those low salinities.  This is
+a SeaExplorer glider, and we have seen already discussed problems
+with spurious values after power-on, so let's look at salinity.
+
+```{r}
+plot(Gs, which = "S")
+```
+
+Oh yes, those initial salinities are definitely wrong.
+
+At this stage, readers are likely to know how to proceed, but here's a hint:
+
+```{r}
+Gs2 <- subset(Gs, salinity > 30)
+plot(Gs2, which = "S")
+```
+
+This looks better, although it is quite ad-hoc to select this particular
+cut-off salinity.  But we are now getting into the territory of advising the
+reader how to do science, as opposed to how to use `oceglider`, so it's time to
+end this vignette.
 
 # FIXME
 
 1. Move quite a few SeaExplorer-specific things from the
    general vignette here. Example: navstate
 
-2. Talk about the big nc files
+2. ~Talk about the big nc files~
 
 3. When cleaned up, use tmp dir.
 
