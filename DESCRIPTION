@@ -6,10 +6,9 @@ Authors@R: c(person(given="Dan", family="Kelley", email="dan.kelley@dal.ca", rol
         person(given="Clark", family="Richards", email="clark.richards@gmail.com", role=c("aut"), comment=c(ORCID="https://orcid.org/0000-0002-7833-206X")),
         person(given="Chantelle", family="Layton", email="layton.chantelle@gmail.com", role=c("aut"), comment=c(ORCID="https://orcid.org/0000-0002-3199-5763")))
 Maintainer: Dan Kelley <dan.kelley@dal.ca>
-Depends: R (>= 4.1.0), utils, oce, gsw
+Depends: ncdf4, R (>= 4.1.0), utils, oce, gsw
 Suggests:
     knitr,
-    ncdf4,
     RCurl,
     rmarkdown,
     testthat

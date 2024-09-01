@@ -1,3 +1,4 @@
+^.*\.nc$
 ^sandbox$
 ^Meta$
 ^doc$
