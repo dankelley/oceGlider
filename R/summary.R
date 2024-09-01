@@ -48,7 +48,7 @@ setMethod(
         # 44     cat(sprintf("* Yo:      %d values, between %d and %d\n",
         # 44                 nyo, object@metadata$yo[1], object@metadata$yo[nyo]))
         payload1Exists <- "payload1" %in% names(object@data)
-        stream <- if (object[["type"]] == "seaexplorer") object@data$payload1 else object@data
+        #stream <- if (object[["type"]] == "seaexplorer") object@data$payload1 else object@data
         if (payload1Exists) {
             odataName <- "payload1"
             odata <- object@data[[odataName]]
@@ -69,25 +69,24 @@ setMethod(
         if ("time" %in% odataNames) {
             from <- min(odata$time, na.rm = TRUE)
             to <- max(odata$time, na.rm = TRUE)
-            nt <- length(odata$time)
             deltat <- mean(diff(as.numeric(odata$time)), na.rm = TRUE)
             if (is.na(deltat)) {
                 cat("* Time:               ", format(from), "\n")
             } else {
-                cat("* Time ranges from", format(from), "to", format(to), "with", nt, "samples and mean increment", deltat, "s\n")
+                cat("* Time:   ",
+                    format(from, format="%Y-%m-%d %H:%M:%S"),
+                    "to",
+                    format(to, format="%Y-%m-%d %H:%M:%S"),
+                    " (mean increment", round(deltat, 4), "s)\n")
             }
         }
         for (i in 1:ndata) {
             threes[i, ] <- oce::threenum(odata[[i]])
         }
         if ("units" %in% metadataNames) {
-            if (payload1Exists) {
-                units <- object@metadata$units$payload1[o]
-                unitsNames <- names(object@metadata$units$payload1[o])
-            } else {
-                units <- object@metadata$units[o]
-                unitsNames <- names(object@metadata$units[o])
-            }
+            units <- object@metadata$units[o]
+            unitsNames <- names(object@metadata$units[o])
+            cat("DAN 1 units follow\n");print(units)
             units <- unlist(lapply(
                 seq_along(units),
                 function(i) {
@@ -125,6 +124,7 @@ setMethod(
                     res
                 }
             ))
+            cat("DAN 2 units follow\n");print(units)
             names(units) <- unitsNames
             rownames(threes) <- paste("    ", oce::dataLabel(names(odata), units), sep = "")
         } else {

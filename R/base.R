@@ -29,8 +29,8 @@ NULL
 #' @author Dan Kelley
 #'
 #' @export
-glider <- setClass("glider", slots = c(metadata="list", data="list", processingLog="list"))
-#glider <- setClass("glider", contains = "oce")
+glider <- setClass("glider", slots = c(metadata = "list", data = "list", processingLog = "list"))
+# glider <- setClass("glider", contains = "oce")
 
 setMethod(
     f = "initialize",
@@ -338,13 +338,13 @@ setMethod(
                     }
                     cal <- x@metadata$oxycalib
                     oxygenFrequency <- x@data[[payloadName]]$oxygenFrequency
-                    #cat(oce::vectorShow(oxygenFrequency))
+                    # cat(oce::vectorShow(oxygenFrequency))
                     salinity <- x@data[[payloadName]]$salinity
-                    #cat(oce::vectorShow(salinity))
+                    # cat(oce::vectorShow(salinity))
                     temperature <- x@data[[payloadName]]$temperature
-                    #cat(oce::vectorShow(temperature))
+                    # cat(oce::vectorShow(temperature))
                     pressure <- x@data[[payloadName]]$pressure
-                    #cat(oce::vectorShow(pressure))
+                    # cat(oce::vectorShow(pressure))
                     cc <- cal$calibrationCoefficients
                     # This Kelvin temperature is as used in swSatOw.  Note the
                     # non-standard offset and the non-unity factor
@@ -671,6 +671,9 @@ getAtt <- function(f, varid = 0, attname = NULL, default = NULL) {
 #' `g[["profileDirection"]]` and
 #' `g[["profile_direction"]]` give the same result.
 #'
+#' See the SeaExplorer vignette for examples of using this
+#' function.
+#'
 #' @param file Name of a netcdf file.
 #'
 #' @template debug
@@ -681,41 +684,42 @@ getAtt <- function(f, varid = 0, attname = NULL, default = NULL) {
 #'
 #' @author Dan Kelley
 #'
-#' @examples
-#' \dontrun{
-#' library(oceglider)
-#'
-#' # NOTE: these files are of order 100Meg, so they are
-#' # not provided with the package as samples. In both
-#' # examples, we plot a map and then an incidence-TS plot.
-#'
-#' # Seaexplorer data, from DFO (January 2019)
-#' g <- read.glider.netcdf("~/Dropbox/glider_dfo.nc")
-#' # Remove spurious times, from a year before deployment
-#' g <- subset(g, time > as.POSIXct("2018-01-01"))
-#' # Remove any observation with bad salinity
-#' g <- subset(g, is.finite(g[["salinity"]]))
-#' plot(g, which = "map")
-#' ctd <- as.ctd(g[["salinity"]], g[["temperature"]], g[["pressure"]],
-#'     longitude = g[["longitude"]], latitude = g[["latitude"]]
-#' )
-#' plotTS(ctd, useSmoothScatter = TRUE)
-#'
-#' # Slocum data,from Dalhousie CEOTR rdapp (April 2019)
-#' g <- read.glider.netcdf("~/Dropbox/glider_erdapp.nc")
-#' # Remove any observation with bad salinity
-#' g <- subset(g, is.finite(g[["salinity"]]))
-#' plot(g, which = "map")
-#' ctd <- as.ctd(g[["salinity"]], g[["temperature"]], g[["pressure"]],
-#'     latitude = g[["latitude"]], longitude = g[["longitude"]]
-#' )
-#' plotTS(ctd, useSmoothScatter = TRUE)
-#' }
+## @examples
+## \dontrun{
+## library(oceglider)
+##
+## # NOTE: these files are of order 100Meg, so they are
+## # not provided with the package as samples. In both
+## # examples, we plot a map and then an incidence-TS plot.
+##
+## # Seaexplorer data, from DFO (January 2019)
+## g <- read.glider.netcdf("~/Dropbox/glider_dfo.nc")
+## # Remove spurious times, from a year before deployment
+## g <- subset(g, time > as.POSIXct("2018-01-01"))
+## # Remove any observation with bad salinity
+## g <- subset(g, is.finite(g[["salinity"]]))
+## plot(g, which = "map")
+## ctd <- as.ctd(g[["salinity"]], g[["temperature"]], g[["pressure"]],
+##     longitude = g[["longitude"]], latitude = g[["latitude"]]
+## )
+## plotTS(ctd, useSmoothScatter = TRUE)
+##
+## # Slocum data,from Dalhousie CEOTR rdapp (April 2019)
+## g <- read.glider.netcdf("~/Dropbox/glider_erdapp.nc")
+## # Remove any observation with bad salinity
+## g <- subset(g, is.finite(g[["salinity"]]))
+## plot(g, which = "map")
+## ctd <- as.ctd(g[["salinity"]], g[["temperature"]], g[["pressure"]],
+##     latitude = g[["latitude"]], longitude = g[["longitude"]]
+## )
+## plotTS(ctd, useSmoothScatter = TRUE)
+## }
 #'
 #' @family functions to read glider data
 #' @family functions to read netcdf glider data
 #'
-## @importFrom ncdf4 nc_open ncatt_get ncvar_get
+#' @importFrom oce as.unit
+#' @importFrom ncdf4 nc_open ncatt_get ncatt_get ncvar_get
 #'
 #' @md
 #'
@@ -741,8 +745,10 @@ read.glider.netcdf <- function(file, debug) {
     res@metadata$instrumentManufacturer <- getAtt(f, attname = "instrument_manufacturer", default = "?")
     res@metadata$instrumentModel <- getAtt(f, attname = "instrument_model", default = "?")
     type <- getAtt(f, attname = "platform_type", default = "?")
-    if (type == "Slocum Glider") {
-        type <- "slocum"
+    if (!is.null(type)) {
+        type <- gsub("Glider$", "", type)
+        type <- tolower(type)
+        type <- trimws(type)
     }
     res@metadata$type <- type
     data <- list()
@@ -754,17 +760,30 @@ read.glider.netcdf <- function(file, debug) {
     # ? if (!"time" %in% dataNames)
     # ?     dataNamesOriginal$time <- "-"
     # Get all variables, except time, which is not listed in f$var
-    gliderDebug(debug, "reading and renaming data\n")
+    gliderDebug(debug, "reading and renaming data, plus collecting units\n")
+    units <- list()
     for (i in seq_along(dataNames)) {
-        newName <- toCamelCase(dataNames[i])
-        dataNamesOriginal[[newName]] <- dataNames[i]
+        oceName <- toCamelCase(dataNames[i])
+        dataNamesOriginal[[oceName]] <- dataNames[i]
         if (dataNames[i] == "time") {
             data[["time"]] <- numberAsPOSIXct(as.vector(ncdf4::ncvar_get(f, "time")))
             gliderDebug(debug, "i=", i, " ... time converted from integer to POSIXct\n", sep = "")
         } else {
-            data[[newName]] <- as.vector(ncdf4::ncvar_get(f, dataNames[i]))
-            gliderDebug(debug, "i=", i, " ... data name \"", dataNames[i], "\" converted to \"", newName, "\"\n", sep = "")
-            dataNames[i] <- newName
+            data[[oceName]] <- as.vector(ncdf4::ncvar_get(f, dataNames[i]))
+            u <- ncdf4::ncatt_get(f, dataNames[i], "units")$value
+            unit <- oce::as.unit(u, default = NULL)
+            if (is.null(unit)) {
+                unit <- list(unit = bquote(.(u)), scale = "")
+                message("DDDD")
+            }
+            if (debug > 0) {
+                cat("  original name = \"", dataNames[i], "\"\n", sep = "")
+                cat("    oce name = \"", oceName, "\"\n", sep = "")
+                cat("    original unit = ", u, "\n", sep = "")
+                cat("    oce unit = ", as.character(unit$unit), "\n", sep = "")
+            }
+            units[[oceName]] <- unit
+            dataNames[i] <- oceName
         }
     }
     # gliderDebug(debug, "dataNames:", paste(dataNames, collapse=";"), "\n")
@@ -773,6 +792,11 @@ read.glider.netcdf <- function(file, debug) {
     # head(res@data$payload1$time)
     res@metadata$filename <- file
     res@metadata$dataNamesOriginal <- list(payload1 = dataNamesOriginal)
+    res@metadata$units <- units
+    #if (debug > 1) {
+    #    message("DAN next is @metadata$units at end")
+    #    print(res@metadata$units)
+    #}
     gliderDebug(debug, "} # read.glider.netcdf", unindent = 1, sep = "")
     res
 }

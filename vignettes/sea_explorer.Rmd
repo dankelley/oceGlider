@@ -159,7 +159,26 @@ if (!file.exists(fileNC)) {
 
 Next, read the data. This takes only a second or two.
 ```{r}
+library(oce)
+library(oceglider)
 G <- read.glider.netcdf(fileNC)
+summary(G)
+#<debugging units> print(G@metadata$units)
+#<debugging units> library(ncdf4)
+#<debugging units> nc <- nc_open("dfo-eva035-20231019_delayed.nc")
+#<debugging units> units <- list()
+#<debugging units> names(nc$var)
+#<debugging units> ncatt_get(nc, "temperature")$units
+#<debugging units> as.unit(tolower(ncatt_get(nc, "temperature", "units")$value))
+#<debugging units> units[["temperature"]] <- as.unit(ncatt_get(nc, "temperature", "units")$value)
+#<debugging units> units[["depth"]] <- as.unit(ncatt_get(nc, "depth", "units")$value)
+#<debugging units> names(nc$var)
+#<debugging units> for (v in names(nc$var)) {
+#<debugging units>     unit <- ncatt_get(nc, v, "units")$value
+#<debugging units>     cat(v, " :  ", unit, "\n")
+#<debugging units>     cat(" -- ", as.character(as.unit(unit, "copy")$unit), "\n")
+#<debugging units> }
+#<debugging units> print(units)
 ```
 
 A summary is usually helpful, so we start with that.  Note that the original
@@ -191,57 +210,75 @@ by a ship then.
 Let's learn more about the water column by plotting pressure
 versus time.
 
-```{r} plot(G, which = "p") ``` This verifies the assumption that the early
-data were on the shelf.  Note that the device must have been set to return to
-the surface when it got to a depth of 1 kilometre at
-about 2023-10-27.
+```{r}
+plot(G, which = "p")
+```
+
+This verifies the assumption that the early data were on the shelf.  Note that
+the device must have been set to return to the surface when it got to a depth
+of 1 kilometre at about 2023-10-27.
 
 Let's look at temperature on the continental shelf, by selecting just the first
 week of data.
 
-```R
-Gs <- subset(G, time < G[["time"]][1] + 7*86400)
+```{r}
+Gs <- subset(G, time < G[["time"]][1] + 7 * 86400)
 temperature <- Gs[["temperature"]]
-Q <- quantile(temperature, c(0.01, 0.99)) # avoid outliers
-cm <- oce::colormap(temperature, 
-                    zlim = Q,
-                    col = oceColorsTurbo)
-par(mar=c(3, 3, 1, 1))
+cm <- oce::colormap(temperature, col = oceColorsTurbo)
+par(mar = c(3, 3, 1, 1))
 drawPalette(colormap = cm)
-plot(Gs, which="p", type = "p", col = cm$zcol, mar = c(3, 3, 1, 4))
-plot(Gs, which = "TS")
+plot(Gs, which = "p", type = "p", col = cm$zcol, mar = c(3, 3, 1, 4))
 ```
 
-This is starting to look interesting, isn't it?
+The overall pattern look sensible for this domain, but notice that there are
+very few parts of the image that are read. Closer inspection shows that that
+end of the temperature scale may be controlled by the very first data points.
 
-But let's not get carried away just yet.  Shouldn't we check to see how much we
-trust the data?  A temperature-salinity plot can help with that.
+What of salinity?  It shows a similar pattern.
+
+```{r}
+salinity <- Gs[["salinity"]]
+cm <- oce::colormap(salinity, col = oceColorsTurbo)
+par(mar = c(3, 3, 1, 1))
+drawPalette(colormap = cm)
+plot(Gs, which = "p", type = "p", col = cm$zcol, mar = c(3, 3, 1, 4))
+```
+
+The sensible next step is to draw a temperature-salinity diagram, to get an
+idea of the outliers.
 
 ```{r}
 plot(Gs, which = "TS")
 ```
 
-Oh, there is a problem here. Notice those low salinities.  This is
-a SeaExplorer glider, and we have seen already discussed problems
-with spurious values after power-on, so let's look at salinity.
+Taking these last three plots together, it is obvious that
+there are some serious outliers.  A time-series plot can help.
 
 ```{r}
-plot(Gs, which = "S")
+layout(matrix(c(1, 3, 2, 3), byrow = TRUE, nrow = 2), widths = c(0.6, 0.4))
+plot(Gs, which = "T", type = "p", cex = 0.3)
+plot(Gs, which = "S", type = "p", cex = 0.3)
+plot(Gs, which = "TS")
 ```
 
-Oh yes, those initial salinities are definitely wrong.
-
-At this stage, readers are likely to know how to proceed, but here's a hint:
+We need a way to skip over those initial data. A bit
+of exploration suggests that skipping the first 2 hours
+will remove those data.
 
 ```{r}
-Gs2 <- subset(Gs, salinity > 30)
-plot(Gs2, which = "S")
+Gss <- subset(Gs, time > time[1] + 2 * 3600)
+layout(matrix(c(1, 3, 2, 3), byrow = TRUE, nrow = 2), widths = c(0.6, 0.4))
+plot(Gss, which = "T", type = "p", cex = 0.3)
+plot(Gss, which = "S", type = "p", cex = 0.3)
+plot(Gss, which = "TS")
 ```
 
-This looks better, although it is quite ad-hoc to select this particular
-cut-off salinity.  But we are now getting into the territory of advising the
-reader how to do science, as opposed to how to use `oceglider`, so it's time to
-end this vignette.
+What to do next?  That depends, of course, on the wishes of the analyst.  At
+this point, it should be clear how to read in data using
+`read.glider.netcdf()`, how to extract data with `[[,glider-method`, how to
+isolate subsets of data with `subset,glider-method()`, and how to use
+`plot,glider-method()` to make some useful plots.
+
 
 # FIXME
 

@@ -37,38 +37,9 @@ to \code{profileDirection}, although the \code{\link{[[,glider-method}}
 mechanism works with either name, e.g. if \code{g} is a glider object, then
 \code{g[["profileDirection"]]} and
 \code{g[["profile_direction"]]} give the same result.
-}
-\examples{
-\dontrun{
-library(oceglider)
 
-# NOTE: these files are of order 100Meg, so they are
-# not provided with the package as samples. In both
-# examples, we plot a map and then an incidence-TS plot.
-
-# Seaexplorer data, from DFO (January 2019)
-g <- read.glider.netcdf("~/Dropbox/glider_dfo.nc")
-# Remove spurious times, from a year before deployment
-g <- subset(g, time > as.POSIXct("2018-01-01"))
-# Remove any observation with bad salinity
-g <- subset(g, is.finite(g[["salinity"]]))
-plot(g, which = "map")
-ctd <- as.ctd(g[["salinity"]], g[["temperature"]], g[["pressure"]],
-    longitude = g[["longitude"]], latitude = g[["latitude"]]
-)
-plotTS(ctd, useSmoothScatter = TRUE)
-
-# Slocum data,from Dalhousie CEOTR rdapp (April 2019)
-g <- read.glider.netcdf("~/Dropbox/glider_erdapp.nc")
-# Remove any observation with bad salinity
-g <- subset(g, is.finite(g[["salinity"]]))
-plot(g, which = "map")
-ctd <- as.ctd(g[["salinity"]], g[["temperature"]], g[["pressure"]],
-    latitude = g[["latitude"]], longitude = g[["longitude"]]
-)
-plotTS(ctd, useSmoothScatter = TRUE)
-}
-
+See the SeaExplorer vignette for examples of using this
+function.
 }
 \seealso{
 Other functions to read glider data: 
