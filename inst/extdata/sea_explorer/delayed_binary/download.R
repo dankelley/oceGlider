@@ -1,5 +1,4 @@
-# Sea-Explorer, realtime binary
-# Downloaded 2024-09-02
+# Sea-Explorer, delayed-mode binary (NetCDF file)
 file <- "dfo-eva035-20190718_delayed.nc"
 url <- paste0(
     "https://cproof.uvic.ca/gliderdata/deployments/",

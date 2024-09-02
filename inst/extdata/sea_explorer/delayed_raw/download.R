@@ -1,5 +1,4 @@
-# Sea-Explorer, delayed mode
-# downloaded 2024-09-02
+# Sea-Explorer, delayed-mode raw (gli and pld1 files)
 n <- 6 # number of files to download
 urlRaw <- paste0(
     "https://cproof.uvic.ca/gliderdata/deployments/",

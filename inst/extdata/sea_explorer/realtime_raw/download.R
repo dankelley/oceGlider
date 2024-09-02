@@ -1,5 +1,4 @@
-# Sea-Explorer, realtime mode
-# Downloaded 2024-09-02
+# Sea-Explorer, realtime raw mode (gli and pld1 files)
 n <- 6 # number of files to download
 urlRaw <- paste0(
     "https://cproof.uvic.ca/gliderdata/deployments/",
