@@ -96,7 +96,7 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
             stop("cannot have progressBar=\"shiny\" unless the \"shiny\" package is installed")
         }
     }
-    gliderDebug(debug, "read.glider.seaexplorer.realtime(\"", directory, "\", ...) {\n", sep = "", unindent = 1)
+    gliderDebug(debug, "read.glider.seaexplorer.realtime(\"", directory, "\", ...) START\n", sep = "", unindent = 1)
     yoGiven <- !missing(yo)
     glifiles <- dir(directory, pattern = "*gli*", full.names = TRUE)
     pld1files <- dir(directory, pattern = "*.pld1.*", full.names = TRUE)
@@ -109,14 +109,8 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
         )
     }
 
-    if (debug > 1) {
-        cat("Originally, gli files:\n")
-        print(glifiles)
-        cat("\n")
-        cat("Originally, pld1 files:\n")
-        print(pld1files)
-        cat("\n")
-    }
+    gliderDebug(debug, "Originally, gli files: ", oce::vectorShow(glifiles))
+    gliderDebug(debug, "Originally, pld1 files: ", oce::vectorShow(pld1files))
 
     # If 'yo' was not given, we use all possible values, based on the files
     # identified so far. This is done with gsub() calls in a step-by-step
@@ -124,11 +118,12 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
     # filename pattern.
     if (!yoGiven) {
         yo <- gsub(".*/", "", pld1files) # now just filename
-        # gliderDebug(debug, "step 1 yo=", paste(yo, collapase = " "), "\n", sep = "")
-        yo <- gsub("^.*.(raw|sub).([0-9]+)\\..*$", "\\2", yo) # now just yo number
-        # gliderDebug(debug, "step 2 yo=", paste(yo, collapase = " "), "\n", sep = "")
+        gliderDebug(debug, "stage 1. ", oce::vectorShow(yo))
+        #yo <- gsub("^.*.(raw|sub).([0-9]+)\\..*$", "\\2", yo) # now just yo number
+        yo <- gsub("^.*\\.", "", yo) # now just yo number (at end of filename)
+        gliderDebug(debug, "stage 2. ", oce::vectorShow(yo))
         yo <- as.numeric(yo)
-        # gliderDebug(debug, "step 3 yo=", paste(yo, collapase = " "), "\n", sep = "")
+        gliderDebug(debug, "stage 3. ", oce::vectorShow(yo))
     }
     # Narrow glifiles and pld1files, to just those that match the yo pattern
     keepglifiles <- NULL
@@ -403,6 +398,6 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
             sep = ""
         )
     )
-    gliderDebug(debug, "} # read.glider.seaexplorer.realtime()\n", unindent = 1)
+    gliderDebug(debug, "# END read.glider.seaexplorer.realtime()\n", unindent = 1)
     res
 }

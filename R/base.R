@@ -449,19 +449,27 @@ setMethod(
                 gliderDebug(debug, "  returning item from @data\n")
                 return(x@data[[i]])
             } else {
+                #message("DAN FIXME 1")
+                #cat(str(x@metadata$dataNamesOriginal$payload1))
+                #message("DAN FIXME 2")
                 if (i %in% names(x@data$payload1)) {
                     gliderDebug(debug, "  result in @data$payload1\n")
                     return(x@data$payload1[[i]])
                 } else if (i %in% names(x@data$glider)) {
                     gliderDebug(debug, "  result in @data$glider\n")
                     return(x@data$glider[[i]])
-                } else if (i %in% names(x@metadata$dataNamesOriginal$payload1)) {
-                    gliderDebug(debug, "  result in @data$payload1 inferred from original name\n")
-                    iname <- names(which(x@metadata$dataNamesOriginal$payload1 == i))[2]
-                    return(x@data$payload1[[iname]])
-                } else if (i %in% names(x@metadata$dataNamesOriginal$glider)) {
+                } else if (i %in% x@metadata$dataNamesOriginal$payload1) {
+                    target <- "payload1"
+                    gliderDebug(debug, "  result in @data$", target, "inferred from original name\n")
+                    w <- which(x@metadata$dataNamesOriginal[[target]] == i)
+                    #print(w)
+                    names <- names(x@metadata$dataNamesOriginal[[target]])
+                    #print(names)
+                    gliderDebug(debug, "  returning ", names[w], "\n")
+                    return(x@data[[target]][[names[w]]])
+                } else if (i %in% names(x@metadata$dataNamesOriginal)) {
                     gliderDebug(debug, "  result in @data$glider inferred from original name\n")
-                    iname <- names(which(x@metadata$dataNamesOriginal$glider == i))[2]
+                    iname <- names(which(x@metadata$dataNamesOriginal == i))[2]
                     return(x@data$glider[[iname]])
                 }
                 gliderDebug(debug, "  cannot find what to return\n")

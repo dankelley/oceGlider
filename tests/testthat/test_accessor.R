@@ -1,11 +1,13 @@
 # vim:textwidth=80:expandtab:shiftwidth=4:softtabstop=4
 library(oceglider)
-# library(testthat)
+#library(testthat)
 
 test_that("[[ with glider names and original names", {
-    directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
-    expect_silent(g <- read.glider.seaexplorer.realtime(directory = directory, yo = 3, progressBar = FALSE))
+    directory <- system.file("extdata/sea_explorer/delayed_mode", package = "oceglider")
+    expect_silent(g <- read.glider.seaexplorer.delayed(directory = directory, yo = 3, progressBar = FALSE))
+    #expect_silent(g <- read.glider.seaexplorer.realtime(directory = directory, yo = 3, progressBar = FALSE))
     # items in @data$payload1
+    #TT<-g[["GPCTD_TEMPERATURE", debug = 1]]
     expect_equal(g[["temperature"]], g[["GPCTD_TEMPERATURE"]])
     expect_equal(g[["conductivity"]], g[["GPCTD_CONDUCTIVITY"]])
     # items in @data$glider

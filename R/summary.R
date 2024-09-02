@@ -56,9 +56,6 @@ setMethod(
             odataName <- ""
             odata <- object@data
         }
-        # order names alphabetically (easier with long lists of unfamiliar names)
-        o <- order(names(odata))
-        odata <- odata[, o]
         # Make a list, so following code looks more like oce code.
         if (is.data.frame(odata)) {
             odata <- as.list(odata)
