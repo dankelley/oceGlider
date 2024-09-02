@@ -86,7 +86,7 @@ setMethod(
         if ("units" %in% metadataNames) {
             units <- object@metadata$units[o]
             unitsNames <- names(object@metadata$units[o])
-            cat("DAN 1 units follow\n");print(units)
+            #cat("DAN 1 units follow\n");print(units)
             units <- unlist(lapply(
                 seq_along(units),
                 function(i) {
@@ -124,7 +124,7 @@ setMethod(
                     res
                 }
             ))
-            cat("DAN 2 units follow\n");print(units)
+            #cat("DAN 2 units follow\n");print(units)
             names(units) <- unitsNames
             rownames(threes) <- paste("    ", oce::dataLabel(names(odata), units), sep = "")
         } else {

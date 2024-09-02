@@ -728,17 +728,17 @@ read.glider.netcdf <- function(file, debug) {
     if (missing(debug)) {
         debug <- getOption("gliderDebug", default = 0)
     }
-    gliderDebug(debug, "read.glider.netcdf(file=\"", file, "\", ...) {", unindent = 1, sep = "")
+    gliderDebug(debug, "read.glider.netcdf(file=\"", file, "\", ...) BEGIN", unindent = 1, sep = "")
     if (missing(file)) {
-        stop("must provide `file'")
+        stop("must provide file")
     }
     if (length(file) != 1) {
-        stop("file must have length 1")
+        stop("can only read one file at a time")
     }
+    res <- new("glider")
     capture.output({
         f <- ncdf4::nc_open(file)
     })
-    res <- new("glider")
 
     # Next demonstrates how to detect this filetype.
     res@metadata$instrument <- getAtt(f, attname = "instrument", default = "?")
@@ -774,7 +774,6 @@ read.glider.netcdf <- function(file, debug) {
             unit <- oce::as.unit(u, default = NULL)
             if (is.null(unit)) {
                 unit <- list(unit = bquote(.(u)), scale = "")
-                message("DDDD")
             }
             if (debug > 0) {
                 cat("  original name = \"", dataNames[i], "\"\n", sep = "")
@@ -793,11 +792,11 @@ read.glider.netcdf <- function(file, debug) {
     res@metadata$filename <- file
     res@metadata$dataNamesOriginal <- list(payload1 = dataNamesOriginal)
     res@metadata$units <- units
-    #if (debug > 1) {
+    # if (debug > 1) {
     #    message("DAN next is @metadata$units at end")
     #    print(res@metadata$units)
-    #}
-    gliderDebug(debug, "} # read.glider.netcdf", unindent = 1, sep = "")
+    # }
+    gliderDebug(debug, "# END read.glider.netcdf", unindent = 1, sep = "")
     res
 }
 

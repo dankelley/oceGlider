@@ -19,278 +19,45 @@ vignette: >
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
-# FIXME
 
-1. Move several things from here to the SeaExplorer
-   vignette.
+**Abstract.** This vignette explains the basics of using the `oceglider`
+package. Please note that the package is still a work in progress, with
+functions evolving as the authors realize that new features might be helpful to
+analysts working with glider data.
 
+# History of the Package
 
-**Abstract.** This vignette explains the basics of using the
-`oceglider` package. It is \emph{very much} a work in progress,
-because the functions provided by this package are under active
-development.
+The package started with code to read SeaExplorer data in what is called "raw"
+form.  Functions are provided to work with both data telemetered back to base
+as the glider is en-route, and with data downloaded after it is recovered.
+These functions are named `read.glider.seaexplorer.delayed()` and
+`read.glider.seaexplorer.realtime(),` respectively.
 
-# Introduction
+In addition to functions for reading such data, some specialized variants of
+standard R functions, notably `plot()`, `summary()` and `[[`, were set up.
+These differ from similar functions in the `oce` package both in the sorts of
+plots that are offered and in handling the internal structure of the objects
+used in the `oceglider` package (e.g. with the separation of payload and glider
+                                 files, for the SeaExplorer devices).
 
-The `oceglider` package is intended to make it easier for analysts to
-work with data acquired by ocean gliders. There is a wide variety of
-glider types and file formats, and discussing them all is beyond the
-scope of this document, let alone the package.  I hope in what follows
-to give a flavour for what is is like to work with a particular type
-(the SeaExplorer glider, from Alseamar) and particular approach (using
-data files produced by the glider itself).
+The next stage in the evolution of the package was to handle Slocum data. The
+functions `read.glider.slocum()` and `read.glider.slocum.netcdf()` were
+designed for this work, but neither has been tested recently, because the
+data servers being employed recently seem to store a more generic format that
+is handled by `read.glider.netcdf()`.
 
-The form of the document is that of an illustrated diary, touching on
-some elements of working with a small sample dataset that is provided
-with the package.
+Indeed, as of September 2024, it seems that many datasets are provided in a
+format that `read.glider.netcdf()` can read.  A problem that is still
+unresolved, here and generally for oceanographic data, is the naming convention
+for variables (and units). Work is underway, both in the `oceglider` package
+and the older and more general `oce` package, to handle the variety of names in
+a more accurate manner, and in a way that lets users intercede when they know
+the convention being used in a particular dataset.
 
-# Data Sources and file organization
+Please consult the other vignettes for details on processing
+various types of glider data.
 
-
-The first step in working with glider data is often to download them
-from a server. The lack of URL conventions for such servers makes it
-challenging to discuss in general terms. The same can be said of the
-various file layouts. The `oceglider` package cannot handle the wide
-variety of possibilities. Indeed, whether the code shown here will
-work on new datasets is very much in question.
-
-The package comes with some sample files that will be used for
-illustration.  These files are also used in the help pages that come
-with the package.  They stem from extraction of files from the
-following directories on the author's computer. 
-
-```
-~/data/glider/sea021/M71/raw
-~/data/glider/sea021/M71/sub
-```
-
-The convention is as follows. The `sea021` directory contains data
-from a SeaExplorer glider owned by a particular institute, and `M49`
-directory holds the data from a particular mission.  The `raw`
-directory holds full datasets as downloaded a glider after recovery.
-The `sub` directory holds subsets provided by the glider during its
-transmissions while underway on a mission.
-
-# SeaExplorer Gliders
-
-This package comes with some sample data files that can be used for
-practice and illustration.
-
-## Reading Datasets
-
-A small dataset provided with the package may be loaded as follows.
-
-```{r}
-library(oceglider)
-directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
-g <- read.glider.seaexplorer.delayed(directory)
-```
-
-## Pressure-time Plots
-
-Here is how to plot a time-series of pressure from this dataset:
-
-```{r dev.args = list(pointsize = 11)}
-plot(g, which = "p")
-```
-
-In the plot, notice that the pressure at the glider is about 2
-decibars for about 10 minutes at the start of the record.  Given the
-geometry and sensor setup, this indicates that the glider was at the
-surface. After this period, it descends to about 50 metres (where 1
-metre corresponds to about 1 decibar).  Then it ascends, but not to
-the surface.  This descent/ascent pair is will be called a "yo"
-henceforth, and the same word is used in some functions provided
-by the `oceglider` package.
-
-## Navigation State
-
-SeaExplorer gliders store a record of `navState`, which
-is stored as a numerical code, as follows.
-
-* 105 means the glider is not navigating yet;
-* 115 means the glider is surfacing in preparation for communication;
-* 116 means the glider is at the surface, acquiring a GPS signal, and is communicating;
-* 110 means the glider is inflecting downward;
-* 100 means the glider has ballast set to be descending;
-* 118 means the glider has ballast adjusted to reduce density, so will be inflecting upward;
-* 117 means the glider has ballast set to be ascending.
-
-The `plot()` function provided for `oceglider` objects (as read by
-`read.glider.seaexplorer.delayed()` and the related
-`read.glider.seaexplorer.realtime()` function) can be plotted as
-follows.  This information can be quite handy in analysing datasets.
-
-```{r dev.args = list(pointsize = 11)}
-plot(g, which = "navState", type = "o", cex = 0.5)
-```
-
-## Maps
-
-The following shows how to see locations in space. Note that 1 degree
-of latitude is approximately 111 km, so the total span of the diagram
-is only about half a kilometre.
-
-```{r dev.args = list(pointsize = 11)}
-plot(g, which = "map", cex = 0.5)
-```
-
-## Isolating Yos
-
-Quite often, it will be desirable to work with individual yos. With
-just a few yos, as in this small test case, we might as well plot them
-all, say as temperature profiles. For that, it is helpful to split by
-yo number, and then cycle though the subsets, converting to CTD
-objects and plotting with functions from the \CRANpkg{oce} package.
-
-The individual yos can be examined by splitting the `payload` portion:
-
-```{r dev.args = list(pointsize = 11)}
-payload <- g[["payload"]]
-s <- split(payload, payload$yoNumber)
-par(mfrow = c(2, 3)) # we happen to know there are 6 yos
-for (ss in s) {
-    ctd <- oce::as.ctd(
-        salinity = ss[["salinity"]],
-        temperature = ss[["temperature"]],
-        pressure = ss[["pressure"]],
-        longitude = ss[["longitude"]],
-        latitude = ss[["latitude"]]
-    )
-    oce::plotProfile(ctd, xtype = "salinity+temperature", eos = "unesco")
-}
-```
-
-Let's use the navigation state to examine the ascending data.
-
-```{r dev.args = list(pointsize = 11)}
-ga <- subset(g, navState == 117)
-payload <- ga[["payload"]] # or [["payload1"]]
-s <- split(payload, payload$yoNumber)
-par(mfrow = c(2, 3))
-for (ss in s) {
-    ctd <- oce::as.ctd(
-        salinity = ss$salinity,
-        temperature = ss$temperature,
-        pressure = ss$pressure,
-        longitude = ss$longitude,
-        latitude = ss$latitude
-    )
-    oce::plotProfile(ctd,
-        xtype = "salinity+temperature", eos = "unesco",
-        type = "p", cex = 0.5
-    )
-}
-```
-
-## Waterfall Plots
-
-Let's try a waterfall temperature plot, with black for the first yo,
-red for the second, and green for the third.
-
-*Exercise 1:* For more context, compare the results of similar plots
-that use specific density anomaly, `sigma0`, instead of `pressure`, on
-the y axis.
-
-```{r dev.args = list(pointsize = 11)}
-par(mfrow = c(1, 1))
-# use limits based on all yos, to avoid clipping
-Tlim <- range(sapply(s, \(ss) range(ss[["temperature"]], na.rm = TRUE)))
-plim <- rev(range(sapply(s, \(ss) range(ss[["pressure"]], na.rm = TRUE))))
-for (i in seq_along(s)) {
-    ss <- s[[i]]
-    ctd <- oce::as.ctd(
-        salinity = ss$salinity,
-        temperature = ss$temperature,
-        pressure = ss$pressure,
-        longitude = ss$longitude,
-        latitude = ss$latitude
-    )
-    ctd <- oce::ctdTrim(ctd, "upcast")
-    if (i == 1) {
-        oce::plotProfile(ctd,
-            xtype = "temperature", eos = "unesco",
-            Tlim = Tlim, plim = plim
-        )
-    } else {
-        lines(ctd[["temperature"]], ctd[["pressure"]], col = i)
-    }
-}
-legend("topleft",
-    title = "Start Time",
-    lwd = 1, col = seq_along(s), cex = 0.75, bg = "white",
-    legend = sapply(s, function(ss) format(ss$time[[1]], "%H:%S"))
-)
-```
-
-## Computing Oxygen
-
-A more advanced example concerns oxygen. For SeaExplorer files, this
-is indicated by a variable named `GPCTD_DOF` (which is renamed to
-`oxygenFrequency` by the [read.seaexplorer.delayed()]), and a
-conversion process is required to get oxygen in umol/kg.  This is as
-follows.  First, we must insert calibration information into the
-glider object. (Note: the format follows a convention developed by
-Chantelle Layton at the Canadian Department of Fisheries and Oceans,
-in the \url{https://github.com/DFOglider/pilotingApp} project. In
-fact, the computation of oxygen only requires the
-`calibrationCoefficients` entry.)
-
-```{r dev.args = list(pointsize = 11)}
-directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
-g <- read.glider.seaexplorer.delayed(directory = directory, progressBar = FALSE)
-g@metadata$oxycalib <- list(
-    serialNumber = "43-3336",
-    model = "SBE43F",
-    calibrationDate = "20220201",
-    calibrationCoefficients = data.frame(
-        Soc = 3.0667e-4,
-        Foffset = -878.86,
-        Tau20 = 1.26,
-        A = -4.6593e-3,
-        B = 1.7954e-4,
-        C = -2.2483e-6,
-        Enom = 0.036
-    )
-)
-```
-
-Once this is done, the `[[` can compute oxygen, as in the following.
-
-
-```{r dev.args = list(pointsize = 11)}
-time <- g[["time"]]
-pressure <- g[["pressure"]]
-oxygen <- g[["oxygen"]]
-par(mfrow = c(2, 1))
-oce::oce.plot.ts(time, pressure, ylim = rev(range(pressure,
-    na.rm =
-        TRUE
-)))
-oce::oce.plot.ts(time, oxygen)
-```
-
-*Exercise 2:* Ponder the patterns in this plot in an oceanographic
-context.
-
-*Exercise 3:* Use the `colormap()` function from the \CRANpkg{oce}
-package to set up a colour-coding based on the oxygen record, and then
-plot a pressure-time plot with dots, to display both variables at
-once.  Try extending this for a whole dataset.  Hint: use
-`drawPalette()` to draw the colour scale, and be aware that you may
-need to set `par(mar)` to get a spacing that you like.
-
-# Next steps
-
-At this stage, readers will likely have some ideas for doing more with
-this sample dataset, but they ought to bear in mind that aspects of
-the dataset may be quite different from other datasets.  It makes
-sense to explore things in detail, as has been done above, before
-moving on to final results.  This applies not just to Sea Explorer
-datasets, but to Slocum datasets as well (see the vignette on that
-data type).
-
-# References
+# Further Reading
 
 1. Integrated Ocean Observing System (U.S.). “Manual for Quality
    Control of Temperature and Salinity Data Observations from Gliders.

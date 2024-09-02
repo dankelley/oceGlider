@@ -18,3 +18,5 @@ Rplot.png
 _pkgdown.yml
 meetings
 docs
+check_package.R
+^codemeta\.json$

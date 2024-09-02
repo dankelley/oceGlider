@@ -93,7 +93,7 @@
 #' @param ... ignored.
 #'
 #' @importFrom oce as.ctd colormap drawPalette oceColorsTurbo oce.plot.ts plotTS resizableLabel
-#' @importFrom graphics abline par plot text
+#' @importFrom graphics abline lines par plot text
 #'
 #' @examples
 #' library(oceglider)
@@ -263,13 +263,16 @@ setMethod(
         } else if (which == 5 || which == "navState") {
             gliderDebug(debug, "navState plot\n", sep = "")
             ns <- navStateCodes(x)
+            # We actually draw the data after the guiding lines
             oce.plot.ts(x[["time"]], x[["navState"]],
-                ylab = "navState",
-                mar = c(2, 3, 1, 9), ...
+                type = "n",
+                ylab = "navState", mar = c(2, 3, 1, 9), ...
             )
             for (ii in seq_along(ns)) {
-                abline(h = ns[[ii]], col = "blue")
+                abline(h = ns[[ii]], col = "blue", lwd = 0.75)
             }
+            # redraw navState on top of the guiding lines
+            lines(x[["time"]], x[["navState"]], lwd = 2)
             oxpd <- par("xpd")
             par(xpd = NA)
             tmax <- par("usr")[2] + 0.00 * diff(par("usr")[1:2])

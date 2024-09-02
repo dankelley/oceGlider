@@ -37,7 +37,7 @@ where `sigma0` is seawater potential density anomaly in kg/m^3
 The calibration formula comes from SBE calibration sheets. This
 code is based on `sbeO2Hz2Sat()` in
 \url{https://github.com/DFOglider/pilotingApp}, with minor
-modifiations: (1) it has a new name to avoid conflicts, (2) the
+modifications: (1) it has a new name to avoid conflicts, (2) the
 calibration coefficients are collected into a single parameter,
 `cal`, (3) `oxygenFrequency` is renamed `frequency`, (3) `unit`
 is added, to permit specifying the unit of the return value,
@@ -54,7 +54,7 @@ DAC Level (version 2.3.3)". Ifremer, 2022.
 2. Garcia, Herncin E., and Louis I. Gordon. "Oxygen Solubility in
 Seawater: Better Fitting Equations." Limnology and Oceanography 37,
 no. 6 (September 1992): 1307–12.
-\url{https://doi.org/10.4319/lo.1992.37.6.1307}.
+`https://doi.org/10.4319/lo.1992.37.6.1307`.
 }
 \author{
 Chantelle Layton and Dan Kelley
