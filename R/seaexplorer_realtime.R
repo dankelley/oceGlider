@@ -129,12 +129,13 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
     keepglifiles <- NULL
     # message("next is glifiles");print(glifiles)
     # message("next is yo");print(yo)
+    #cat("glifiles:\n");print(glifiles)
     for (y in yo) {
-        # message("y=",y)
-        pattern <- paste("\\.", y, "\\.", sep = "")
-        # message("pattern ='", pattern, "'")
+        #message("y=",y)
+        pattern <- paste("\\.", y, "\\.{0,1}", sep = "")
+        #message("pattern ='", pattern, "'")
         found <- grep(pattern, glifiles)
-        # message("found=", paste(found, collapse = " "))
+        #message("found=", paste(found, collapse = " "))
         if (length(found) == 1) {
             keepglifiles <- c(keepglifiles, glifiles[found])
         }
@@ -145,7 +146,7 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
     glifiles <- keepglifiles
     keeppld1files <- NULL
     for (y in yo) {
-        found <- grep(paste("\\.", y, "\\.", sep = ""), pld1files)
+        found <- grep(paste("\\.", y, "\\.{0,1}", sep = ""), pld1files)
         if (length(found) == 1) {
             keeppld1files <- c(keeppld1files, pld1files[found])
         }
