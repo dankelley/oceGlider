@@ -81,8 +81,8 @@ setMethod(
             threes[i, ] <- oce::threenum(odata[[i]])
         }
         if ("units" %in% metadataNames) {
-            units <- object@metadata$units[o]
-            unitsNames <- names(object@metadata$units[o])
+            units <- object@metadata$units
+            unitsNames <- names(object@metadata$units)
             #cat("DAN 1 units follow\n");print(units)
             units <- unlist(lapply(
                 seq_along(units),
