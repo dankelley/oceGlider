@@ -99,8 +99,8 @@
 #' library(oceglider)
 #'
 #' # Example 1: various plot types
-#' dirRealtime <- system.file("extdata/seaexplorer/sub", package = "oceglider")
-#' gr <- read.glider.seaexplorer.realtime(dirRealtime,
+#' directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
+#' gr <- read.glider.seaexplorer.realtime(directory ,
 #'     yo = 3, progressBar = FALSE
 #' )
 #' plot(gr, which = "p")
@@ -116,8 +116,8 @@
 #' # Example 3: navState and pressure history of some delayed-mode yos,
 #' # from a deployment in which sampling was supposed to be
 #' # suppressed during the descending phases of motion.
-#' dirRaw <- system.file("extdata/seaexplorer/raw", package = "oceglider")
-#' gd <- read.glider.seaexplorer.delayed(dirRaw, progressBar = FALSE)
+#' directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
+#' gd <- read.glider.seaexplorer.delayed(directory, progressBar = FALSE)
 #' plot(gd, which = "navState")
 #'
 #' # Example 4: colourizing by temperature, with fine-grained control.

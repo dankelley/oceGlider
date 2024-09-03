@@ -31,7 +31,7 @@ be written with units fully specified.
 }
 \examples{
 library(oceglider)
-directory <- system.file("extdata/seaexplorer/raw", package = "oceglider")
+directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
 g <- read.glider.seaexplorer.delayed(directory)
 data <- g[["payload"]]
 units <- list(

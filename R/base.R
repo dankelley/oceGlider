@@ -165,7 +165,7 @@ setMethod(
 #'
 #' @examples
 #' library(oceglider)
-#' directory <- system.file("extdata/seaexplorer/raw", package = "oceglider")
+#' directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
 #' g <- read.glider.seaexplorer.delayed(directory, progressBar = FALSE)
 #'
 #' # Example 1: look up Absolute Salinity
@@ -876,7 +876,7 @@ read.glider <- function(file, debug, ...) {
 #'
 #' @examples
 #' library(oceglider)
-#' directory <- system.file("extdata/seaexplorer/raw", package = "oceglider")
+#' directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
 #' g <- read.glider.seaexplorer.delayed(directory)
 #' data <- g[["payload"]]
 #' units <- list(

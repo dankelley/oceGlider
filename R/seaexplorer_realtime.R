@@ -57,7 +57,7 @@
 #'
 #' @examples
 #' library(oceglider)
-#' directory <- system.file("extdata/seaexplorer/sub", package = "oceglider")
+#' directory <- system.file("extdata/sea_explorer/realtime_raw", package = "oceglider")
 #' g <- read.glider.seaexplorer.realtime(directory, progressBar = FALSE)
 #' plot(g, which = "navState")
 #' plot(g, which = "S")
@@ -119,24 +119,26 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
     if (!yoGiven) {
         yo <- gsub(".*/", "", pld1files) # now just filename
         gliderDebug(debug, "stage 1. ", oce::vectorShow(yo))
-        #yo <- gsub("^.*.(raw|sub).([0-9]+)\\..*$", "\\2", yo) # now just yo number
+        # yo <- gsub("^.*.(raw|sub).([0-9]+)\\..*$", "\\2", yo) # now just yo number
         yo <- gsub("^.*\\.", "", yo) # now just yo number (at end of filename)
         gliderDebug(debug, "stage 2. ", oce::vectorShow(yo))
         yo <- as.numeric(yo)
         gliderDebug(debug, "stage 3. ", oce::vectorShow(yo))
     }
     # Narrow glifiles and pld1files, to just those that match the yo pattern
+    # Identify files by pattern-matching, e.g. for yo=10, use files that end in
+    # either '.10' or '.10.gz'. Do this first for gli files (glider files)
+    # and then for pld1 files (payload files).
     keepglifiles <- NULL
     # message("next is glifiles");print(glifiles)
     # message("next is yo");print(yo)
-    #cat("glifiles:\n");print(glifiles)
+    # cat("glifiles:\n");print(glifiles)
     for (y in yo) {
-        #message("y=",y)
-        pattern <- paste("\\.", y, "\\.{0,1}", sep = "")
-        #message("pattern ='", pattern, "'")
+        # message("y=",y)
+        pattern <- paste0("^.*\\.", y, "\\.{0,1}(.gz){0,1}$")
+        # message("pattern ='", pattern, "'")
         found <- grep(pattern, glifiles)
-        #message("found=", paste(found, collapse = " "))
-        if (length(found) == 1) {
+        if (length(found) == 1L) {
             keepglifiles <- c(keepglifiles, glifiles[found])
         }
     }
@@ -145,10 +147,17 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
     }
     glifiles <- keepglifiles
     keeppld1files <- NULL
+    #cat("pld1files:\n");print(pld1files)
     for (y in yo) {
-        found <- grep(paste("\\.", y, "\\.{0,1}", sep = ""), pld1files)
-        if (length(found) == 1) {
+        #message("y=", y)
+        pattern <- paste0("^.*\\.", y, "\\.{0,1}(.gz){0,1}$")
+        #message("pattern=", pattern)
+        found <- grep(pattern, pld1files)
+        if (length(found) == 1L) {
+            #message(" found")
             keeppld1files <- c(keeppld1files, pld1files[found])
+        } else {
+            #message(" not found")
         }
     }
     if (!length(keeppld1files)) {
@@ -235,14 +244,18 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
     gliderDebug(debug, "about to rename items read from the 'gli' file\n")
     # Rename items in glider data.
     nameDict <- data.frame(
-        oname = c("NavState", "SecurityLevel", "Declination", "Heading",
+        oname = c(
+            "NavState", "SecurityLevel", "Declination", "Heading",
             "Pitch", "Roll", "Declination", "Depth", "Temperature", "Pa",
             "DesiredH", "BallastCmd", "BallastPos", "LinCmd", "LinPos",
-            "AngCmd", "AngPos", "Voltage", "Altitude"),
-        nname = c( "navState", "alarm", "declination", "heading", "pitch",
+            "AngCmd", "AngPos", "Voltage", "Altitude"
+        ),
+        nname = c(
+            "navState", "alarm", "declination", "heading", "pitch",
             "roll", "declination", "depth", "temperature", "pressureInternal",
             "desiredH", "ballastCmd", "ballastPos", "linCmd", "linPos",
-            "angCmd", "angPos", "voltage", "altitude")
+            "angCmd", "angPos", "voltage", "altitude"
+        )
     )
     for (row in seq_len(nrow(nameDict))) {
         nd <- nameDict[row, ]
@@ -298,6 +311,7 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
     # NOTE: use the same here and in seaexplorer_delayed.R
     nameDictDefault <- data.frame(
         oname = c(
+            "AROD_FT_DO", "AROD_FT_TEMP",
             "NAV_RESOURCE", "NAV_LONGITUDE", "NAV_LATITUDE",
             "NAV_DEPTH", "FLBBCD_CHL_COUNT", "FLBBCD_CHL_SCALED",
             "FLBBCD_BB_700_COUNT", "FLBBCD_BB_700_SCALED",
@@ -306,6 +320,7 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
             "PLD_REALTIMECLOCK"
         ),
         nname = c(
+            "oxygen", "oxygenTemperature",
             "navState", "longitude", "latitude", "pressureNav",
             "chlorophyllCount", "chlorophyll", "backscatterCount",
             "backscatter", "cdomCount", "cdom", "conductivity",

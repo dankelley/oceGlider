@@ -55,7 +55,7 @@ see pages 1-24 of reference 1.)
 }
 \examples{
 # Use codes to identify upcasts, at least roughly (note the stray points)
-directory <- system.file("extdata/seaexplorer/raw", package = "oceglider")
+directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
 g <- read.glider.seaexplorer.delayed(directory, progressBar = FALSE)
 ns <- navStateCodes(g)
 plot(g, which = "p")

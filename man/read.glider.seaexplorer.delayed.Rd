@@ -198,7 +198,7 @@ authors, if you need to handle such files.
 
 \examples{
 library(oceglider)
-directory <- system.file("extdata/seaexplorer/raw", package = "oceglider")
+directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
 g <- read.glider.seaexplorer.delayed(directory, progressBar = FALSE)
 plot(g, which = "p")
 

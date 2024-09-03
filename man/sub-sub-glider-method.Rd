@@ -36,7 +36,7 @@ a given glider object, to find out what items \code{[[} can retrieve
 }
 \examples{
 library(oceglider)
-directory <- system.file("extdata/seaexplorer/raw", package = "oceglider")
+directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
 g <- read.glider.seaexplorer.delayed(directory, progressBar = FALSE)
 
 # Example 1: look up Absolute Salinity
