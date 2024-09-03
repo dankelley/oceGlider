@@ -3,8 +3,8 @@ library(oceglider)
 # library(testthat)
 
 test_that("read.glider.seaexplorer.realtime flag names", {
-    directory <- system.file("extdata/sea_explorer/delayed_mode", package = "oceglider")
-    expect_silent(g <- read.glider.seaexplorer.delayed(directory = directory, yo = 3, progressBar = FALSE))
+    directory <- system.file("extdata/sea_explorer/realtime_raw", package = "oceglider")
+    expect_silent(g <- read.glider.seaexplorer.realtime(directory = directory, progressBar = FALSE))
     expect_equal(
         g@metadata$flagScheme,
         list(
@@ -16,7 +16,7 @@ test_that("read.glider.seaexplorer.realtime flag names", {
 })
 
 test_that("read.glider.seaexplorer.delayed flag names", {
-    directory <- system.file("extdata/sea_explorer/delayed_mode", package = "oceglider")
+    directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
     expect_silent(g <- read.glider.seaexplorer.delayed(directory = directory, progressBar = FALSE))
     expect_equal(
         g@metadata$flagScheme,
@@ -30,7 +30,7 @@ test_that("read.glider.seaexplorer.delayed flag names", {
 
 test_that("read.glider.seaexplorer.realtime flag setting and handling", {
     # This is based on the example given by ?"handleFlags,glider-method"
-    directory <- system.file("extdata/sea_explorer/realtime_mode", package = "oceglider")
+    directory <- system.file("extdata/sea_explorer/realtime_raw", package = "oceglider")
     expect_silent(g <- read.glider.seaexplorer.realtime(directory))
     # NOTE: this test was more hard-wired before issue40, e.g. it
     # demanded that the number of data read be 2784, but that number
@@ -48,7 +48,7 @@ test_that("read.glider.seaexplorer.realtime flag setting and handling", {
 
 test_that("read.glider.seaexplorer.delayed flag setting and handling", {
     # This is based on the example given by ?"handleFlags,glider-method"
-    directory <- system.file("extdata/sea_explorer/delayed_mode", package = "oceglider")
+    directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
     expect_silent(g <- read.glider.seaexplorer.delayed(directory, progressBar = FALSE))
     # NOTE: this test was more hard-wired before issue40, e.g. it
     # demanded that the number of data read be 2784, but that number
