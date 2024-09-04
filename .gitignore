@@ -4,7 +4,6 @@ doc
 *.swp
 .Rproj.user
 .Rhistory
-sea*gz
 .RData
 .Rapp.history
 .DS_Store
