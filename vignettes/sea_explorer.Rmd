@@ -53,8 +53,8 @@ urlRaw <- paste0(
 )
 subsRemote <- paste0("sea035.12.gli.sub.", 1:n)
 rawsRemote <- paste0("sea035.12.pld1.raw.", 1:n)
-subs <- paste0(tmpdir, "/", subsRemote)
-raws <- paste0(tmpdir, "/", rawsRemote)
+subs <- file.path(tmpdir, subsRemote)
+raws <- file.path(tmpdir, rawsRemote)
 for (i in 1:n) {
     if (!file.exists(subs[i])) {
         download.file(paste0(urlRaw, subsRemote[i]), subs[i])
@@ -206,12 +206,12 @@ urlNC <- paste0(
     "dfo-eva035/dfo-eva035-20190718/",
     "/L0-timeseries/dfo-eva035-20190718_delayed.nc"
 )
-fileNC <- paste0(tmpdir, "/", gsub(".*/", "", urlNC))
+fileNC <- file.path(tmpdir, "/", gsub(".*/", "", urlNC))
 download.file(urlNC, fileNC)
 G <- read.glider.netcdf(fileNC)
 ```
 
-As for the raw data, drop the data before a certain time.
+As was done for the raw data, we ought to drop the data before a certain time.
 
 ```{r}
 G2 <- subset(G, time > G[["time"]][1] + 2.5 * 3600)
