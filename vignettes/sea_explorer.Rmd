@@ -25,14 +25,16 @@ SeaExplorer gliders.
 
 # Create Temporary Directory for CRAN Submission
 
-For this vignette to be suitable for CRAN submission, it must not
-download files to the user's working space.  However, it may 
-create a temporary directory and download there, so long as that
-directory is deleted at the end.  Such a temporary directory may
-be created as follows.
+For this vignette to be suitable for CRAN submission, it must not download
+files to the user's working space.  We avoid that by setting aside space in the
+next two lines of code. This space is removed at the end of the vignette.
+Obviously for practical work it would make sense to store these things in a
+more permanent directory, to avoid the need for new downloads every time work
+is to be done with the data.
 
 ```{r}
-tmpdir <- tempdir()
+tmpdir <- tempdir() # to hold raw files
+fileNC <- tempfile(fileext = ".nc") # to hold a binary (NetCDF) file
 ```
 
 # Analysis
@@ -206,10 +208,7 @@ urlNC <- paste0(
     "dfo-eva035/dfo-eva035-20190718/",
     "/L0-timeseries/dfo-eva035-20190718_delayed.nc"
 )
-fileNC <- file.path(tmpdir, sub(".*/", "", urlNC))
 download.file(urlNC, fileNC)
-saved <- file.exists(fileNC)
-cat("saved=", saved, "\n")
 G <- read.glider.netcdf(fileNC)
 ```
 
@@ -292,7 +291,8 @@ As noted at the outset, CRAN rules dictate that the downloaded material
 be deleted.  In actual analysis, though, it is unlikely that
 such material would be deleted, so don't just copy this line!
 ```{r}
-unlink(tmpdir, recursive = TRUE)
+unlink(fileNC) # where the binary (NetCDF) file went
+unlink(tmpdir, recursive = TRUE) # where the raw files went
 ```
 
 **Exercises.**
