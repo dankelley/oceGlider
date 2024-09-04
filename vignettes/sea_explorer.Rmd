@@ -206,7 +206,7 @@ urlNC <- paste0(
     "dfo-eva035/dfo-eva035-20190718/",
     "/L0-timeseries/dfo-eva035-20190718_delayed.nc"
 )
-fileNC <- file.path(tmpdir, "/", gsub(".*/", "", urlNC))
+fileNC <- file.path(tmpdir, sub(".*/", "", urlNC))
 download.file(urlNC, fileNC)
 G <- read.glider.netcdf(fileNC)
 ```
