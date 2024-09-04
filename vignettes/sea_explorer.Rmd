@@ -1,5 +1,5 @@
 ---
-title: "Handling SeaExplorer Data"
+title: "Handling SeaExplorer Glider Data"
 author: "Dan Kelley (https://orcid.org/0000-0001-7808-5911)"
 date: "`r Sys.Date()`"
 output:
@@ -11,7 +11,7 @@ output:
     fig_height: 4
     dpi: 72
 vignette: >
-  %\VignetteIndexEntry{Handling SeaExplorer Data}
+  %\VignetteIndexEntry{Handling SeaExplorer Glider Data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -21,10 +21,23 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
 **Abstract.** This vignette explains the basics of working with data from
-SeaExplorer gliders.  It is VERY MUCH a work in progress, not much more than a
-skeleton.
+SeaExplorer gliders.
 
-# Raw Files
+# Create Temporary Directory for CRAN Submission
+
+For this vignette to be suitable for CRAN submission, it must not
+download files to the user's working space.  However, it may 
+create a temporary directory and download there, so long as that
+directory is deleted at the end.  Such a temporary directory may
+be created as follows.
+
+```{r}
+tmpdir <- tempdir()
+```
+
+# Analysis
+
+## Raw Files
 
 The below shows how to download a small number of files (just 5) from the
 CPROOF server at Reference 1. The code worked as of 2024-08-29, but if reader
@@ -38,14 +51,16 @@ urlRaw <- paste0(
     "dfo-eva035/dfo-eva035-20190718/",
     "delayed_raw/"
 )
-subs <- paste0("sea035.12.gli.sub.", 1:n)
-raws <- paste0("sea035.12.pld1.raw.", 1:n)
+subsRemote <- paste0("sea035.12.gli.sub.", 1:n)
+rawsRemote <- paste0("sea035.12.pld1.raw.", 1:n)
+subs <- paste0(tmpdir, "/", subsRemote)
+raws <- paste0(tmpdir, "/", rawsRemote)
 for (i in 1:n) {
     if (!file.exists(subs[i])) {
-        download.file(paste0(urlRaw, subs[i]), subs[i])
+        download.file(paste0(urlRaw, subsRemote[i]), subs[i])
     }
     if (!file.exists(raws[i])) {
-        download.file(paste0(urlRaw, raws[i]), raws[i])
+        download.file(paste0(urlRaw, rawsRemote[i]), raws[i])
     }
 }
 ```
@@ -62,7 +77,7 @@ format that is quite useful for an initial look at the data.
 ```{r fig.height=4, fig.width=7, fig.cap="**Figure 1. An overview of the raw data. Note the spurious values in the time-series plots for the first hour or two.**", dev.args=list(pointsize=12)}
 library(oce)
 library(oceglider)
-g <- read.glider.seaexplorer.delayed(".")
+g <- read.glider.seaexplorer.delayed(tmpdir)
 layout(matrix(c(2, 1, 3, 1, 4, 1), byrow = TRUE, nrow = 3), widths = c(0.6, 0.4))
 plot(g, which = "TS")
 plot(g, which = "p", type = "p", cex = 0.3)
@@ -168,27 +183,31 @@ legend("bottomright",
 )
 ```
 
-# Delayed-mode NetCDF Files
+## Binary (NetCDF) Files
 
 NetCDF files are likely the format that most users will be dealing with, partly
 because it can be loaded quickly, and it is simple to read. The sample file,
 from Reference 2, corresponds to the full dataset used in the previous
 discussion of raw data.
 
-Since the file is large, it can take a minute or two to download, and so the
-following code caches the file.  Note that the reading step takes only a second
-or two, so the caching increases processing speed enormously.
+Note that the following code creates a temporary directory into
+which downloaded material is saved.  This cleanup is required for submission
+on CRAN machines but would not normally be a part of typical workflow. Indeed,
+it would be common to only download the files if they were not present locally,
+as indicated by a call to `file.exist()`.
 
 ```{r}
-fileNC <- "dfo-eva035-20190718_delayed.nc"
+# Create a temporary file, so the vignette can build
+# on CRAN systems.  In practical work, though, the user
+# will almost certainly want to use a non-temporary
+# directory.
 urlNC <- paste0(
     "https://cproof.uvic.ca/gliderdata/deployments/",
     "dfo-eva035/dfo-eva035-20190718/",
-    "/L0-timeseries/"
+    "/L0-timeseries/dfo-eva035-20190718_delayed.nc"
 )
-if (!file.exists(fileNC)) {
-    download.file(paste0(urlNC, fileNC), fileNC)
-}
+fileNC <- paste0(tmpdir, "/", gsub(".*/", "", urlNC))
+download.file(urlNC, fileNC)
 G <- read.glider.netcdf(fileNC)
 ```
 
@@ -264,6 +283,15 @@ yos obscuring colours from earlier rows.  One way around that is to use the
 generic `plot()` used above will need to be replaced by lower-level plot calls.
 (Readers with experience in this will know how to do it; others ought to think
 the problem through, because this is quite a useful method.)
+
+## Cleanup of Temporary Files
+
+As noted at the outset, CRAN rules dictate that the downloaded material
+be deleted.  In actual analysis, though, it is unlikely that
+such material would be deleted, so don't just copy this line!
+```{r}
+unlink(tmpdir, recursive = TRUE)
+```
 
 **Exercises.**
 
