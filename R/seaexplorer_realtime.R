@@ -120,10 +120,12 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
         yo <- gsub(".*/", "", pld1files) # now just filename
         gliderDebug(debug, "stage 1. ", oce::vectorShow(yo))
         # yo <- gsub("^.*.(raw|sub).([0-9]+)\\..*$", "\\2", yo) # now just yo number
-        yo <- gsub("^.*\\.", "", yo) # now just yo number (at end of filename)
+        yo <- gsub(".gz$", "", yo)
         gliderDebug(debug, "stage 2. ", oce::vectorShow(yo))
-        yo <- as.numeric(yo)
+        yo <- gsub("^.*\\.", "", yo) # now just yo number (at end of filename)
         gliderDebug(debug, "stage 3. ", oce::vectorShow(yo))
+        yo <- as.numeric(yo)
+        gliderDebug(debug, "stage 4. ", oce::vectorShow(yo))
     }
     # Narrow glifiles and pld1files, to just those that match the yo pattern
     # Identify files by pattern-matching, e.g. for yo=10, use files that end in
@@ -133,11 +135,14 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
     # message("next is glifiles");print(glifiles)
     # message("next is yo");print(yo)
     # cat("glifiles:\n");print(glifiles)
+    gliderDebug(debug, "about to look for gli files for yos: ", oce::vectorShow(yo))
     for (y in yo) {
-        # message("y=",y)
-        pattern <- paste0("^.*\\.", y, "\\.{0,1}(.gz){0,1}$")
-        # message("pattern ='", pattern, "'")
+        #message("y=", y)
+        # pattern <- paste0("^.*\\.", y, "\\.{0,1}(.gz){0,1}$")
+        pattern <- paste0("^.*\\.", y, "\\..*$")
+        #message("pattern ='", pattern, "'")
         found <- grep(pattern, glifiles)
+        #message("found='", found, "'")
         if (length(found) == 1L) {
             keepglifiles <- c(keepglifiles, glifiles[found])
         }
@@ -147,17 +152,17 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
     }
     glifiles <- keepglifiles
     keeppld1files <- NULL
-    #cat("pld1files:\n");print(pld1files)
+    # cat("pld1files:\n");print(pld1files)
     for (y in yo) {
-        #message("y=", y)
+        # message("y=", y)
         pattern <- paste0("^.*\\.", y, "\\.{0,1}(.gz){0,1}$")
-        #message("pattern=", pattern)
+        # message("pattern=", pattern)
         found <- grep(pattern, pld1files)
         if (length(found) == 1L) {
-            #message(" found")
+            # message(" found")
             keeppld1files <- c(keeppld1files, pld1files[found])
         } else {
-            #message(" not found")
+            # message(" not found")
         }
     }
     if (!length(keeppld1files)) {

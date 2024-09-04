@@ -1,5 +1,5 @@
 # Sea-Explorer, realtime raw mode (gli and pld1 files)
-n <- 6 # number of files to download
+n <- 4 # number of files to download
 urlRaw <- paste0(
     "https://cproof.uvic.ca/gliderdata/deployments/",
     "dfo-eva035/dfo-eva035-20190718/",

@@ -121,10 +121,11 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #' @md
 #'
 #' @export
-read.glider.seaexplorer.delayed <- function(directory, yo, level = 1, interpolateToCTD = TRUE, removeTimeSincePowerOn = 0, progressBar = interactive(), debug) {
-    if (missing(debug)) {
-        debug <- getOption("gliderDebug", default = 0)
-    }
+read.glider.seaexplorer.delayed <- function(directory, yo,
+                                            level = 1, interpolateToCTD = TRUE,
+                                            removeTimeSincePowerOn = 0,
+                                            progressBar = interactive(),
+                                            debug = getOption("gliderDebug", default = 0)) {
     if (missing(directory)) {
         stop("must provide 'directory', in which glider files reside")
     }
@@ -134,10 +135,10 @@ read.glider.seaexplorer.delayed <- function(directory, yo, level = 1, interpolat
         }
     }
     gliderDebug(debug, "read.glider.seaexplorer.delayed(\"", directory, "\", ...) {\n", sep = "", unindent = 1)
-    if (level != 0 & level != 1) {
+    if (level != 0 && level != 1) {
         stop("Level must be either 0 or 1")
     }
-    navfiles <- dir(directory, pattern = "*gli*", full.names = TRUE) # FIXME: not used
+    # navfiles <- dir(directory, pattern = "*gli*", full.names = TRUE) # FIXME: not used
     pld1files <- dir(directory, pattern = "*.pld1.raw.*", full.names = TRUE)
     pld2files <- dir(directory, pattern = "*.pld2.raw.*", full.names = TRUE)
     if (length(pld2files)) {
@@ -211,6 +212,7 @@ read.glider.seaexplorer.delayed <- function(directory, yo, level = 1, interpolat
         # }
         nameDictDefault <- data.frame(
             oname = c(
+                "AROD_FT_DO", "AROD_FT_TEMP",
                 "NAV_RESOURCE", "NAV_LONGITUDE", "NAV_LATITUDE",
                 "NAV_DEPTH", "FLBBCD_CHL_COUNT", "FLBBCD_CHL_SCALED",
                 "FLBBCD_BB_700_COUNT", "FLBBCD_BB_700_SCALED",
@@ -219,6 +221,7 @@ read.glider.seaexplorer.delayed <- function(directory, yo, level = 1, interpolat
                 "PLD_REALTIMECLOCK"
             ),
             nname = c(
+                "oxygen", "oxygenTemperature",
                 "navState", "longitude", "latitude", "pressureNav",
                 "chlorophyllCount", "chlorophyll", "backscatterCount",
                 "backscatter", "cdomCount", "cdom", "conductivity",

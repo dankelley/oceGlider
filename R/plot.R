@@ -1,6 +1,7 @@
+#'
+#'
 #' Plot a glider Object
 #'
-
 #' This is a limited function that is intended for quick views of a
 #' dataset. More serious analysis is best done by extracting data and
 #' using whatever graphical methods best suit the task at hand.
@@ -98,33 +99,29 @@
 #' @examples
 #' library(oceglider)
 #'
-#' # Example 1: various plot types
+#' # Example 1: various plot types, using defaults
 #' directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
-#' gr <- read.glider.seaexplorer.realtime(directory ,
-#'     yo = 3, progressBar = FALSE
+#' g <- read.glider.seaexplorer.realtime(directory, progressBar = FALSE)
+#' plot(g, which = "p")
+#' plot(g, which = "S")
+#' plot(g, which = "T")
+#' plot(g, which = "TS")
+#' plot(g, which = "map")
+#' plot(g, which = "navState")
+#'
+#' # Example 2: colour-code p by temperature, autoscaled
+#' plot(g, which = "p", type = "p", pch = 20, colorby = "temperature")
+#'
+#' # Example 3: colour-code p by temperature, with a colour palette,
+#' # and more aesthetic control, e.g. setting limits using quantiles.
+#' temperature <- g[["temperature"]]
+#' cm <- colormap(temperature,
+#'     zlim = quantile(temperature, c(0.01, 0.99), na.rm = TRUE),
+#'     col = oceColorsTurbo
 #' )
-#' plot(gr, which = "p")
-#' plot(gr, which = "S")
-#' plot(gr, which = "T")
-#' plot(gr, which = "TS")
-#' plot(gr, which = "map")
-#' plot(gr, which = "navState")
-#'
-#' # Example 2: colour-code p by chlorophyll
-#' plot(gr, which = "p", type = "p", colorby = "chlorophyll", pch = 20)
-#'
-#' # Example 3: navState and pressure history of some delayed-mode yos,
-#' # from a deployment in which sampling was supposed to be
-#' # suppressed during the descending phases of motion.
-#' directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
-#' gd <- read.glider.seaexplorer.delayed(directory, progressBar = FALSE)
-#' plot(gd, which = "navState")
-#'
-#' # Example 4: colourizing by temperature, with fine-grained control.
-#' cm <- colormap(gd[["temperature"]], col = oceColorsTurbo)
 #' par(mar = c(2, 3.5, 2, 4))
 #' drawPalette(colormap = cm)
-#' plot(gd, which = "p", type = "p", col = cm$zcol, mar = c(2, 3.5, 2, 4), pch = 20)
+#' plot(g, which = "p", type = "p", col = cm$zcol, mar = c(2, 3.5, 2, 4), pch = 20)
 #'
 #' @md
 #'
@@ -208,7 +205,10 @@ setMethod(
             }
             args <- c(args, dots)
             par(mar = omar)
+            oldwarn <- options()$warn
+            options(warn = -1)
             do.call("oce.plot.ts", args)
+            options(warn = oldwarn)
             par(mar = omar)
         } else if (which == 2 || which == "T") {
             gliderDebug(debug, "temperature time-series plot\n", sep = "")
@@ -223,7 +223,10 @@ setMethod(
             }
             args <- c(args, dots)
             par(mar = omar)
+            oldwarn <- options()$warn
+            options(warn = -1)
             do.call("oce.plot.ts", args)
+            options(warn = oldwarn)
             par(mar = omar)
         } else if (which == 3 || which == "S") {
             gliderDebug(debug, "salinity time-series plot\n", sep = "")
@@ -238,7 +241,10 @@ setMethod(
             }
             args <- c(args, dots)
             par(mar = omar)
+            oldwarn <- options()$warn
+            options(warn = -1)
             do.call("oce.plot.ts", args)
+            options(warn = oldwarn)
             par(mar = omar)
         } else if (which == 4 || which == "TS") {
             gliderDebug(debug, "TS plot\n", sep = "")
@@ -264,10 +270,13 @@ setMethod(
             gliderDebug(debug, "navState plot\n", sep = "")
             ns <- navStateCodes(x)
             # We actually draw the data after the guiding lines
+            oldwarn <- options()$warn
+            options(warn = -1)
             oce.plot.ts(x[["time"]], x[["navState"]],
                 type = "n",
                 ylab = "navState", mar = c(2, 3, 1, 9), ...
             )
+            options(warn = oldwarn)
             for (ii in seq_along(ns)) {
                 abline(h = ns[[ii]], col = "blue", lwd = 0.75)
             }

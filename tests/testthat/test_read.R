@@ -7,7 +7,7 @@ test_that("read.glider.seaexplorer.realtime raw", {
     expect_silent(g <- read.glider.seaexplorer.realtime(directory = directory, progressBar = FALSE))
     expect_equal(c("glider", "payload1"), names(g[["data"]]))
     # dimensionality and names in glider stream
-    expect_equal(dim(g[["glider"]]), c(692, 22))
+    expect_equal(dim(g[["glider"]]), c(462, 22))
     gliderNamesExpected <- sort(c(
         "alarm", "altitude", "angCmd", "angPos",
         "ballastCmd", "ballastPos", "declination", "depth",
@@ -18,8 +18,8 @@ test_that("read.glider.seaexplorer.realtime raw", {
     expect_equal(sort(names(g[["glider"]])), gliderNamesExpected)
     # dimensionality and names in payload1 stream (and payload nickname)
     # This is partly a check against changes to the built-in file.
-    expect_equal(dim(g[["payload1"]]), c(528, 19))
-    expect_equal(dim(g[["payload"]]), c(528, 19))
+    expect_equal(dim(g[["payload1"]]), c(339, 19))
+    expect_equal(dim(g[["payload"]]), c(339, 19))
     payloadNamesExpected <- c(
         "backscatter", "backscatterCount", "cdom", "cdomCount",
         "chlorophyll", "chlorophyllCount", "conductivity", "latitude",

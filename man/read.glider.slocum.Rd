@@ -52,7 +52,8 @@ if (file.exists("~/slocum.csv")) {
     t <- g[["time"]]
     p <- g[["depth"]]
     plot(t, p,
-        ylim = rev(range(p)), xlab = "Time", ylab = "Pressure [dbar]",
+        ylim = rev(range(p, na.rm = TRUE)),
+        xlab = "Time", ylab = "Pressure [dbar]",
         col = cm$zcol, cex = 1 / 2, pch = 20
     )
     mtext(paste("Temperature, from", t[1]), cex = 3 / 4)
@@ -64,7 +65,8 @@ if (file.exists("~/slocum.csv")) {
     drawPalette(colormap = cm, cex.axis = 3 / 4)
     p <- g[["depth"]]
     plot(dist, p,
-        ylim = rev(range(p)), xlab = "Distance [km]", ylab = "Pressure [dbar]",
+        ylim = rev(range(p, na.rm = TRUEp)),
+        xlab = "Distance [km]", ylab = "Pressure [dbar]",
         col = cm$zcol, cex = 1 / 2, pch = 20
     )
     mtext(paste("Temperature, from", t[1]), cex = 3 / 4)

@@ -61,7 +61,7 @@
       <h1>Handling SeaExplorer Data</h1>
                         <h4 data-toc-skip class="author">Dan Kelley (<a href="https://orcid.org/0000-0001-7808-5911" class="external-link uri">https://orcid.org/0000-0001-7808-5911</a>)</h4>
             
-            <h4 data-toc-skip class="date">2024-08-29</h4>
+            <h4 data-toc-skip class="date">2024-09-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/dankelley/oceglider/blob/HEAD/vignettes/sea_explorer.Rmd" class="external-link"><code>vignettes/sea_explorer.Rmd</code></a></small>
       <div class="d-none name"><code>sea_explorer.Rmd</code></div>
@@ -73,29 +73,27 @@
 working with data from SeaExplorer gliders. It is VERY MUCH a work in
 progress, not much more than a skeleton.</p>
 <div class="section level2">
-<h2 id="raw-files">Raw files<a class="anchor" aria-label="anchor" href="#raw-files"></a>
+<h2 id="raw-files">Raw Files<a class="anchor" aria-label="anchor" href="#raw-files"></a>
 </h2>
-<div class="section level3">
-<h3 id="downloading-the-files">Downloading the files<a class="anchor" aria-label="anchor" href="#downloading-the-files"></a>
-</h3>
 <p>The below shows how to download a small number of files (just 5) from
 the CPROOF server at Reference 1. The code worked as of 2024-08-29, but
 if reader finds that the server has changed, the solution is to alter
 the value of <code>urlbase</code> in line 2 below.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">5</span> <span class="co"># number of files to download</span></span>
-<span><span class="va">urlbase</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">6</span> <span class="co"># number of files to download</span></span>
+<span><span class="va">urlRaw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
 <span>    <span class="st">"https://cproof.uvic.ca/gliderdata/deployments/"</span>,</span>
-<span>    <span class="st">"dfo-eva035/dfo-eva035-20231019/delayed_raw/"</span></span>
+<span>    <span class="st">"dfo-eva035/dfo-eva035-20231019/"</span>,</span>
+<span>    <span class="st">"delayed_raw/"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">subs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"sea035.118.gli.sub."</span>, <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span></span>
 <span><span class="va">raws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"sea035.118.pld1.raw."</span>, <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">subs</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">urlbase</span>, <span class="va">subs</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>, <span class="va">subs</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">urlRaw</span>, <span class="va">subs</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>, <span class="va">subs</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
 <span>    <span class="op">}</span></span>
 <span>    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">raws</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">urlbase</span>, <span class="va">raws</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>, <span class="va">raws</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">urlRaw</span>, <span class="va">raws</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>, <span class="va">raws</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
 <span>    <span class="op">}</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Note that the above is based on the assumption that the server holds
@@ -103,113 +101,221 @@ the <code>sub</code> and <code>pld1</code> files in the same directory.
 If your server holds them in separate directories, it should be a simple
 matter to alter the lines defining <code>subs</code> and
 <code>raws</code> in the above.</p>
-</div>
-<div class="section level3">
-<h3 id="trimming-spurious-data-after-power-on">Trimming spurious data after power-on<a class="anchor" aria-label="anchor" href="#trimming-spurious-data-after-power-on"></a>
-</h3>
-<p>Raw SeaExplorer data files may contain spurious values after the
-sensors are powered on. This may occur at the start of a deployment, but
-it may also occur later on in the data set, if the glider was set up to
-power-down the sensors from time to time.</p>
-<p>To avoid problems with analysis, it makes sense to trim data acquired
-just after power-on events. The
-<code><a href="../reference/read.glider.seaexplorer.delayed.html">read.glider.seaexplorer.delayed()</a></code> function has a parameter
-called <code>removeTimeSincePowerOn</code> that does just this. It’s
-value is the number of seconds of of data that are to be ignored after
-power-on events.</p>
-<p>There may be statistical ways to determine these spurious data
-(e.g. looking for salinities below a certain fixed threshold, or a
-certain quantile), but a quicker method is to do this by examining plots
-of data. This is illustrated in the following code.</p>
-<p>In the plot call, note that the <code>type</code> is set to give
-points. This is required, because the default setting of
-<code>type="l"</code> will skip over quite a lot of the data because
-there are so many NA values between valid points. Indeed, for this
-dataset, 3/4 of the data are NA.</p>
+<p>The following produces a plot that summarizes key hydrographic
+properties, in a format that is quite useful for an initial look at the
+data.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dankelley.github.io/oce/" class="external-link">oce</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: gsw</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">oceglider</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dankelley.github.io/oceglider/">oceglider</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: ncdf4</span></span>
 <span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.glider.seaexplorer.delayed.html">read.glider.seaexplorer.delayed</a></span><span class="op">(</span><span class="st">"."</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/layout.html" class="external-link">layout</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>, widths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.6</span>, <span class="fl">0.4</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://dankelley.github.io/oce/reference/oce.plot.ts.html" class="external-link">oce.plot.ts</a></span><span class="op">(</span><span class="va">g</span><span class="op">[[</span><span class="st">"time"</span><span class="op">]</span><span class="op">]</span>, <span class="va">g</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    ylab <span class="op">=</span> <span class="st">"Temperature"</span>, type <span class="op">=</span> <span class="st">"p"</span>, cex <span class="op">=</span> <span class="fl">0.3</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">ctd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dankelley.github.io/oce/reference/as.ctd.html" class="external-link">as.ctd</a></span><span class="op">(</span><span class="va">g</span><span class="op">[[</span><span class="st">"salinity"</span><span class="op">]</span><span class="op">]</span>, <span class="va">g</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span>, <span class="va">g</span><span class="op">[[</span><span class="st">"pressure"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://dankelley.github.io/oce/reference/plotTS.html" class="external-link">plotTS</a></span><span class="op">(</span><span class="va">ctd</span>, eos <span class="op">=</span> <span class="st">"unesco"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://dankelley.github.io/oce/reference/oce.plot.ts.html" class="external-link">oce.plot.ts</a></span><span class="op">(</span><span class="va">g</span><span class="op">[[</span><span class="st">"time"</span><span class="op">]</span><span class="op">]</span>, <span class="va">g</span><span class="op">[[</span><span class="st">"salinity"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    ylab <span class="op">=</span> <span class="st">"Salinity"</span>, type <span class="op">=</span> <span class="st">"p"</span>, cex <span class="op">=</span> <span class="fl">0.3</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/layout.html" class="external-link">layout</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">4</span>, <span class="fl">1</span><span class="op">)</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span>, nrow <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, widths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.6</span>, <span class="fl">0.4</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"TS"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, cex <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"T"</span>, type <span class="op">=</span> <span class="st">"p"</span>, cex <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"S"</span>, type <span class="op">=</span> <span class="st">"p"</span>, cex <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="sea_explorer_files/figure-html/unnamed-chunk-3-1.png" alt="**Figure 1. Raw data, without trimming after power-on. Note the spuriously low salinities and odd temperatures before about 20:15 or so.**" width="672"><p class="caption">
-<strong>Figure 1. Raw data, without trimming after power-on. Note the
-spuriously low salinities and odd temperatures before about 20:15 or
-so.</strong>
+<img src="sea_explorer_files/figure-html/unnamed-chunk-3-1.png" alt="**Figure 1. An overview of the raw data. Note the spurious values in the time-series plots for the first hour or two.**" width="672"><p class="caption">
+<strong>Figure 1. An overview of the raw data. Note the spurious values
+in the time-series plots for the first hour or two.</strong>
 </p>
 </div>
-<p>Obviously, the salinities are highly spurious at the start. And,
-after that, there is a ramp-up period that is also suspicious.
-Temperature is also odd, having a different character of variation
-before and after the time of spurious salinity. The temperature-salinity
-diagram is also a good indication that the initial data are not
-representative of the ocean.</p>
-<p>Visual inspection puts the spurious time at somewhere between 1 and 2
-hours since the first plotted point. The use of <code><a href="https://rdrr.io/r/graphics/locator.html" class="external-link">locator()</a></code>
-can narrow this down more precisely, but for illustration, we’ll try 1.5
-hours.</p>
+<p>Inspection reveals spurious (non-oceanographic) signals for the first
+hour or two, with low pressures, high temperatures and very low
+salinities. Reasoning that these spurious data resulted from the
+instrument having been set to record a few hours before deployment, an
+analyst might choose to discard those data. This can be done with the
+<code><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset()</a></code> function, e.g. as follows.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dankelley.github.io/oce/" class="external-link">oce</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">oceglider</span><span class="op">)</span></span>
-<span><span class="va">skip</span> <span class="op">&lt;-</span> <span class="fl">1.5</span> <span class="op">*</span> <span class="fl">3600</span> <span class="co"># 1.5 hours, in seconds</span></span>
-<span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.glider.seaexplorer.delayed.html">read.glider.seaexplorer.delayed</a></span><span class="op">(</span><span class="st">"."</span>, removeTimeSincePowerOn <span class="op">=</span> <span class="va">skip</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/layout.html" class="external-link">layout</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>, widths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.6</span>, <span class="fl">0.4</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://dankelley.github.io/oce/reference/oce.plot.ts.html" class="external-link">oce.plot.ts</a></span><span class="op">(</span><span class="va">g</span><span class="op">[[</span><span class="st">"time"</span><span class="op">]</span><span class="op">]</span>, <span class="va">g</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    ylab <span class="op">=</span> <span class="st">"Temperature"</span>, type <span class="op">=</span> <span class="st">"o"</span>, cex <span class="op">=</span> <span class="fl">0.3</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">ctd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dankelley.github.io/oce/reference/as.ctd.html" class="external-link">as.ctd</a></span><span class="op">(</span><span class="va">g</span><span class="op">[[</span><span class="st">"salinity"</span><span class="op">]</span><span class="op">]</span>, <span class="va">g</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span>, <span class="va">g</span><span class="op">[[</span><span class="st">"pressure"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://dankelley.github.io/oce/reference/plotTS.html" class="external-link">plotTS</a></span><span class="op">(</span><span class="va">ctd</span>, eos <span class="op">=</span> <span class="st">"unesco"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://dankelley.github.io/oce/reference/oce.plot.ts.html" class="external-link">oce.plot.ts</a></span><span class="op">(</span><span class="va">g</span><span class="op">[[</span><span class="st">"time"</span><span class="op">]</span><span class="op">]</span>, <span class="va">g</span><span class="op">[[</span><span class="st">"salinity"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    ylab <span class="op">=</span> <span class="st">"Salinity"</span>, type <span class="op">=</span> <span class="st">"o"</span>, cex <span class="op">=</span> <span class="fl">0.3</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">g2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">g</span>, <span class="va">time</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2023-10-19 20:30:00"</span>, tz <span class="op">=</span> <span class="st">"UTC"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/layout.html" class="external-link">layout</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">4</span>, <span class="fl">1</span><span class="op">)</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span>, nrow <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, widths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.6</span>, <span class="fl">0.4</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g2</span>, which <span class="op">=</span> <span class="st">"TS"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g2</span>, which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, cex <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g2</span>, which <span class="op">=</span> <span class="st">"T"</span>, type <span class="op">=</span> <span class="st">"p"</span>, cex <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g2</span>, which <span class="op">=</span> <span class="st">"S"</span>, type <span class="op">=</span> <span class="st">"p"</span>, cex <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="sea_explorer_files/figure-html/unnamed-chunk-4-1.png" alt="**Figure 2. Raw data, after trimming spurious data in the 1.5 hours following power-on events.**" width="672"><p class="caption">
 <strong>Figure 2. Raw data, after trimming spurious data in the 1.5
 hours following power-on events.</strong>
 </p>
 </div>
-<p>With this skipping of initial data following the power-up, we have
-data that are of the expected character. The time series plots show an
-expected pattern for a glider that is moving up and down in the water
-column. The temperature-salinity diagram also looks sensible.</p>
-<p>As noted, statistical methods might also be useful in determining
-whether this sort of data trimming is warranted. For example, for this
-particular dataset, the spuriously fresh water could be detected using
-the <code><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile()</a></code> function, with a 2 percent level as the
-criterion. However, that number would need to be changed if the whole
-dataset were to be used. Given the ease with which this kind of work can
-be done visually, as above, there seems to be little need to suggest
-more quantitative methods. Besides, there is great merit in looking at
-the data, at the earliest opportunity.</p>
-</div>
+<p>The spurious data are now gone, so that this new <code>g2</code>
+version certainly looks more like oceanographic data collected with a
+glider. Note how pressure increases as the glider descends and then
+decreases as it ascends. Temperature decreases with depth, and salinity
+increases.</p>
+<p>SeaExplorer gliders store a record of <code>navState</code>, which is
+stored as a numerical code, as follows.</p>
+<ul>
+<li>105 means the glider is not navigating yet;</li>
+<li>115 means the glider is surfacing in preparation for
+communication;</li>
+<li>116 means the glider is at the surface, acquiring a GPS signal, and
+is communicating;</li>
+<li>110 means the glider is inflecting downward;</li>
+<li>100 means the glider has ballast set to be descending;</li>
+<li>118 means the glider has ballast adjusted to reduce density, so will
+be inflecting upward;</li>
+<li>117 means the glider has ballast set to be ascending.</li>
+</ul>
+<p>There is a way to see the transition from one state to another, as
+follows.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g2</span>, which <span class="op">=</span> <span class="st">"navState"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sea_explorer_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+<p>Another useful operation is to look at individual yos, which can be
+done as follows. Note the extraction of the data from the
+<code>payload1</code> item.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Show first 4 yos in a 2x2 matrix</span></span>
+<span><span class="va">payload</span> <span class="op">&lt;-</span> <span class="va">g2</span><span class="op">[[</span><span class="st">"payload"</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="va">payload</span>, <span class="va">payload</span><span class="op">$</span><span class="va">yoNumber</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">ss</span> <span class="kw">in</span> <span class="va">s</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">ctd</span> <span class="op">&lt;-</span> <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/as.ctd.html" class="external-link">as.ctd</a></span><span class="op">(</span></span>
+<span>        salinity <span class="op">=</span> <span class="va">ss</span><span class="op">[[</span><span class="st">"salinity"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>        temperature <span class="op">=</span> <span class="va">ss</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>        pressure <span class="op">=</span> <span class="va">ss</span><span class="op">[[</span><span class="st">"pressure"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>        longitude <span class="op">=</span> <span class="va">ss</span><span class="op">[[</span><span class="st">"longitude"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>        latitude <span class="op">=</span> <span class="va">ss</span><span class="op">[[</span><span class="st">"latitude"</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="op">)</span></span>
+<span>    <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/plotProfile.html" class="external-link">plotProfile</a></span><span class="op">(</span><span class="va">ctd</span>, xtype <span class="op">=</span> <span class="st">"salinity+temperature"</span>, eos <span class="op">=</span> <span class="st">"unesco"</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/graphics/mtext.html" class="external-link">mtext</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"yo %d"</span>, <span class="va">ss</span><span class="op">$</span><span class="va">yoNumber</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>, line <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, cex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="st">"cex"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p><img src="sea_explorer_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<p>From the labels in the plots, it is evident that the data removed
+from the start of the sampling were contained within the first yo, as
+numbered in the data files.</p>
+<p>Note that the plots show both the downcast and the upcast portions of
+the yo.</p>
+<p>Waterfall plots are also useful, and they are easily constructed,
+with lower-level oce code.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># use limits based on all yos, to avoid clipping</span></span>
+<span><span class="va">Tlim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">s</span>, \<span class="op">(</span><span class="va">ss</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">ss</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">plim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">s</span>, \<span class="op">(</span><span class="va">ss</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">ss</span><span class="op">[[</span><span class="st">"pressure"</span><span class="op">]</span><span class="op">]</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">ss</span> <span class="op">&lt;-</span> <span class="va">s</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="va">ctd</span> <span class="op">&lt;-</span> <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/as.ctd.html" class="external-link">as.ctd</a></span><span class="op">(</span></span>
+<span>        salinity <span class="op">=</span> <span class="va">ss</span><span class="op">$</span><span class="va">salinity</span>,</span>
+<span>        temperature <span class="op">=</span> <span class="va">ss</span><span class="op">$</span><span class="va">temperature</span>,</span>
+<span>        pressure <span class="op">=</span> <span class="va">ss</span><span class="op">$</span><span class="va">pressure</span>,</span>
+<span>        longitude <span class="op">=</span> <span class="va">ss</span><span class="op">$</span><span class="va">longitude</span>,</span>
+<span>        latitude <span class="op">=</span> <span class="va">ss</span><span class="op">$</span><span class="va">latitude</span></span>
+<span>    <span class="op">)</span></span>
+<span>    <span class="va">ctd</span> <span class="op">&lt;-</span> <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/ctdTrim.html" class="external-link">ctdTrim</a></span><span class="op">(</span><span class="va">ctd</span>, <span class="st">"upcast"</span><span class="op">)</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="va">i</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/plotProfile.html" class="external-link">plotProfile</a></span><span class="op">(</span><span class="va">ctd</span>,</span>
+<span>            xtype <span class="op">=</span> <span class="st">"temperature"</span>, eos <span class="op">=</span> <span class="st">"unesco"</span>,</span>
+<span>            Tlim <span class="op">=</span> <span class="va">Tlim</span>, plim <span class="op">=</span> <span class="va">plim</span></span>
+<span>        <span class="op">)</span></span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">ctd</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span>, <span class="va">ctd</span><span class="op">[[</span><span class="st">"pressure"</span><span class="op">]</span><span class="op">]</span>, col <span class="op">=</span> <span class="va">i</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"bottomright"</span>,</span>
+<span>    title <span class="op">=</span> <span class="st">"Start Time"</span>,</span>
+<span>    lwd <span class="op">=</span> <span class="fl">1</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span>, cex <span class="op">=</span> <span class="fl">0.75</span>, bg <span class="op">=</span> <span class="st">"white"</span>,</span>
+<span>    legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">s</span>, <span class="kw">function</span><span class="op">(</span><span class="va">ss</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="va">ss</span><span class="op">$</span><span class="va">time</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"%H:%S"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="sea_explorer_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 </div>
 <div class="section level2">
-<h2 id="fixme">FIXME<a class="anchor" aria-label="anchor" href="#fixme"></a>
+<h2 id="delayed-mode-netcdf-files">Delayed-mode NetCDF Files<a class="anchor" aria-label="anchor" href="#delayed-mode-netcdf-files"></a>
 </h2>
+<p>NetCDF files are likely the format that most users will be dealing
+with, partly because it can be loaded quickly, and it is simple to read.
+The sample file, from Reference 2, corresponds to the full dataset used
+in the previous discussion of raw data.</p>
+<p>Since the file is large, it can take a minute or two to download, and
+so the following code caches the file. Note that the reading step takes
+only a second or two, so the caching increases processing speed
+enormously.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">urlNC</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
+<span>    <span class="st">"https://cproof.uvic.ca/gliderdata/deployments/"</span>,</span>
+<span>    <span class="st">"dfo-eva035/dfo-eva035-20231019/"</span>,</span>
+<span>    <span class="st">"/L0-timeseries/dfo-eva035-20231019_delayed.nc"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">fileNC</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">".*/"</span>, <span class="st">""</span>, <span class="va">urlNC</span><span class="op">)</span></span>
+<span><span class="co"># 86.8MB file, so cache it to save O(30) second download.</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">fileNC</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="va">urlNC</span>, <span class="va">fileNC</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">G</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.glider.netcdf.html">read.glider.netcdf</a></span><span class="op">(</span><span class="va">fileNC</span><span class="op">)</span></span></code></pre></div>
+<p>As for the raw data, drop the data before a certain time.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">G2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">G</span>, <span class="va">time</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2023-10-19 20:30:00"</span>, tz <span class="op">=</span> <span class="st">"UTC"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Now that we have all the data for the mission, the sensible starting
+place for graphical analysis is a map. Note that here <code>type</code>
+is set to <code>"l"</code>, so that data points are joined with lines.
+This helps to reveal the starting and ending locations.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">G</span>, which <span class="op">=</span> <span class="st">"map"</span>, type <span class="op">=</span> <span class="st">"l"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sea_explorer_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<p>The longitude and latitude axes indicating that the sampling was made
+off the west coast of Canada. The first samples were likely on the east,
+and the glider traveled to the southwest, before turning around and
+retracing its route to about 131W. Presumably it was picked up by a ship
+then.</p>
+<p>Typically, the next step will be to see the trajectory in time-depth
+space, as follows.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">G2</span>, which <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in oce.plot.ts(x = structure(c(1697747403.902, 1697747407.929, 1697747411.955, : simplifying a large dataset; set simplify=NA to see raw data</span></span></code></pre></div>
+<p><img src="sea_explorer_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<p>Notice that there are so many yos in the shallow water that the plot
+is covered in black for the first several days. When it reaches deep
+water, however, the yos take longer and so individual ascents and
+descents are (barely) discernible. The system was clearly set up to
+descent only to 1km depth at most.</p>
+<p>It may be interesting to see temperature and salinity variations over
+the continental shelf, so we select the first week of data.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">G3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">G2</span>, <span class="va">time</span> <span class="op">&lt;</span> <span class="va">G</span><span class="op">[[</span><span class="st">"time"</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="fl">7</span> <span class="op">*</span> <span class="fl">86400</span><span class="op">)</span></span>
+<span><span class="va">temperature</span> <span class="op">&lt;-</span> <span class="va">G3</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="va">cmT</span> <span class="op">&lt;-</span> <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/colormap.html" class="external-link">colormap</a></span><span class="op">(</span><span class="va">temperature</span>, col <span class="op">=</span> <span class="va">oceColorsTurbo</span><span class="op">)</span></span>
+<span><span class="va">salinity</span> <span class="op">&lt;-</span> <span class="va">G3</span><span class="op">[[</span><span class="st">"salinity"</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="va">cmS</span> <span class="op">&lt;-</span> <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/colormap.html" class="external-link">colormap</a></span><span class="op">(</span><span class="va">salinity</span>, col <span class="op">=</span> <span class="va">oceColorsTurbo</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://dankelley.github.io/oce/reference/drawPalette.html" class="external-link">drawPalette</a></span><span class="op">(</span>colormap <span class="op">=</span> <span class="va">cmT</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">G3</span>, which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, col <span class="op">=</span> <span class="va">cmT</span><span class="op">$</span><span class="va">zcol</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://dankelley.github.io/oce/reference/drawPalette.html" class="external-link">drawPalette</a></span><span class="op">(</span>colormap <span class="op">=</span> <span class="va">cmS</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">G3</span>, which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, col <span class="op">=</span> <span class="va">cmS</span><span class="op">$</span><span class="va">zcol</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sea_explorer_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<p>This representation does not rely on gridding to fill in spots
+between the data, but it can be subject to problems with overpainting of
+colours from later yos obscuring colours from earlier rows. One way
+around that is to use the <code><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample()</a></code> function to randomly
+order the data points, but, for that, the generic <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>
+used above will need to be replaced by lower-level plot calls. (Readers
+with experience in this will know how to do it; others ought to think
+the problem through, because this is quite a useful method.)</p>
+<p><strong>Exercises.</strong></p>
 <ol style="list-style-type: decimal">
-<li><p>Move quite a few SeaExplorer-specific things from the general
-vignette here. Example: navstate</p></li>
-<li><p>Talk about the big nc files</p></li>
-<li><p>When cleaned up, use tmp dir.</p></li>
+<li>Set up the <code><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample()</a></code> scheme to see if overpainting is a
+problem. Also, try adjusting symbol size.</li>
+<li>Extract oxygen, and colour-code the plot for that.</li>
+<li>(Advanced) Explore gridding options, to cast the data onto a uniform
+time-depth grid. If deemed of interest, try gridding also for a lateral
+coordinate instead of time.</li>
 </ol>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <ol style="list-style-type: decimal">
-<li>“Index of
-/Gliderdata/Deployments/Dfo-Eva035/Dfo-Eva035-20231019/Delayed_raw.”
-Accessed August 28, 2024. <a href="https://cproof.uvic.ca/gliderdata/deployments/dfo-eva035/dfo-eva035-20231019/delayed_raw/" class="external-link uri">https://cproof.uvic.ca/gliderdata/deployments/dfo-eva035/dfo-eva035-20231019/delayed_raw/</a>
-</li>
+<li><p>“Index of
+/Gliderdata/Deployments/Dfo-Eva035/Dfo-Eva035-20231019/Realtime_raw.”
+Accessed September 2, 2024. <a href="https://cproof.uvic.ca/gliderdata/deployments/dfo-eva035/dfo-eva035-20231019/realtime_raw/" class="external-link uri">https://cproof.uvic.ca/gliderdata/deployments/dfo-eva035/dfo-eva035-20231019/realtime_raw/</a>.</p></li>
+<li><p>“Time series Delayed
+[dfo-eva035/dfo-eva035-20231019_delayed.nc].” Accessed September 2,
+2024. <a href="https://cproof.uvic.ca/gliderdata/deployments/dfo-eva035/dfo-eva035-20231019/L0-timeseries/dfo-eva035-20231019_delayed.nc" class="external-link uri">https://cproof.uvic.ca/gliderdata/deployments/dfo-eva035/dfo-eva035-20231019/L0-timeseries/dfo-eva035-20231019_delayed.nc</a></p></li>
 </ol>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

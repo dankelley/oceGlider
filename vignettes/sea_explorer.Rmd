@@ -26,7 +26,6 @@ skeleton.
 
 # Raw Files
 
-
 The below shows how to download a small number of files (just 5) from the
 CPROOF server at Reference 1. The code worked as of 2024-08-29, but if reader
 finds that the server has changed, the solution is to alter the value of
@@ -36,11 +35,11 @@ finds that the server has changed, the solution is to alter the value of
 n <- 6 # number of files to download
 urlRaw <- paste0(
     "https://cproof.uvic.ca/gliderdata/deployments/",
-    "dfo-eva035/dfo-eva035-20231019/",
+    "dfo-eva035/dfo-eva035-20190718/",
     "delayed_raw/"
 )
-subs <- paste0("sea035.118.gli.sub.", 1:n)
-raws <- paste0("sea035.118.pld1.raw.", 1:n)
+subs <- paste0("sea035.12.gli.sub.", 1:n)
+raws <- paste0("sea035.12.pld1.raw.", 1:n)
 for (i in 1:n) {
     if (!file.exists(subs[i])) {
         download.file(paste0(urlRaw, subs[i]), subs[i])
@@ -75,10 +74,11 @@ Inspection reveals spurious (non-oceanographic) signals for the first hour or
 two, with low pressures, high temperatures and very low salinities. Reasoning
 that these spurious data resulted from the instrument having been set to record
 a few hours before deployment, an analyst might choose to discard those data.
-This can be done with the `subset()` function, e.g. as follows.
+This can be done with the `subset()` function, e.g. as follows, where 2.5
+hours was chosen as the cutoff after some experimentation.
 
 ```{r fig.height=4, fig.width=7, fig.cap="**Figure 2. Raw data, after trimming spurious data in the 1.5 hours following power-on events.**", dev.args=list(pointsize=12)}
-g2 <- subset(g, time > as.POSIXct("2023-10-19 20:30:00", tz = "UTC"))
+g2 <- subset(g, time > g[["time"]][1] + 2.5 * 3600)
 layout(matrix(c(2, 1, 3, 1, 4, 1), byrow = TRUE, nrow = 3), widths = c(0.6, 0.4))
 plot(g2, which = "TS")
 plot(g2, which = "p", type = "p", cex = 0.3)
@@ -111,29 +111,25 @@ plot(g2, which = "navState")
 ```
 
 Another useful operation is to look at individual yos, which can be done as
-follows.  Note the extraction of the data from the `payload1` item.
+follows, for the first three of the remaining yos.
 
 ```{r}
-# Show first 4 yos in a 2x2 matrix
 payload <- g2[["payload"]]
 s <- split(payload, payload$yoNumber)
-par(mfrow = c(2, 2))
-for (ss in s[1:4]) {
+par(mfrow = c(1, 3))
+for (i in 1:3) {
+    ss <- s[[i]]
     ctd <- oce::as.ctd(
-        salinity = ss[["salinity"]],
-        temperature = ss[["temperature"]],
-        pressure = ss[["pressure"]],
-        longitude = ss[["longitude"]],
-        latitude = ss[["latitude"]]
+        salinity = ss$salinity,
+        temperature = ss$temperature,
+        pressure = ss$pressure,
+        longitude = ss$longitude,
+        latitude = ss$latitude
     )
     oce::plotProfile(ctd, xtype = "salinity+temperature", eos = "unesco")
     mtext(sprintf("yo %d", ss$yoNumber[1]), line = -1, cex = par("cex"))
 }
 ```
-
-From the labels in the plots, it is evident that the data removed from the
-start of the sampling were contained within the first yo, as numbered in the
-data files.
 
 Note that the plots show both the downcast and the upcast portions of the yo.
 
@@ -184,15 +180,14 @@ following code caches the file.  Note that the reading step takes only a second
 or two, so the caching increases processing speed enormously.
 
 ```{r}
+fileNC <- "dfo-eva035-20190718_delayed.nc"
 urlNC <- paste0(
     "https://cproof.uvic.ca/gliderdata/deployments/",
-    "dfo-eva035/dfo-eva035-20231019/",
-    "/L0-timeseries/dfo-eva035-20231019_delayed.nc"
+    "dfo-eva035/dfo-eva035-20190718/",
+    "/L0-timeseries/"
 )
-fileNC <- gsub(".*/", "", urlNC)
-# 86.8MB file, so cache it to save O(30) second download.
 if (!file.exists(fileNC)) {
-    download.file(urlNC, fileNC)
+    download.file(paste0(urlNC, fileNC), fileNC)
 }
 G <- read.glider.netcdf(fileNC)
 ```
@@ -200,22 +195,8 @@ G <- read.glider.netcdf(fileNC)
 As for the raw data, drop the data before a certain time.
 
 ```{r}
-G2 <- subset(G, time > as.POSIXct("2023-10-19 20:30:00", tz = "UTC"))
+G2 <- subset(G, time > G[["time"]][1] + 2.5 * 3600)
 ```
-
-Now that we have all the data for the mission, the sensible starting place for
-graphical analysis is a map.  Note that here `type` is set to `"l"`, so that
-data points are joined with lines. This helps to reveal the starting and ending
-locations.
-
-```{r}
-plot(G, which = "map", type = "l")
-```
-
-The longitude and latitude axes indicating that the sampling was made off the
-west coast of Canada. The first samples were likely on the east, and the glider
-traveled to the southwest, before turning around and retracing its route to
-about 131W.  Presumably it was picked up by a ship then.
 
 Typically, the next step will be to see the trajectory in time-depth space, as
 follows.
@@ -224,28 +205,56 @@ follows.
 plot(G2, which = "p")
 ```
 
-Notice that there are so many yos in the shallow water that the plot is covered
-in black for the first several days. When it reaches
-deep water, however, the yos take longer and so individual
-ascents and descents are (barely) discernible. The system
-was clearly set up to descent only to 1km depth at most.
-
-It may be interesting to see temperature and salinity variations over the
-continental shelf, so we select the first week of data.
+This shows that the glider was at the surface for nearly
+the last day of sampling, so we might expect spurious data
+then.  Salinity is usually a good indicator, so we check
+that.
 
 ```{r}
-G3 <- subset(G2, time < G[["time"]][1] + 7 * 86400)
+plot(G2, which = "S")
+```
+
+Let's trim by time to remove the final time period, rechecking with
+plots of salinity and temperature.
+
+```{r}
+G3 <- subset(G2, time < as.POSIXct("2019-07-23 06:00:00", tz = "UTC"))
+par(mfrow = c(2, 1))
+plot(G3, which = "S")
+plot(G3, which = "T")
+```
+
+At this stage, we have isolated the time interval that has useful data.  There
+are still some obvious problems with spurious salinities, and perhaps
+temperatures, but for the present initial look at the data, we can overcome
+these by setting limits on the colour scale for the plots.  (Obviously, more
+detailed analyses will demand more careful consideration.)
+
+
+```{r}
 temperature <- G3[["temperature"]]
-cmT <- oce::colormap(temperature, col = oceColorsTurbo)
+cmT <- oce::colormap(temperature,
+    zlim = quantile(temperature, c(0.01, 0.99), na.rm = TRUE),
+    col = oceColorsTurbo
+)
 salinity <- G3[["salinity"]]
-cmS <- oce::colormap(salinity, col = oceColorsTurbo)
+cmS <- oce::colormap(salinity,
+    zlim = quantile(salinity, c(0.01, 0.99), na.rm = TRUE),
+    col = oceColorsTurbo
+)
 par(mfrow = c(2, 1))
 par(mar = c(3, 3, 1, 1))
 drawPalette(colormap = cmT)
-plot(G3, which = "p", type = "p", col = cmT$zcol, mar = c(3, 3, 1, 4))
+plot(G3,
+    which = "p", type = "p", col = cmT$zcol, mar = c(3, 3, 1, 4),
+    pch = 20, cex = 0.3
+)
 par(mar = c(3, 3, 1, 1))
 drawPalette(colormap = cmS)
-plot(G3, which = "p", type = "p", col = cmS$zcol, mar = c(3, 3, 1, 4))
+plot(G3,
+    which = "p", type = "p", col = cmS$zcol, mar = c(3, 3, 1, 4),
+    pch = 20, cex = 0.3
+)
 ```
 
 This representation does not rely on gridding to fill in spots between the

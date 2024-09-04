@@ -11,7 +11,7 @@ read.glider.seaexplorer.delayed(
   interpolateToCTD = TRUE,
   removeTimeSincePowerOn = 0,
   progressBar = interactive(),
-  debug
+  debug = getOption("gliderDebug", default = 0)
 )
 }
 \arguments{
