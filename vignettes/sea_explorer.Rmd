@@ -208,6 +208,8 @@ urlNC <- paste0(
 )
 fileNC <- file.path(tmpdir, sub(".*/", "", urlNC))
 download.file(urlNC, fileNC)
+saved <- file.exists(fileNC)
+cat("saved=", saved, "\n")
 G <- read.glider.netcdf(fileNC)
 ```
 
