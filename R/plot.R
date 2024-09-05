@@ -185,7 +185,7 @@ setMethod(
                 }
             }
             mar <- omar
-            mar[4] <- mar[4] + 2
+            mar[4] <- mar[4] + 2 # FIXME: why do this if no palette?
             par(mar = mar)
             do.call("plot", args)
             par(mar = omar)

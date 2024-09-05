@@ -21,155 +21,128 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
-**Abstract.** This vignette explains the basics of using the oceglider
-package on Slocum data. It is \emph{very much} a work in progress,
-because the functions provided by this package are under active
-development.
+**Abstract.** This vignette explains the basics of using the oceglider package
+on Slocum data. The main difference from SeaExplorer files is in the layout of
+the objects, with SeaExplorer basically considering glider and payload in
+separate streams. But normal use, with plotting, subsetting, etc., does not
+require the user to consider the details of the layout.
 
-# Non-netcdf files
+# Create Temporary Directory for CRAN Submission
 
-This section has yet to been written.
+For this vignette to be suitable for CRAN submission, it must not download
+files to the user's working space.  We avoid that by setting aside space in the
+next line.
 
-# Netcdf files
+```{r}
+fileNC <- tempfile(fileext = ".nc") # to hold a binary (NetCDF) file
+```
 
-A good first step in working with a glider file is to find the names
-of the variables, as follows.
+Note that this `fileNC` file will be deleted at the end of this vignette.
+Obviously, in actual practice, the analysit is likely to store the downloaded
+file in a more permanent location, and not to delete it when finished a
+particular task.
 
-```{r eval=FALSE}
+# Some Common Steps with Slocum Datasets
+
+We will use a dataset from CPROOF (Reference 1).
+
+```{r}
 library(oceglider)
-file <- "~/data/gass/sbloom2023/batray-2023-03-17-delayed_trajectory_file.nc"
-names <- read.glider.slocum.netcdf(file, nameMap="?")
+url <- paste0(
+    "https://cproof.uvic.ca/gliderdata/deployments/",
+    "dfo-bumblebee998/dfo-bumblebee998-20221207/",
+    "L0-timeseries/",
+    "dfo-bumblebee998-20221207_delayed.nc"
+)
+file <- gsub(".*/", "", url)
+# 45.8 MB file: download takes 0.4s user, 0.9s system but 11s elapsed
+if (!file.exists(file)) {
+    system.time(curl::curl_download(url = url, destfile = file, mode = "wb"))
+}
+g <- read.glider.netcdf(file) # under 0.2s
 ```
 
-This yields 144 character values, many of which are quite similar.
-For example, it might make sense that there only be one variable for
-latitude, but we find
+It always makes sense to get a summary, to see what data are contained
+in the object.
 
-```{r eval=FALSE}
-names[grep("lat", names)]
-```
-
-yields
-
-```{r eval=FALSE}
-[1] "lat"                     "lat_uv"
-[3] "profile_lat"             "platform"
-[5] "lat_qc"                  "glider_record/c_wpt_lat"
-[7] "glider_record/m_gps_lat" "glider_record/m_lat"
-```
-
-All but the fourth of the items seems to be related to latitude.  The
-one ending `"_qc"` is a quality-control flag, so that can also be
-discounted.  Still, there are six possibilities from which to choose.
-Inspection of the data file, along with some experiments with all the
-choices, suggests, somewhat tentatively, that best choice may be
-`"glider_record/m_gps_lat"` (which is used in the default value of
-`nameMap`).
-
-Similar study, and a fair bit of testing and discussion, led to
-hypotheses for other data items of primary focus, as incorporated in
-the `nameMap` default.
-
-Continuing along this line of reasoning, we may extract location data
-and make a simple plot with the following, producing Figure 1.
-
-```{r eval=FALSE}
-g <- read.glider.slocum.netcdf(file)
-lon <- g[["longitude"]]
-lat <- g[["latitude"]]
-data("coastlineWorldFine", package="ocedata")
-# Construct Figure 1
-plot(coastlineWorldFine, span=450,
-    clatitude=mean(lat, na.rm=TRUE), clongitude=mean(lon, na.rm=TRUE))
-points(lon, lat, cex=0.5, pch=20, col=2)
-data(topoWorld)
-contour(topoWorld[["longitude"]], topoWorld[["latitude"]],
-    -topoWorld[["z"]], level=500, add=TRUE, labcex=0.9)
-```
-
-A hint at other things that might be explored is given by the output from
-```{r eval=FALSE}
+```{r}
 summary(g)
 ```
-which is
-```{r eval=FALSE}
-Glider Summary
---------------
 
-* Input file:
-    ~/data/gass/sbloom2023/batray-2023-03-17-delayed_trajectory_file.nc
-* Type:    slocum
-* Time ranges from 2023-03-17 16:10:55.232 to 2023-04-05 17:36:13.112 with 1822877 samples and mean increment 0.9999643 s
-* Data Overview:
-                        Min.      Mean    Max.    Dim.                             OriginalName
-    conductivity      26.555    33.818  40.192 1822877 glider_record/sci_rbrctd_conductivity_00
-    CT               0.71915    6.8498  11.945 1822877                 conservative_temperature
-    density [kg/m³]   1024.8    1026.4  1028.4 1822877                                  density
-    id                     2    88.343     147 1822877                               profile_id
-    latitude          42.935    43.703  44.387 1822877                  glider_record/m_gps_lat
-    longitude        -63.396   -62.752 -62.096 1822877                  glider_record/m_gps_lon
-    O2                121.47    260.14  350.11 1822877                     oxygen_concentration
-    pressure         -0.2229     74.03  257.36 1822877  glider_record/sci_rbrctd_seapressure_00
-    profileLat [°N]   42.936    43.769  44.387 1822877                              profile_lat
-    profileLon [°E]  -63.395   -62.805 -62.098 1822877                              profile_lon
-    SA                31.069     33.53  35.481 1822877                        absolute_salinity
-    salinity          30.922    33.372  35.312 1822877     glider_record/sci_rbrctd_salinity_00
-    temperature       0.7013    6.8473  11.979 1822877  glider_record/sci_rbrctd_temperature_00
-    u [m/s]         -0.29098 -0.044992 0.19447 1822877                                        u
-    v [m/s]         -0.26387 -0.012287 0.15855 1822877                                        v
-    vx              -0.29347  -0.04552 0.19611 1822877                 glider_record/m_water_vx
-    vxi             -0.29347 -0.047374 0.19611 1822877         glider_record/m_initial_water_vx
-    vy              -0.26742 -0.012923 0.15966 1822877                 glider_record/m_water_vy
-    vyi             -0.26742 -0.012613 0.15966 1822877         glider_record/m_initial_water_vy
+Next, make a map to see where the sampling was done.
 
-* Processing Log
-
-    - 2023-07-13 12:07:18.668 UTC: `create 'glider' object`
+```{r}
+plot(g, which = "map")
 ```
 
-A challenge in working through the data, for this file at least, is
-that so many items hold NA values, e.g.
+This map comports with the one on Reference 2, except we have proper scaling of
+the axes, because `oceglider` computes an aspect ratio that will preserve
+shapes at the centre of the plot.
 
-```{r eval=FALSE}
-table(is.na(g[["O2"]]))
-```
-```
- FALSE   TRUE
-867751 955126
-```
+Next, examine the pressure-time trajectory.
 
-However, it seems that all the hydrographic variables are finite or NA
-together, since
-
-```{r eval=FALSE}
-identical(is.na(g[["salinity"]]), is.na(g[["pressure"]]))
-identical(is.na(g[["pressure"]]), is.na(g[["time"]]))
+```{r}
+plot(g, which = "p")
 ```
 
-so we can construct a time-depth plot colour-coded for salinity with
+This looks good.  Let's colour-code by temperature.
 
-```{r eval=FALSE}
-S <- g[["salinity"]]
-t <- g[["time"]]
-p <- g[["pressure"]]
-# Construct Figure 2
-par(mar = c(2, 3.3, 1, 1))
-cm <- colormap(S, col = oceColorsTurbo)
-drawPalette(colormap = cm)
-oce.plot.ts(t, p,
-    ylim = rev(range(p, na.rm = TRUE)),
-    ylab = "Pressure [dbar]",
-    col = cm$zcol, type = "p", pch = 20, cex = 0.3, mar = c(2, 3.3, 1, 4)
+```{r}
+plot(g, which = "p", type = "p", colorby = "temperature")
+```
+
+Notice that there is very little red in the diagram.  Close inspection will
+reveal that the high temperatures corresponding to this colour are at the start
+of the time series.  The methods illustrated in the SeaExplorer vignette can be
+employed here, but for brevity we will just use percentile trimming to get a
+diagram that at least provides an initial view of the data.
+
+```{r}
+plot(g,
+    which = "p", type = "p", colorby = "temperature",
+    colorbylim = quantile(g[["temperature"]], c(0.01, 0.99), na.rm = TRUE)
 )
-mtext("Salinity", adj = 1)
 ```
 
-# Figures
+Readers might agree that this version looks better, displaying
+more features than in the first plot.
 
-![Figure 1. Glider surfaced locations (red dots) with 500m depth
-contour (black line). The initial and final locations are at the
-northwest end of the dot cloud.](slocum_map.png)
+Salinity is often a problem, but we'll do the same thing, first plotting all
+the data.
 
-![Figure 2. Dependence of salinity with depth, as sampled along the
-path shown in Figure 1.](slocum_tz.png)
+```{r}
+plot(g, which = "p", type = "p", colorby = "salinity")
+```
+
+And, second, trimming.
+
+```{r}
+plot(g,
+    which = "p", type = "p", colorby = "salinity",
+    colorbylim = quantile(g[["salinity"]], c(0.01, 0.99), na.rm = TRUE)
+)
+```
+
+Again, we see improvement.
+
+At this stage, we have some confidence that data are being read properly and
+that plotting, extraction with `[[` and some other basic features work.
+Readers are directed to the SeaExplorer vignette for more ideas on things that
+might be worth pursuing.
+
+## Cleanup of Temporary Files
+
+As noted at the outset, CRAN rules dictate that the downloaded material be
+deleted.  In actual analysis, though, it is unlikely that such material would
+be deleted, so don't just copy this line!
+
+```{r}
+unlink(fileNC) # where the binary (NetCDF) file went
+```
+
+# References
+
+1. “dfo-bumblebee998-2022-12-07 Time series Delayed” Accessed September 5,
+   2024.
+   <https://cproof.uvic.ca/deployments/dfo-bumblebee998/dfo-bumblebee998-20221207/>.
 

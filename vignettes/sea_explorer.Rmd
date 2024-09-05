@@ -34,7 +34,7 @@ is to be done with the data.
 
 ```{r}
 tmpdir <- tempdir() # to hold raw files
-# fileNC <- tempfile(fileext = ".nc") # to hold a binary (NetCDF) file
+fileNC <- tempfile(fileext = ".nc") # to hold a binary (NetCDF) file
 ```
 
 # Analysis
@@ -212,8 +212,6 @@ urlNC <- paste0(
     "dfo-eva035/dfo-eva035-20190718/",
     "/L0-timeseries/dfo-eva035-20190718_delayed.nc"
 )
-fileNC <- tempfile(fileext = ".nc") # to hold a binary (NetCDF) file
-# download.file(urlNC, fileNC)
 curl::curl_download(url = urlNC, destfile = fileNC, mode = "wb")
 G <- read.glider.netcdf(fileNC)
 ```
@@ -296,6 +294,7 @@ the problem through, because this is quite a useful method.)
 As noted at the outset, CRAN rules dictate that the downloaded material
 be deleted.  In actual analysis, though, it is unlikely that
 such material would be deleted, so don't just copy this line!
+
 ```{r}
 unlink(fileNC) # where the binary (NetCDF) file went
 unlink(tmpdir, recursive = TRUE) # where the raw files went
