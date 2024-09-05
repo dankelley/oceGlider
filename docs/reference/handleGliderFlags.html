@@ -11,7 +11,7 @@ flags."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">oceglider</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.10</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.11</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,8 +81,8 @@ In the second form, <code>flags</code> is a list with unnamed vectors, and
 this means to apply the actions to all the data entries; thus,
 <code>flags=list(c(3,4,9))</code> means to apply not just to salinity and temperature,
 but also to everything else for which flags have been set up. If <code>flags</code>
-is not provided, then <code><a href="https://dankelley.github.io/oce/reference/defaultFlags.html" class="external-link">defaultFlags()</a></code> is called on
-<code>object</code>, to try to determine a conservative default.</p></dd>
+is not provided, then an attempt is made to set up a
+useful default.</p></dd>
 
 
 <dt id="arg-actions">actions<a class="anchor" aria-label="anchor" href="#arg-actions"></a></dt>

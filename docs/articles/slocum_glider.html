@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">oceglider</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.10</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.11</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -150,7 +150,7 @@ contained in the object.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; * Processing Log</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     - 2024-09-05 13:53:17 UTC: `create 'glider' object`</span></span></code></pre></div>
+<span><span class="co">#&gt;     - 2024-09-05 19:14:44 UTC: `create 'glider' object`</span></span></code></pre></div>
 <p>Next, make a map to see where the sampling was done.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"map"</span><span class="op">)</span></span></code></pre></div>
@@ -160,11 +160,19 @@ scaling of the axes, because <code>oceglider</code> computes an aspect
 ratio that will preserve shapes at the centre of the plot.</p>
 <p>Next, examine the pressure-time trajectory.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "2022-12-07 16:15:54 UTC" "2022-12-11 06:53:54 UTC"</span></span>
+<span><span class="co">#&gt; w: 228325</span></span>
+<span><span class="co">#&gt; t[w]: 2022-12-11 06:53:54</span></span>
+<span><span class="co">#&gt; p[w]: NaN</span></span></code></pre></div>
 <p><img src="slocum_glider_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
 <p>This looks good. Let’s colour-code by temperature.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, colorby <span class="op">=</span> <span class="st">"temperature"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, colorby <span class="op">=</span> <span class="st">"temperature"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "2022-12-07 16:15:54 UTC" "2022-12-11 06:53:54 UTC"</span></span>
+<span><span class="co">#&gt; w: 228325</span></span>
+<span><span class="co">#&gt; t[w]: 2022-12-11 06:53:54</span></span>
+<span><span class="co">#&gt; p[w]: NaN</span></span></code></pre></div>
 <p><img src="slocum_glider_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <p>Notice that there is very little red in the diagram. Close inspection
 will reveal that the high temperatures corresponding to this colour are
@@ -176,21 +184,33 @@ initial view of the data.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>,</span>
 <span>    which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, colorby <span class="op">=</span> <span class="st">"temperature"</span>,</span>
 <span>    colorbylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">g</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.99</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "2022-12-07 16:15:54 UTC" "2022-12-11 06:53:54 UTC"</span></span>
+<span><span class="co">#&gt; w: 228325</span></span>
+<span><span class="co">#&gt; t[w]: 2022-12-11 06:53:54</span></span>
+<span><span class="co">#&gt; p[w]: NaN</span></span></code></pre></div>
 <p><img src="slocum_glider_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
 <p>Readers might agree that this version looks better, displaying more
 features than in the first plot.</p>
 <p>Salinity is often a problem, but we’ll do the same thing, first
 plotting all the data.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, colorby <span class="op">=</span> <span class="st">"salinity"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, colorby <span class="op">=</span> <span class="st">"salinity"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "2022-12-07 16:15:54 UTC" "2022-12-11 06:53:54 UTC"</span></span>
+<span><span class="co">#&gt; w: 228325</span></span>
+<span><span class="co">#&gt; t[w]: 2022-12-11 06:53:54</span></span>
+<span><span class="co">#&gt; p[w]: NaN</span></span></code></pre></div>
 <p><img src="slocum_glider_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 <p>And, second, trimming.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>,</span>
 <span>    which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, colorby <span class="op">=</span> <span class="st">"salinity"</span>,</span>
 <span>    colorbylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">g</span><span class="op">[[</span><span class="st">"salinity"</span><span class="op">]</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.99</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "2022-12-07 16:15:54 UTC" "2022-12-11 06:53:54 UTC"</span></span>
+<span><span class="co">#&gt; w: 228325</span></span>
+<span><span class="co">#&gt; t[w]: 2022-12-11 06:53:54</span></span>
+<span><span class="co">#&gt; p[w]: NaN</span></span></code></pre></div>
 <p><img src="slocum_glider_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 <p>Again, we see improvement.</p>
 <p>At this stage, we have some confidence that data are being read
@@ -214,8 +234,7 @@ such material would be deleted, so don’t just copy this line!</p>
 <li>“dfo-bumblebee998-2022-12-07 Time series Delayed” Accessed September
 5,
 <ol start="2024" style="list-style-type: decimal">
-<li>
-<a href="https://cproof.uvic.ca/deployments/dfo-bumblebee998/dfo-bumblebee998-20221207/" class="external-link uri">https://cproof.uvic.ca/deployments/dfo-bumblebee998/dfo-bumblebee998-20221207/</a>.</li>
+<li><a href="https://cproof.uvic.ca/gliderdata/deployments/dfo-bumblebee998/dfo-bumblebee998-20221207/" class="external-link uri">https://cproof.uvic.ca/gliderdata/deployments/dfo-bumblebee998/dfo-bumblebee998-20221207/</a></li>
 </ol>
 </li>
 </ol>

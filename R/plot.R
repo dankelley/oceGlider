@@ -197,6 +197,9 @@ setMethod(
             if (!"ylim" %in% dotsNames) {
                 dots$ylim <- rev(range(p, na.rm = TRUE))
             }
+            if (!"xlim" %in% dotsNames) {
+                dots$xlim <- range(t, na.rm = TRUE)
+            }
             omar <- par("mar")
             if (!is.null(colorby)) { # we know 'col' cannot be in dots, from earlier tests
                 oce::drawPalette(colormap = cm)
@@ -207,11 +210,11 @@ setMethod(
             par(mar = omar)
             oldwarn <- options()$warn
             options(warn = -1)
-            #FIXME browser()
+            # FIXME browser()
             print(range(t))
             do.call("oce.plot.ts", args)
-            lines(t,p)
-            abline(v=max(t, na.rm=TRUE))
+            lines(t, p)
+            abline(v = max(t, na.rm = TRUE))
             w <- which.max(t)
             message(oce::vectorShow(w))
             message(oce::vectorShow(t[w]))

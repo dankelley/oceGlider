@@ -11,7 +11,7 @@ using whatever graphical methods best suit the task at hand."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">oceglider</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.10</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.11</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,14 +81,14 @@ colourization of individual plotted points (i.e. <code>type="p"</code> must be
 governing the plot for <code>colorby</code> to have an effect). For example, a
 form of a temperature section plot can be created by plotting
 glider depth versus time, coloured by temperature. For reference, a
-colour palette (using <code><a href="https://dankelley.github.io/oce/reference/oceColorsTurbo.html" class="external-link">oceColorsTurbo()</a></code> is displayed to the right
+colour palette (using <code><a href="https://dankelley.github.io/oce/reference/oceColorsTurbo.html" class="external-link">oce::oceColorsTurbo()</a></code> is displayed to the right
 of the plot.  See Example 3.</p></dd>
 
 
 <dt id="arg-colorbylim">colorbylim<a class="anchor" aria-label="anchor" href="#arg-colorbylim"></a></dt>
 <dd><p>optional value, used only if <code>colorby</code> is
 provided, to set the limits of the colorizing limits.  It does this
-by being provided as the <code>zlim</code> argument to <code><a href="https://dankelley.github.io/oce/reference/colormap.html" class="external-link">colormap()</a></code>.</p></dd>
+by being provided as the <code>zlim</code> argument to <code><a href="https://dankelley.github.io/oce/reference/colormap.html" class="external-link">oce::colormap()</a></code>.</p></dd>
 
 
 <dt id="arg-debug">debug<a class="anchor" aria-label="anchor" href="#arg-debug"></a></dt>
@@ -157,6 +157,10 @@ numerically and with phrases, as inferred by <code><a href="navStateCodes.html">
 <span class="r-in"><span><span class="va">directory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/sea_explorer/delayed_raw"</span>, package <span class="op">=</span> <span class="st">"oceglider"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="read.glider.seaexplorer.realtime.html">read.glider.seaexplorer.realtime</a></span><span class="op">(</span><span class="va">directory</span>, progressBar <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "2019-07-19 15:12:10 UTC" "2019-07-19 18:02:08 UTC"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> w: 14475</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> t[w]: 2019-07-19 18:02:08.088</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> p[w]: NA</span>
 <span class="r-plt img"><img src="plot-glider-method-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"S"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot-glider-method-2.png" alt="" width="700" height="433"></span>
@@ -171,6 +175,10 @@ numerically and with phrases, as inferred by <code><a href="navStateCodes.html">
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: colour-code p by temperature, autoscaled</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, pch <span class="op">=</span> <span class="fl">20</span>, colorby <span class="op">=</span> <span class="st">"temperature"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "2019-07-19 15:12:10 UTC" "2019-07-19 18:02:08 UTC"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> w: 14475</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> t[w]: 2019-07-19 18:02:08.088</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> p[w]: NA</span>
 <span class="r-plt img"><img src="plot-glider-method-7.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 3: colour-code p by temperature, with a colour palette,</span></span></span>
@@ -183,6 +191,10 @@ numerically and with phrases, as inferred by <code><a href="navStateCodes.html">
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3.5</span>, <span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://dankelley.github.io/oce/reference/drawPalette.html" class="external-link">drawPalette</a></span><span class="op">(</span>colormap <span class="op">=</span> <span class="va">cm</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, col <span class="op">=</span> <span class="va">cm</span><span class="op">$</span><span class="va">zcol</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3.5</span>, <span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span>, pch <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "2019-07-19 15:12:10 UTC" "2019-07-19 18:02:08 UTC"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> w: 14475</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> t[w]: 2019-07-19 18:02:08.088</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> p[w]: NA</span>
 <span class="r-plt img"><img src="plot-glider-method-8.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
