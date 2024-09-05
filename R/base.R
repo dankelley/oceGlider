@@ -599,57 +599,57 @@ gliderDebug <- function(debug = 0, ..., unindent = 0) {
     invisible(NULL)
 }
 
-#' Check whether a URL exists, backtracing by separators, if not
-#'
-#' This uses [RCurl::url.exists()] to see if the indicated URL exists.
-#' If not, an attempt is made to find a lower-level URL that does exist.
-#' This is done by progressively removing items separated by `"/"`
-#' in `url`
-#'
-#' @param url Character value specifying the URL. If no `/` is present
-#' at the end of this string, then it is added before checks are done.
-#'
-#' @param quiet Logical value indicating whether to print a suggestion
-#' for an alternative website, in the case where `url` does not exist.
-#'
-#' @return A logical value indicating whether the website indicated
-#' by `url` exists.
-#'
-#' @author Dan Kelley
-#'
-## @importFrom RCurl url.exists
-#'
-#' @md
-#'
-#' @export
-urlExists <- function(url, quiet = FALSE) {
-    # tack a '/' on the end, if not there already
-    urlOrig <- url
-    if (0 == length(grep("/$", url))) {
-        url <- paste(url, "/", sep = "")
-    }
-    if (!requireNamespace("RCurl", quietly = TRUE)) {
-        stop("must install.packages(\"RCurl\") to read this data type")
-    }
-    exists <- RCurl::url.exists(url)
-    if (exists) {
-        return(TRUE)
-    } else {
-        while (!quiet && TRUE) {
-            w <- which("/" == strsplit(url, "")[[1]])
-            if (length(w) > 1) {
-                url <- strtrim(url, w[length(w) - 1])
-                if (RCurl::url.exists(url)) {
-                    if (!quiet) {
-                        cat("'", urlOrig, "' does not exist, but '", url, "' does\n", sep = "")
-                    }
-                    break
-                }
-            }
-        }
-        return(FALSE)
-    }
-}
+#<not used> #' Check whether a URL exists, backtracing by separators, if not
+#<not used> #'
+#<not used> #' This uses [RCurl::url.exists()] to see if the indicated URL exists.
+#<not used> #' If not, an attempt is made to find a lower-level URL that does exist.
+#<not used> #' This is done by progressively removing items separated by `"/"`
+#<not used> #' in `url`
+#<not used> #'
+#<not used> #' @param url Character value specifying the URL. If no `/` is present
+#<not used> #' at the end of this string, then it is added before checks are done.
+#<not used> #'
+#<not used> #' @param quiet Logical value indicating whether to print a suggestion
+#<not used> #' for an alternative website, in the case where `url` does not exist.
+#<not used> #'
+#<not used> #' @return A logical value indicating whether the website indicated
+#<not used> #' by `url` exists.
+#<not used> #'
+#<not used> #' @author Dan Kelley
+#<not used> #'
+#<not used> ## @importFrom RCurl url.exists
+#<not used> #'
+#<not used> #' @md
+#<not used> #'
+#<not used> #' @export
+#<not used> urlExists <- function(url, quiet = FALSE) {
+#<not used>     # tack a '/' on the end, if not there already
+#<not used>     urlOrig <- url
+#<not used>     if (0 == length(grep("/$", url))) {
+#<not used>         url <- paste(url, "/", sep = "")
+#<not used>     }
+#<not used>     if (!requireNamespace("RCurl", quietly = TRUE)) {
+#<not used>         stop("must install.packages(\"RCurl\") to read this data type")
+#<not used>     }
+#<not used>     exists <- RCurl::url.exists(url)
+#<not used>     if (exists) {
+#<not used>         return(TRUE)
+#<not used>     } else {
+#<not used>         while (!quiet && TRUE) {
+#<not used>             w <- which("/" == strsplit(url, "")[[1]])
+#<not used>             if (length(w) > 1) {
+#<not used>                 url <- strtrim(url, w[length(w) - 1])
+#<not used>                 if (RCurl::url.exists(url)) {
+#<not used>                     if (!quiet) {
+#<not used>                         cat("'", urlOrig, "' does not exist, but '", url, "' does\n", sep = "")
+#<not used>                     }
+#<not used>                     break
+#<not used>                 }
+#<not used>             }
+#<not used>         }
+#<not used>         return(FALSE)
+#<not used>     }
+#<not used> }
 
 # a helper function to simplify code in read.glider.netcdf()
 getAtt <- function(f, varid = 0, attname = NULL, default = NULL) {
@@ -780,6 +780,14 @@ read.glider.netcdf <- function(file, debug) {
             data[[oceName]] <- as.vector(ncdf4::ncvar_get(f, dataNames[i]))
             u <- ncdf4::ncatt_get(f, dataNames[i], "units")$value
             unit <- oce::as.unit(u, default = NULL)
+            # some local unit decoding
+            if (is.null(unit)) {
+                if (u == "Celsius") {
+                    unit <- list(unit = expression(degree * C), scale = "")
+                }
+            }
+            # as a last resort, don't try to make an expression (this loses superscipts,
+            # for example)
             if (is.null(unit)) {
                 unit <- list(unit = bquote(.(u)), scale = "")
             }

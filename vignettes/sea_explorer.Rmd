@@ -34,7 +34,7 @@ is to be done with the data.
 
 ```{r}
 tmpdir <- tempdir() # to hold raw files
-fileNC <- tempfile(fileext = ".nc") # to hold a binary (NetCDF) file
+# fileNC <- tempfile(fileext = ".nc") # to hold a binary (NetCDF) file
 ```
 
 # Analysis
@@ -59,10 +59,18 @@ subs <- file.path(tmpdir, subsRemote)
 raws <- file.path(tmpdir, rawsRemote)
 for (i in 1:n) {
     if (!file.exists(subs[i])) {
-        download.file(paste0(urlRaw, subsRemote[i]), subs[i])
+        # download.file(paste0(urlRaw, subsRemote[i]), subs[i])
+        curl::curl_download(
+            url = paste0(urlRaw, subsRemote[i]),
+            destfile = subs[i], mode = "wb"
+        )
     }
     if (!file.exists(raws[i])) {
-        download.file(paste0(urlRaw, rawsRemote[i]), raws[i])
+        # download.file(paste0(urlRaw, rawsRemote[i]), raws[i])
+        curl::curl_download(
+            url = paste0(urlRaw, rawsRemote[i]),
+            destfile = raws[i], mode = "wb"
+        )
     }
 }
 ```
@@ -199,16 +207,14 @@ it would be common to only download the files if they were not present locally,
 as indicated by a call to `file.exist()`.
 
 ```{r}
-# Create a temporary file, so the vignette can build
-# on CRAN systems.  In practical work, though, the user
-# will almost certainly want to use a non-temporary
-# directory.
 urlNC <- paste0(
     "https://cproof.uvic.ca/gliderdata/deployments/",
     "dfo-eva035/dfo-eva035-20190718/",
     "/L0-timeseries/dfo-eva035-20190718_delayed.nc"
 )
-download.file(urlNC, fileNC)
+fileNC <- tempfile(fileext = ".nc") # to hold a binary (NetCDF) file
+# download.file(urlNC, fileNC)
+curl::curl_download(url = urlNC, destfile = fileNC, mode = "wb")
 G <- read.glider.netcdf(fileNC)
 ```
 

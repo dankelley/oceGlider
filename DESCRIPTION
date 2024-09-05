@@ -9,7 +9,7 @@ Maintainer: Dan Kelley <dan.kelley@dal.ca>
 Depends: ncdf4, R (>= 4.1.0), utils, oce, gsw
 Suggests:
     knitr,
-    RCurl,
+    curl,
     rmarkdown,
     testthat
 Imports: methods, shiny
