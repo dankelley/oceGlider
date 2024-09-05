@@ -34,8 +34,8 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/sea_explorer.html">Handling SeaExplorer Data</a></li>
-    <li><a class="dropdown-item" href="../articles/slocum_glider.html">Slocum Gliders</a></li>
+<li><a class="dropdown-item" href="../articles/sea_explorer.html">Handling SeaExplorer Glider Data</a></li>
+    <li><a class="dropdown-item" href="../articles/slocum_glider.html">Handling Slocum Glider Data</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -61,7 +61,7 @@
       <h1>Introduction to oceglider</h1>
                         <h4 data-toc-skip class="author">Dan Kelley (<a href="https://orcid.org/0000-0001-7808-5911" class="external-link uri">https://orcid.org/0000-0001-7808-5911</a>)</h4>
             
-            <h4 data-toc-skip class="date">2024-09-04</h4>
+            <h4 data-toc-skip class="date">2024-09-05</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/dankelley/oceglider/blob/HEAD/vignettes/oceglider.Rmd" class="external-link"><code>vignettes/oceglider.Rmd</code></a></small>
       <div class="d-none name"><code>oceglider.Rmd</code></div>
@@ -69,14 +69,10 @@
 
     
     
-<p><strong>Abstract.</strong> This vignette explains the basics of using
-the <code>oceglider</code> package. Please note that the package is
-still a work in progress, with functions evolving as the authors realize
-that new features might be helpful to analysts working with glider
-data.</p>
-<div class="section level2">
-<h2 id="history-of-the-package">History of the Package<a class="anchor" aria-label="anchor" href="#history-of-the-package"></a>
-</h2>
+<p>This vignette explains the basics of using the <code>oceglider</code>
+package. Please note that the package is still a work in progress, with
+functions evolving as the authors realize that new features might be
+helpful to analysts working with glider data.</p>
 <p>The package started with code to read SeaExplorer data in what is
 called “raw” form. Functions are provided to work with both data
 telemetered back to base as the glider is en-route, and with data
@@ -105,24 +101,18 @@ underway, both in the <code>oceglider</code> package and the older and
 more general <code>oce</code> package, to handle the variety of names in
 a more accurate manner, and in a way that lets users intercede when they
 know the convention being used in a particular dataset.</p>
-<p>Please consult the other vignettes for details on processing various
-types of glider data.</p>
-</div>
-<div class="section level2">
-<h2 id="further-reading">Further Reading<a class="anchor" aria-label="anchor" href="#further-reading"></a>
-</h2>
+<p>The <code>oceglider</code>code uses datasets from Reference 1
+extensively for testing and illustration. The data format in these files
+is assumed to reflect up-to-date standards with respect to formatting
+and nomenclature.</p>
+<p>Other vignettes explain how to deal with data acquired with
+SeaExplorer and Slocum gliders. These are the best place to start, in
+learning how to use <code>oceglider</code>.</p>
+<p><strong>References</strong></p>
 <ol style="list-style-type: decimal">
-<li><p>Integrated Ocean Observing System (U.S.). “Manual for Quality
-Control of Temperature and Salinity Data Observations from Gliders.
-Version 1.0.” Report. U.S. Department of Commerce, National Oceanic and
-Atmospheric Administration, National Ocean Service, Integrated Ocean
-Observing System, U.S. Integrated Ocean Observing System, Glider Data
-Assembly Center, 2016. <a href="https://www.oceanbestpractices.net/handle/11329/289" class="external-link uri">https://www.oceanbestpractices.net/handle/11329/289</a>.</p></li>
-<li><p>Integrated Ocean Observing System (U.S.). “NGDAC NetCDF File
-Format Version 2,” March 27, 2019. <a href="https://github.com/ioos/ioosngdac/wiki/NGDAC-NetCDF-File-Format-Version-2" class="external-link uri">https://github.com/ioos/ioosngdac/wiki/NGDAC-NetCDF-File-Format-Version-2</a>.</p></li>
-</ol>
-</div>
-  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+<li>Canadian-Pacific Robotic Ocean Observing Facility (C-PROOF) data are
+accessible at <a href="https://cproof.uvic.ca" class="external-link uri">https://cproof.uvic.ca</a>, DOI: (available soon).</li>
+</ol></main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 

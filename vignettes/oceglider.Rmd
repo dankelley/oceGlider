@@ -20,12 +20,10 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
-**Abstract.** This vignette explains the basics of using the `oceglider`
-package. Please note that the package is still a work in progress, with
-functions evolving as the authors realize that new features might be helpful to
-analysts working with glider data.
-
-# History of the Package
+This vignette explains the basics of using the `oceglider` package. Please note
+that the package is still a work in progress, with functions evolving as the
+authors realize that new features might be helpful to analysts working with
+glider data.
 
 The package started with code to read SeaExplorer data in what is called "raw"
 form.  Functions are provided to work with both data telemetered back to base
@@ -38,7 +36,7 @@ standard R functions, notably `plot()`, `summary()` and `[[`, were set up.
 These differ from similar functions in the `oce` package both in the sorts of
 plots that are offered and in handling the internal structure of the objects
 used in the `oceglider` package (e.g. with the separation of payload and glider
-                                 files, for the SeaExplorer devices).
+files, for the SeaExplorer devices).
 
 The next stage in the evolution of the package was to handle Slocum data. The
 functions `read.glider.slocum()` and `read.glider.slocum.netcdf()` were
@@ -54,20 +52,15 @@ and the older and more general `oce` package, to handle the variety of names in
 a more accurate manner, and in a way that lets users intercede when they know
 the convention being used in a particular dataset.
 
-Please consult the other vignettes for details on processing
-various types of glider data.
+The `oceglider `code uses datasets from Reference 1 extensively for testing and
+illustration. The data format in these files is assumed to reflect up-to-date
+standards with respect to formatting and nomenclature.
 
-# Further Reading
+Other vignettes explain how to deal with data acquired with SeaExplorer and
+Slocum gliders. These are the best place to start, in learning how to
+use `oceglider`.
 
-1. Integrated Ocean Observing System (U.S.). “Manual for Quality
-   Control of Temperature and Salinity Data Observations from Gliders.
-Version 1.0.” Report. U.S. Department of Commerce, National Oceanic
-and Atmospheric Administration, National Ocean Service, Integrated
-Ocean Observing System, U.S. Integrated Ocean Observing System, Glider
-Data Assembly Center, 2016.
-https://www.oceanbestpractices.net/handle/11329/289.
+**References**
 
-2. Integrated Ocean Observing System (U.S.). “NGDAC NetCDF File Format
-   Version 2,” March 27, 2019.
-https://github.com/ioos/ioosngdac/wiki/NGDAC-NetCDF-File-Format-Version-2.
-
+1. Canadian-Pacific Robotic Ocean Observing Facility (C-PROOF) data are
+   accessible at https://cproof.uvic.ca, DOI: (available soon).
