@@ -144,5 +144,6 @@ unlink(fileNC) # where the binary (NetCDF) file went
 
 1. “dfo-bumblebee998-2022-12-07 Time series Delayed” Accessed September 5,
    2024.
-   <https://cproof.uvic.ca/deployments/dfo-bumblebee998/dfo-bumblebee998-20221207/>.
+<https://cproof.uvic.ca/gliderdata/deployments/dfo-bumblebee998/dfo-bumblebee998-20221207/>
+
 

@@ -1,20 +1,28 @@
+# oceglider 0.1.11
+
+* Add some sample data for SeaExplorer raw.
+* Rewrite vignettes to download files from CPROOF.
+* Rename `read.glider.slocum()` as `read.glider.slocum.csv()` to make its (very
+  limited) purpose clearer. Also, add notes about the lack of intention to
+  maintain this ad-hoc function.
+
 # oceglider 0.1.10
 
-* Rename flag functions to avoid conflict with oce, e.g. the `oce`
-functions named `setFlags()` and `handleFlags()` are replaced with
-`setGliderFlags()` and `handleGliderFlags()` in `oceglider`.
-* Correct the formula used to convert oxygen from ml/l to umol/kg,
-used in `swOxygenFrequencyToSaturation()`.
+* Rename flag functions to avoid conflict with oce, e.g. the `oce` functions
+  named `setFlags()` and `handleFlags()` are replaced with `setGliderFlags()`
+  and `handleGliderFlags()` in `oceglider`.
+* Correct the formula used to convert oxygen from ml/l to umol/kg, used in
+  `swOxygenFrequencyToSaturation()`.
 
 # oceglider 0.1.9
 
-* Change oxygen calibration.  I think the computation was wrong
-before, but I've not checked and so there is no issue for this.
+* Change oxygen calibration.  I think the computation was wrong before, but
+  I've not checked and so there is no issue for this.
 
 # oceglider 0.1.8
 
-* Change `read.glider.slocum.netcdf()` to default the `debug`
-parameter (issue #101).
+* Change `read.glider.slocum.netcdf()` to default the `debug` parameter (issue
+  #101).
 
 # oceglider 0.1.7
 

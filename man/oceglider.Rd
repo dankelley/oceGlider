@@ -16,7 +16,7 @@ as more datasets are examined by the author.
 Useful links:
 \itemize{
   \item \url{https://dankelley.github.io/oceglider/}
-  \item Report bugs at \url{https://github.com/dankelley/oceglider}
+  \item Report bugs at \url{https://github.com/dankelley/oceglider/issues}
 }
 
 }

@@ -27,8 +27,8 @@ In the second form, \code{flags} is a list with unnamed vectors, and
 this means to apply the actions to all the data entries; thus,
 \code{flags=list(c(3,4,9))} means to apply not just to salinity and temperature,
 but also to everything else for which flags have been set up. If \code{flags}
-is not provided, then \code{\link[=defaultFlags]{defaultFlags()}} is called on
-\code{object}, to try to determine a conservative default.}
+is not provided, then an attempt is made to set up a
+useful default.}
 
 \item{actions}{An optional \code{list} that contains items with
 names that match those in the \code{flags} argument.  If \code{actions}

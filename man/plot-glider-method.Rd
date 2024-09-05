@@ -23,12 +23,12 @@ colourization of individual plotted points (i.e. \code{type="p"} must be
 governing the plot for \code{colorby} to have an effect). For example, a
 form of a temperature section plot can be created by plotting
 glider depth versus time, coloured by temperature. For reference, a
-colour palette (using \code{\link[=oceColorsTurbo]{oceColorsTurbo()}} is displayed to the right
+colour palette (using \code{\link[oce:oceColorsTurbo]{oce::oceColorsTurbo()}} is displayed to the right
 of the plot.  See Example 3.}
 
 \item{colorbylim}{optional value, used only if \code{colorby} is
 provided, to set the limits of the colorizing limits.  It does this
-by being provided as the \code{zlim} argument to \code{\link[=colormap]{colormap()}}.}
+by being provided as the \code{zlim} argument to \code{\link[oce:colormap]{oce::colormap()}}.}
 
 \item{debug}{an integer specifying whether debugging information is
 to be printed during processing. If this is not provided, then

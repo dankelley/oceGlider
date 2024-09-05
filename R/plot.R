@@ -82,12 +82,12 @@
 #' governing the plot for `colorby` to have an effect). For example, a
 #' form of a temperature section plot can be created by plotting
 #' glider depth versus time, coloured by temperature. For reference, a
-#' colour palette (using [oceColorsTurbo()] is displayed to the right
+#' colour palette (using [oce::oceColorsTurbo()] is displayed to the right
 #' of the plot.  See Example 3.
 #'
 #' @param colorbylim optional value, used only if `colorby` is
 #' provided, to set the limits of the colorizing limits.  It does this
-#' by being provided as the `zlim` argument to [colormap()].
+#' by being provided as the `zlim` argument to [oce::colormap()].
 #'
 #' @template debug
 #'
@@ -207,7 +207,15 @@ setMethod(
             par(mar = omar)
             oldwarn <- options()$warn
             options(warn = -1)
+            #FIXME browser()
+            print(range(t))
             do.call("oce.plot.ts", args)
+            lines(t,p)
+            abline(v=max(t, na.rm=TRUE))
+            w <- which.max(t)
+            message(oce::vectorShow(w))
+            message(oce::vectorShow(t[w]))
+            message(oce::vectorShow(p[w]))
             options(warn = oldwarn)
             par(mar = omar)
         } else if (which == 2 || which == "T") {
