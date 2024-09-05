@@ -73,7 +73,7 @@ Other functions to read glider data:
 \code{\link{read.glider.netcdf.ioos}()},
 \code{\link{read.glider.seaexplorer.delayed}()},
 \code{\link{read.glider.seaexplorer.realtime}()},
-\code{\link{read.glider.slocum}()}
+\code{\link{read.glider.slocum.csv}()}
 
 Other functions to read netcdf glider data: 
 \code{\link{read.glider.netcdf}()},

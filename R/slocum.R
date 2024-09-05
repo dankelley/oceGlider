@@ -1,17 +1,13 @@
 # vim:textwidth=80:expandtab:shiftwidth=4:softtabstop=4
 
-#' Read a Slocum Glider file
+#' Read a Slocum Glider File in CSV Format
 #'
-#' These files do not use standard names for variables, but
-#' the `nameMap` argument facilitates renaming for storage
-#' in the returned object. (Renaming simplifies later analysis, e.g.
-#' permitting direct use of algorithms in the `oce` package,
-#' which assume that salinity is named `"salinity"`, etc.)
-#' The original names of data items are retained in the metadata
-#' of the returned object, so that the `[[` operator in the `oce`
-#' package can retrieve the data using either the original name
-#' (e.g. `x[["sci_water_temp"]]`) or the more standard
-#' name (e.g. `x[["temperature"]]`).
+#' This function handles a CSV format used by some files
+#' made available to the author at some time in the 2010s.
+#' In the meantime, the community has settled on other formats,
+#' such as NetCDF (see [read.glider.netcdf()] for how to read
+#' such files).  For that reason, there are no plans to
+#' extend or even maintain this function.
 #'
 #' @param file A connection or a character string giving the name of the file to
 #' load.
@@ -30,7 +26,7 @@
 #' @examples
 #' library(oceglider)
 #' if (file.exists("~/slocum.csv")) {
-#'     g <- read.glider.slocum("~/slocum.csv")
+#'     g <- read.glider.slocum.csv("~/slocum.csv")
 #'     summary(g)
 #'
 #'     # 1. Plot time-depth trace, colour-coded for temperature
@@ -72,7 +68,7 @@
 #' @md
 #'
 #' @export
-read.glider.slocum <- function(
+read.glider.slocum.csv <- function(
     file,
     nameMap = list(
         conductivity = "sci_water_cond",
@@ -90,7 +86,9 @@ read.glider.slocum <- function(
     if (length(file) != 1) {
         stop("file must have length 1")
     }
-    gliderDebug(debug, "read.glider.slocum(file=\"", file, "\", ...) {\n", unindent = 1, sep = "")
+    gliderDebug(debug, "read.glider.slocum.csv(file=\"", file, "\", ...) START\n",
+        unindent = 1, sep = ""
+    )
     filename <- ""
     if (is.character(file)) {
         filename <- normalizePath(file)
@@ -122,16 +120,13 @@ read.glider.slocum <- function(
     }
     gliderDebug(debug, 'new data names: "', paste(names, collapse = '", "'), '"\n')
     names(data) <- names
-    salinity <- with(
-        data,
-        oce::swSCTp(conductivity, temperature, pressure,
-            conductivityUnit = "S/m", eos = "unesco"
-        )
+    salinity <- oce::swSCTp(data$conductivity, data$temperature, data$pressure,
+        conductivityUnit = "S/m", eos = "unesco"
     )
     data$salinity <- salinity
     data$time <- oce::numberAsPOSIXct(data$unix_timestamp, "unix")
     rval@data$payload1 <- as.data.frame(data)
     rval@metadata$filename <- filename
-    # FIXME add to dataNamesOriginal as for CTD data type
+    gliderDebug(debug, "END read.glider.slocum.csv\n")
     rval
 }
