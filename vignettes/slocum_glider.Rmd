@@ -38,7 +38,7 @@ fileNC <- tempfile(fileext = ".nc") # to hold a binary (NetCDF) file
 ```
 
 Note that this `fileNC` file will be deleted at the end of this vignette.
-Obviously, in actual practice, the analysit is likely to store the downloaded
+Obviously, in actual practice, the analyst is likely to store the downloaded
 file in a more permanent location, and not to delete it when finished a
 particular task.
 
