@@ -5,7 +5,7 @@
 \alias{plot.glider}
 \title{Plot a glider Object}
 \usage{
-\S4method{plot}{glider}(x, which, col = 1, colorby = NULL, colorbylim, debug, ...)
+\S4method{plot}{glider}(x, which, col = 1, colorby = NULL, colorbylim, simplify = NA, debug, ...)
 }
 \arguments{
 \item{x}{a [glider-class object.}
@@ -29,6 +29,14 @@ of the plot.  See Example 3.}
 \item{colorbylim}{optional value, used only if \code{colorby} is
 provided, to set the limits of the colorizing limits.  It does this
 by being provided as the \code{zlim} argument to \code{\link[oce:colormap]{oce::colormap()}}.}
+
+\item{simplify}{either NA or an integer value, that will be supplied
+to \code{\link[oce:oce.plot.ts]{oce::oce.plot.ts()}} for time-series plots. The default value of NA
+instructs \code{\link[oce:oce.plot.ts]{oce::oce.plot.ts()}} not to try to simplify the plot by breaking
+it up into shorter time intervals and finding ranges therein. This can
+cause problems with the CRAN version of oce (1.8-3, as of early 2025)
+but it will cease to cause those problems once oce 1.8-4 is released,
+perhaps in mid 2025.}
 
 \item{debug}{an integer specifying whether debugging information is
 to be printed during processing. If this is not provided, then

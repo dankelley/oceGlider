@@ -27,8 +27,6 @@ the objects, with SeaExplorer basically considering glider and payload in
 separate streams. But normal use, with plotting, subsetting, etc., does not
 require the user to consider the details of the layout.
 
-# Create Temporary Directory for CRAN Submission
-
 For this vignette to be suitable for CRAN submission, it must not download
 files to the user's working space.  We avoid that by setting aside space in the
 next line.
@@ -48,6 +46,7 @@ We will use a dataset from CPROOF (Reference 1).
 
 ```{r}
 library(oceglider)
+library(gsw)
 url <- paste0(
     "https://cproof.uvic.ca/gliderdata/deployments/",
     "dfo-bumblebee998/dfo-bumblebee998-20221207/",
@@ -82,24 +81,33 @@ shapes at the centre of the plot.
 Next, examine the pressure-time trajectory.
 
 ```{r}
-plot(g, which = "p", cex = 0.2)
+plot(g, which = "p")
 ```
 
-This looks good.  Let's colour-code by temperature.
+Note that there is a large region of whitespace on the right of the plot panel.
+This is because the dataset has time values in that interval, but all the
+pressure values are NA. The `subset()` function could be used to trim
+the dataset, but that is not necessarily wise because there could be other
+valuable data (even just longitude and latitude are valuable, in case the
+hydrographic sensors provide nothing useable).
+
+We can show temperature on a similar plot, by switching from lines to points,
+and colour-coding by temperature.
 
 ```{r}
-plot(g, which = "p", type = "p", pch = 20, colorby = "temperature")
+plot(g, which = "p", type = "p", pch = 20, cex = 0.2, colorby = "temperature")
 ```
 
-Notice that there is very little red in the diagram.  Close inspection will
-reveal that the high temperatures corresponding to this colour are at the start
-of the time series.  The methods illustrated in the SeaExplorer vignette can be
-employed here, but for brevity we will just use percentile trimming to get a
-diagram that at least provides an initial view of the data.
+Notice that the colour palette ranges up to red, although only a small region
+of the graph has that colour. but a quick glance at the graph does not reveal
+many points that are of sufficient temperature to be indicated with that color.
+The methods illustrated in the SeaExplorer vignette can be employed here, but
+for brevity we will just use percentile trimming to get a diagram that at least
+provides an initial view of the data.
 
 ```{r}
 plot(g,
-    which = "p", type = "p", pch = 20, colorby = "temperature",
+    which = "p", type = "p", pch = 20, cex = 0.2, colorby = "temperature",
     colorbylim = quantile(g[["temperature"]], c(0.01, 0.99), na.rm = TRUE)
 )
 ```
@@ -111,14 +119,14 @@ Salinity is often a problem, but we'll do the same thing, first plotting all
 the data.
 
 ```{r}
-plot(g, which = "p", type = "p", pch = 20, colorby = "salinity")
+plot(g, which = "p", type = "p", pch = 20, cex = 0.2, colorby = "salinity")
 ```
 
 And, second, trimming.
 
 ```{r}
 plot(g,
-    which = "p", type = "p", pch = 20, colorby = "salinity",
+    which = "p", type = "p", pch = 20, cex = 0.2, colorby = "salinity",
     colorbylim = quantile(g[["salinity"]], c(0.01, 0.99), na.rm = TRUE)
 )
 ```
@@ -129,8 +137,6 @@ At this stage, we have some confidence that data are being read properly and
 that plotting, extraction with `[[` and some other basic features work.
 Readers are directed to the SeaExplorer vignette for more ideas on things that
 might be worth pursuing.
-
-## Cleanup of Temporary Files
 
 As noted at the outset, CRAN rules dictate that the downloaded material be
 deleted.  In actual analysis, though, it is unlikely that such material would

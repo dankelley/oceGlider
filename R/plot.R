@@ -86,6 +86,14 @@
 #' provided, to set the limits of the colorizing limits.  It does this
 #' by being provided as the `zlim` argument to [oce::colormap()].
 #'
+#' @param simplify either NA or an integer value, that will be supplied
+#' to [oce::oce.plot.ts()] for time-series plots. The default value of NA
+#' instructs [oce::oce.plot.ts()] not to try to simplify the plot by breaking
+#' it up into shorter time intervals and finding ranges therein. This can
+#' cause problems with the CRAN version of oce (1.8-3, as of early 2025)
+#' but it will cease to cause those problems once oce 1.8-4 is released,
+#' perhaps in mid 2025.
+#'
 #' @template debug
 #'
 #' @param ... ignored.
@@ -128,7 +136,7 @@
 setMethod(
     f = "plot",
     signature = signature("glider"),
-    definition = function(x, which, col = 1, colorby = NULL, colorbylim, debug, ...) # plot,glider-method
+    definition = function(x, which, col = 1, colorby = NULL, colorbylim, simplify = NA, debug, ...) # plot,glider-method
     {
         debug <- if (!missing(debug)) debug else getOption("gliderDebug", 0)
         gliderDebug(debug, "plot,glider-method {\n", sep = "", unindent = 1)
@@ -190,7 +198,10 @@ setMethod(
             gliderDebug(debug, "pressure time-series plot\n", sep = "")
             t <- x[["time"]]
             p <- x[["pressure"]]
-            args <- list(x = t, y = p, xlab = "", ylab = "Pressure [dbar]", col = col)
+            args <- list(
+                x = t, y = p, xlab = "",
+                ylab = "Pressure [dbar]", simplify = simplify, col = col
+            )
             if (!"ylim" %in% dotsNames) {
                 dots$ylim <- rev(range(p, na.rm = TRUE))
             }
@@ -207,22 +218,18 @@ setMethod(
             par(mar = omar)
             oldwarn <- options()$warn
             options(warn = -1)
-            # FIXME browser()
-            #print(range(t))
             do.call("oce.plot.ts", args)
-            lines(t, p)
-            abline(v = max(t, na.rm = TRUE))
-            w <- which.max(t)
-            message(oce::vectorShow(w))
-            message(oce::vectorShow(t[w]))
-            message(oce::vectorShow(p[w]))
             options(warn = oldwarn)
             par(mar = omar)
         } else if (which == 2 || which == "T") {
             gliderDebug(debug, "temperature time-series plot\n", sep = "")
             t <- x[["time"]]
             TT <- x[["temperature"]]
-            args <- list(x = t, y = TT, xlab = "", ylab = expression("Temperature [" * degree * "C]"))
+            args <- list(
+                x = t, y = TT, xlab = "",
+                ylab = expression("Temperature [" * degree * "C]"),
+                simplify = simplify, col = col
+            )
             omar <- par("mar")
             if (!is.null(colorby)) { # we know 'col' cannot be in dots, from earlier tests
                 oce::drawPalette(colormap = cm)
@@ -240,9 +247,11 @@ setMethod(
             gliderDebug(debug, "salinity time-series plot\n", sep = "")
             t <- x[["time"]]
             S <- x[["salinity"]]
-            args <- list(x = t, y = S, xlab = "", ylab = "Practical Salinity")
+            args <- list(
+                x = t, y = S, xlab = "", ylab = "Practical Salinity",
+                simplify = simplify, col = col
+            )
             omar <- par("mar")
-            #browser()
             if (!is.null(colorby)) { # we know 'col' cannot be in dots, from earlier tests
                 oce::drawPalette(colormap = cm)
                 args$col <- cm$zcol
@@ -283,7 +292,9 @@ setMethod(
             options(warn = -1)
             oce.plot.ts(x[["time"]], x[["navState"]],
                 type = "n",
-                ylab = "navState", mar = c(2, 3, 1, 9), ...
+                ylab = "navState", mar = c(2, 3, 1, 9),
+                simplify = simplify,
+                ...
             )
             options(warn = oldwarn)
             for (ii in seq_along(ns)) {
