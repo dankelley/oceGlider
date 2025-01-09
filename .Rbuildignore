@@ -1,2 +1,10 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+_pkgdown.yml
+check_package.R
+codemeta.json
+docs
+man-roxygen
+meetings
+sandbox
+
