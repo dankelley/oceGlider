@@ -1,3 +1,7 @@
+# oceglider 0.1.12
+
+* Change `plot.glider()` to handle a new parameter named `simplify`.
+
 # oceglider 0.1.11
 
 * Add some sample data for SeaExplorer raw.
@@ -26,18 +30,18 @@
 
 # oceglider 0.1.7
 
-* Change to `plot,glider-method()` fix map axis mix-up (issue #98).
+* Change to `plot.glider()` fix map axis mix-up (issue #98).
 * Make `[["z"]]` and `[["?"]]` work.
 
 # oceglider 0.1.6
 
-* Change `plot,glider-method()` by adding `colorbylim` argument.
+* Change `plot.glider()` by adding `colorbylim` argument.
 * Require R version 4.1.0 or later (for pipes).
 
 # oceglider 0.1.5
 
 * Rename from `oceanglider` to `oceglider`.
-* Add `plot,glider-method()`.
+* Add `plot.glider()`.
 
 # oceglider 0.1.4
 

@@ -4,6 +4,7 @@ doc
 *.swp
 *.out
 *.pdf
+*.nc
 .Rproj.user
 .Rhistory
 .RData

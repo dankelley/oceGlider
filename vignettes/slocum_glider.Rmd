@@ -46,7 +46,6 @@ We will use a dataset from CPROOF (Reference 1).
 
 ```{r}
 library(oceglider)
-library(gsw)
 url <- paste0(
     "https://cproof.uvic.ca/gliderdata/deployments/",
     "dfo-bumblebee998/dfo-bumblebee998-20221207/",

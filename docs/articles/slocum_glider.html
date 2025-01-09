@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">oceglider</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.11</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.12</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,9 +75,6 @@ SeaExplorer files is in the layout of the objects, with SeaExplorer
 basically considering glider and payload in separate streams. But normal
 use, with plotting, subsetting, etc., does not require the user to
 consider the details of the layout.</p>
-<div class="section level2">
-<h2 id="create-temporary-directory-for-cran-submission">Create Temporary Directory for CRAN Submission<a class="anchor" aria-label="anchor" href="#create-temporary-directory-for-cran-submission"></a>
-</h2>
 <p>For this vignette to be suitable for CRAN submission, it must not
 download files to the user’s working space. We avoid that by setting
 aside space in the next line.</p>
@@ -87,7 +84,6 @@ aside space in the next line.</p>
 this vignette. Obviously, in actual practice, the analyst is likely to
 store the downloaded file in a more permanent location, and not to
 delete it when finished a particular task.</p>
-</div>
 <div class="section level2">
 <h2 id="some-common-steps-with-slocum-datasets">Some Common Steps with Slocum Datasets<a class="anchor" aria-label="anchor" href="#some-common-steps-with-slocum-datasets"></a>
 </h2>
@@ -150,7 +146,7 @@ contained in the object.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; * Processing Log</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     - 2025-01-09 15:17:13 UTC: `create 'glider' object`</span></span></code></pre></div>
+<span><span class="co">#&gt;     - 2025-01-09 20:06:31 UTC: `create 'glider' object`</span></span></code></pre></div>
 <p>Next, make a map to see where the sampling was done.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"map"</span><span class="op">)</span></span></code></pre></div>
@@ -160,67 +156,57 @@ scaling of the axes, because <code>oceglider</code> computes an aspect
 ratio that will preserve shapes at the centre of the plot.</p>
 <p>Next, examine the pressure-time trajectory.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span>, cex <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="slocum_glider_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
-<pre><code><span><span class="co">#&gt; w: 228325</span></span>
-<span><span class="co">#&gt; t[w]: 2022-12-11 06:53:54</span></span>
-<span><span class="co">#&gt; p[w]: NaN</span></span></code></pre>
-<p>This looks good. Let’s colour-code by temperature.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, pch <span class="op">=</span> <span class="fl">20</span>, colorby <span class="op">=</span> <span class="st">"temperature"</span><span class="op">)</span></span></code></pre></div>
+<p>Note that there is a large region of whitespace on the right of the
+plot panel. This is because the dataset has time values in that
+interval, but all the pressure values are NA. The <code><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset()</a></code>
+function could be used to trim the dataset, but that is not necessarily
+wise because there could be other valuable data (even just longitude and
+latitude are valuable, in case the hydrographic sensors provide nothing
+useable).</p>
+<p>We can show temperature on a similar plot, by switching from lines to
+points, and colour-coding by temperature.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, pch <span class="op">=</span> <span class="fl">20</span>, cex <span class="op">=</span> <span class="fl">0.2</span>, colorby <span class="op">=</span> <span class="st">"temperature"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="slocum_glider_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
-<pre><code><span><span class="co">#&gt; w: 228325</span></span>
-<span><span class="co">#&gt; t[w]: 2022-12-11 06:53:54</span></span>
-<span><span class="co">#&gt; p[w]: NaN</span></span></code></pre>
-<p>Notice that there is very little red in the diagram. Close inspection
-will reveal that the high temperatures corresponding to this colour are
-at the start of the time series. The methods illustrated in the
-SeaExplorer vignette can be employed here, but for brevity we will just
-use percentile trimming to get a diagram that at least provides an
-initial view of the data.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<p>Notice that the colour palette ranges up to red, although only a
+small region of the graph has that colour. but a quick glance at the
+graph does not reveal many points that are of sufficient temperature to
+be indicated with that color. The methods illustrated in the SeaExplorer
+vignette can be employed here, but for brevity we will just use
+percentile trimming to get a diagram that at least provides an initial
+view of the data.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>,</span>
-<span>    which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, pch <span class="op">=</span> <span class="fl">20</span>, colorby <span class="op">=</span> <span class="st">"temperature"</span>,</span>
+<span>    which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, pch <span class="op">=</span> <span class="fl">20</span>, cex <span class="op">=</span> <span class="fl">0.2</span>, colorby <span class="op">=</span> <span class="st">"temperature"</span>,</span>
 <span>    colorbylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">g</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.99</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="slocum_glider_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
-<pre><code><span><span class="co">#&gt; w: 228325</span></span>
-<span><span class="co">#&gt; t[w]: 2022-12-11 06:53:54</span></span>
-<span><span class="co">#&gt; p[w]: NaN</span></span></code></pre>
 <p>Readers might agree that this version looks better, displaying more
 features than in the first plot.</p>
 <p>Salinity is often a problem, but we’ll do the same thing, first
 plotting all the data.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, pch <span class="op">=</span> <span class="fl">20</span>, colorby <span class="op">=</span> <span class="st">"salinity"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, pch <span class="op">=</span> <span class="fl">20</span>, cex <span class="op">=</span> <span class="fl">0.2</span>, colorby <span class="op">=</span> <span class="st">"salinity"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="slocum_glider_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
-<pre><code><span><span class="co">#&gt; w: 228325</span></span>
-<span><span class="co">#&gt; t[w]: 2022-12-11 06:53:54</span></span>
-<span><span class="co">#&gt; p[w]: NaN</span></span></code></pre>
 <p>And, second, trimming.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>,</span>
-<span>    which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, pch <span class="op">=</span> <span class="fl">20</span>, colorby <span class="op">=</span> <span class="st">"salinity"</span>,</span>
+<span>    which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, pch <span class="op">=</span> <span class="fl">20</span>, cex <span class="op">=</span> <span class="fl">0.2</span>, colorby <span class="op">=</span> <span class="st">"salinity"</span>,</span>
 <span>    colorbylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">g</span><span class="op">[[</span><span class="st">"salinity"</span><span class="op">]</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.99</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="slocum_glider_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
-<pre><code><span><span class="co">#&gt; w: 228325</span></span>
-<span><span class="co">#&gt; t[w]: 2022-12-11 06:53:54</span></span>
-<span><span class="co">#&gt; p[w]: NaN</span></span></code></pre>
 <p>Again, we see improvement.</p>
 <p>At this stage, we have some confidence that data are being read
 properly and that plotting, extraction with <code>[[</code> and some
 other basic features work. Readers are directed to the SeaExplorer
 vignette for more ideas on things that might be worth pursuing.</p>
-<div class="section level3">
-<h3 id="cleanup-of-temporary-files">Cleanup of Temporary Files<a class="anchor" aria-label="anchor" href="#cleanup-of-temporary-files"></a>
-</h3>
 <p>As noted at the outset, CRAN rules dictate that the downloaded
 material be deleted. In actual analysis, though, it is unlikely that
 such material would be deleted, so don’t just copy this line!</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">fileNC</span><span class="op">)</span> <span class="co"># where the binary (NetCDF) file went</span></span></code></pre></div>
-</div>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
