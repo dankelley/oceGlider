@@ -226,7 +226,7 @@ Typically, the next step will be to see the trajectory in time-depth space, as
 follows.
 
 ```{r}
-plot(G2, which = "p")
+plot(G2, which = "p", type = "p", cex = 0.3)
 ```
 
 This shows that the glider was at the surface for nearly
@@ -235,7 +235,7 @@ then.  Salinity is usually a good indicator, so we check
 that.
 
 ```{r}
-plot(G2, which = "S")
+plot(G2, which = "S", type = "p", cex = 0.3)
 ```
 
 Let's trim by time to remove the final time period, rechecking with
@@ -244,8 +244,8 @@ plots of salinity and temperature.
 ```{r}
 G3 <- subset(G2, time < as.POSIXct("2019-07-23 06:00:00", tz = "UTC"))
 par(mfrow = c(2, 1))
-plot(G3, which = "S")
-plot(G3, which = "T")
+plot(G3, which = "S", type = "p", cex = 0.3)
+plot(G3, which = "T", type = "p", cex = 0.3)
 ```
 
 At this stage, we have isolated the time interval that has useful data.  There

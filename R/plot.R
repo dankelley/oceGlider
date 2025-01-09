@@ -1,5 +1,3 @@
-#'
-#'
 #' Plot a glider Object
 #'
 #' This is a limited function that is intended for quick views of a
@@ -66,7 +64,6 @@
 #'
 #' }
 #'
-
 #' @param x a [glider-class object.
 #'
 #' @param which either an integer or character value specifying which
@@ -211,7 +208,7 @@ setMethod(
             oldwarn <- options()$warn
             options(warn = -1)
             # FIXME browser()
-            print(range(t))
+            #print(range(t))
             do.call("oce.plot.ts", args)
             lines(t, p)
             abline(v = max(t, na.rm = TRUE))
@@ -245,6 +242,7 @@ setMethod(
             S <- x[["salinity"]]
             args <- list(x = t, y = S, xlab = "", ylab = "Practical Salinity")
             omar <- par("mar")
+            #browser()
             if (!is.null(colorby)) { # we know 'col' cannot be in dots, from earlier tests
                 oce::drawPalette(colormap = cm)
                 args$col <- cm$zcol

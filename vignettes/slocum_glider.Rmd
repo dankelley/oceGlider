@@ -82,13 +82,13 @@ shapes at the centre of the plot.
 Next, examine the pressure-time trajectory.
 
 ```{r}
-plot(g, which = "p")
+plot(g, which = "p", cex = 0.2)
 ```
 
 This looks good.  Let's colour-code by temperature.
 
 ```{r}
-plot(g, which = "p", type = "p", colorby = "temperature")
+plot(g, which = "p", type = "p", pch = 20, colorby = "temperature")
 ```
 
 Notice that there is very little red in the diagram.  Close inspection will
@@ -99,7 +99,7 @@ diagram that at least provides an initial view of the data.
 
 ```{r}
 plot(g,
-    which = "p", type = "p", colorby = "temperature",
+    which = "p", type = "p", pch = 20, colorby = "temperature",
     colorbylim = quantile(g[["temperature"]], c(0.01, 0.99), na.rm = TRUE)
 )
 ```
@@ -111,14 +111,14 @@ Salinity is often a problem, but we'll do the same thing, first plotting all
 the data.
 
 ```{r}
-plot(g, which = "p", type = "p", colorby = "salinity")
+plot(g, which = "p", type = "p", pch = 20, colorby = "salinity")
 ```
 
 And, second, trimming.
 
 ```{r}
 plot(g,
-    which = "p", type = "p", colorby = "salinity",
+    which = "p", type = "p", pch = 20, colorby = "salinity",
     colorbylim = quantile(g[["salinity"]], c(0.01, 0.99), na.rm = TRUE)
 )
 ```

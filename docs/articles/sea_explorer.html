@@ -8,8 +8,8 @@
 <title>Handling SeaExplorer Glider Data • oceglider</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Handling SeaExplorer Glider Data">
 </head>
 <body>
@@ -61,7 +61,7 @@
       <h1>Handling SeaExplorer Glider Data</h1>
                         <h4 data-toc-skip class="author">Dan Kelley (<a href="https://orcid.org/0000-0001-7808-5911" class="external-link uri">https://orcid.org/0000-0001-7808-5911</a>)</h4>
             
-            <h4 data-toc-skip class="date">2024-09-11</h4>
+            <h4 data-toc-skip class="date">2025-01-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/dankelley/oceglider/blob/HEAD/vignettes/sea_explorer.Rmd" class="external-link"><code>vignettes/sea_explorer.Rmd</code></a></small>
       <div class="d-none name"><code>sea_explorer.Rmd</code></div>
@@ -108,14 +108,14 @@ the value of <code>urlbase</code> in line 2 below.</p>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">subs</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>        <span class="co"># download.file(paste0(urlRaw, subsRemote[i]), subs[i])</span></span>
-<span>        <span class="fu">curl</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/curl/man/curl_download.html" class="external-link">curl_download</a></span><span class="op">(</span></span>
+<span>        <span class="fu">curl</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/curl/reference/curl_download.html" class="external-link">curl_download</a></span><span class="op">(</span></span>
 <span>            url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">urlRaw</span>, <span class="va">subsRemote</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>,</span>
 <span>            destfile <span class="op">=</span> <span class="va">subs</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, mode <span class="op">=</span> <span class="st">"wb"</span></span>
 <span>        <span class="op">)</span></span>
 <span>    <span class="op">}</span></span>
 <span>    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">raws</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>        <span class="co"># download.file(paste0(urlRaw, rawsRemote[i]), raws[i])</span></span>
-<span>        <span class="fu">curl</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/curl/man/curl_download.html" class="external-link">curl_download</a></span><span class="op">(</span></span>
+<span>        <span class="fu">curl</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/curl/reference/curl_download.html" class="external-link">curl_download</a></span><span class="op">(</span></span>
 <span>            url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">urlRaw</span>, <span class="va">rawsRemote</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>,</span>
 <span>            destfile <span class="op">=</span> <span class="va">raws</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, mode <span class="op">=</span> <span class="st">"wb"</span></span>
 <span>        <span class="op">)</span></span>
@@ -138,7 +138,6 @@ data.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/layout.html" class="external-link">layout</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">4</span>, <span class="fl">1</span><span class="op">)</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span>, nrow <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, widths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.6</span>, <span class="fl">0.4</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"TS"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, cex <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "2019-07-19 15:12:15 UTC" "2019-07-19 19:36:11 UTC"</span></span>
 <span><span class="co">#&gt; w: 3960</span></span>
 <span><span class="co">#&gt; t[w]: 2019-07-19 19:36:11.302</span></span>
 <span><span class="co">#&gt; p[w]: 4.04</span></span>
@@ -162,7 +161,6 @@ chosen as the cutoff after some experimentation.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/layout.html" class="external-link">layout</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">4</span>, <span class="fl">1</span><span class="op">)</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span>, nrow <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, widths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.6</span>, <span class="fl">0.4</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g2</span>, which <span class="op">=</span> <span class="st">"TS"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g2</span>, which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, cex <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "2019-07-19 17:42:15 UTC" "2019-07-19 19:36:11 UTC"</span></span>
 <span><span class="co">#&gt; w: 1710</span></span>
 <span><span class="co">#&gt; t[w]: 2019-07-19 19:36:11.302</span></span>
 <span><span class="co">#&gt; p[w]: 4.04</span></span>
@@ -272,7 +270,7 @@ present locally, as indicated by a call to
 <span>    <span class="st">"dfo-eva035/dfo-eva035-20190718/"</span>,</span>
 <span>    <span class="st">"/L0-timeseries/dfo-eva035-20190718_delayed.nc"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu">curl</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/curl/man/curl_download.html" class="external-link">curl_download</a></span><span class="op">(</span>url <span class="op">=</span> <span class="va">urlNC</span>, destfile <span class="op">=</span> <span class="va">fileNC</span>, mode <span class="op">=</span> <span class="st">"wb"</span><span class="op">)</span></span>
+<span><span class="fu">curl</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/curl/reference/curl_download.html" class="external-link">curl_download</a></span><span class="op">(</span>url <span class="op">=</span> <span class="va">urlNC</span>, destfile <span class="op">=</span> <span class="va">fileNC</span>, mode <span class="op">=</span> <span class="st">"wb"</span><span class="op">)</span></span>
 <span><span class="va">G</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.glider.netcdf.html">read.glider.netcdf</a></span><span class="op">(</span><span class="va">fileNC</span><span class="op">)</span></span></code></pre></div>
 <p>As was done for the raw data, we ought to drop the data before a
 certain time.</p>
@@ -281,25 +279,24 @@ certain time.</p>
 <p>Typically, the next step will be to see the trajectory in time-depth
 space, as follows.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">G2</span>, which <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "2019-07-19 17:42:15 UTC" "2019-07-23 21:26:12 UTC"</span></span>
-<span><span class="co">#&gt; w: 89761</span></span>
-<span><span class="co">#&gt; t[w]: 2019-07-23 21:26:12.111</span></span>
-<span><span class="co">#&gt; p[w]: -0.03</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">G2</span>, which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, cex <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sea_explorer_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<pre><code><span><span class="co">#&gt; w: 89761</span></span>
+<span><span class="co">#&gt; t[w]: 2019-07-23 21:26:12.111</span></span>
+<span><span class="co">#&gt; p[w]: -0.03</span></span></code></pre>
 <p>This shows that the glider was at the surface for nearly the last day
 of sampling, so we might expect spurious data then. Salinity is usually
 a good indicator, so we check that.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">G2</span>, which <span class="op">=</span> <span class="st">"S"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">G2</span>, which <span class="op">=</span> <span class="st">"S"</span>, type <span class="op">=</span> <span class="st">"p"</span>, cex <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sea_explorer_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
 <p>Let’s trim by time to remove the final time period, rechecking with
 plots of salinity and temperature.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">G3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">G2</span>, <span class="va">time</span> <span class="op">&lt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2019-07-23 06:00:00"</span>, tz <span class="op">=</span> <span class="st">"UTC"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">G3</span>, which <span class="op">=</span> <span class="st">"S"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">G3</span>, which <span class="op">=</span> <span class="st">"T"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">G3</span>, which <span class="op">=</span> <span class="st">"S"</span>, type <span class="op">=</span> <span class="st">"p"</span>, cex <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">G3</span>, which <span class="op">=</span> <span class="st">"T"</span>, type <span class="op">=</span> <span class="st">"p"</span>, cex <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sea_explorer_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 <p>At this stage, we have isolated the time interval that has useful
 data. There are still some obvious problems with spurious salinities,
@@ -307,7 +304,7 @@ and perhaps temperatures, but for the present initial look at the data,
 we can overcome these by setting limits on the colour scale for the
 plots. (Obviously, more detailed analyses will demand more careful
 consideration.)</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">temperature</span> <span class="op">&lt;-</span> <span class="va">G3</span><span class="op">[[</span><span class="st">"temperature"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">cmT</span> <span class="op">&lt;-</span> <span class="fu">oce</span><span class="fu">::</span><span class="fu"><a href="https://dankelley.github.io/oce/reference/colormap.html" class="external-link">colormap</a></span><span class="op">(</span><span class="va">temperature</span>,</span>
 <span>    zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">temperature</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.99</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
@@ -325,7 +322,6 @@ consideration.)</p>
 <span>    which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, col <span class="op">=</span> <span class="va">cmT</span><span class="op">$</span><span class="va">zcol</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>,</span>
 <span>    pch <span class="op">=</span> <span class="fl">20</span>, cex <span class="op">=</span> <span class="fl">0.3</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "2019-07-19 17:42:15 UTC" "2019-07-23 05:59:59 UTC"</span></span>
 <span><span class="co">#&gt; w: 75867</span></span>
 <span><span class="co">#&gt; t[w]: 2019-07-23 05:59:59.312</span></span>
 <span><span class="co">#&gt; p[w]: 504.6</span></span>
@@ -334,12 +330,11 @@ consideration.)</p>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">G3</span>,</span>
 <span>    which <span class="op">=</span> <span class="st">"p"</span>, type <span class="op">=</span> <span class="st">"p"</span>, col <span class="op">=</span> <span class="va">cmS</span><span class="op">$</span><span class="va">zcol</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>,</span>
 <span>    pch <span class="op">=</span> <span class="fl">20</span>, cex <span class="op">=</span> <span class="fl">0.3</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "2019-07-19 17:42:15 UTC" "2019-07-23 05:59:59 UTC"</span></span>
-<span><span class="co">#&gt; w: 75867</span></span>
-<span><span class="co">#&gt; t[w]: 2019-07-23 05:59:59.312</span></span>
-<span><span class="co">#&gt; p[w]: 504.6</span></span></code></pre></div>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="sea_explorer_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
+<pre><code><span><span class="co">#&gt; w: 75867</span></span>
+<span><span class="co">#&gt; t[w]: 2019-07-23 05:59:59.312</span></span>
+<span><span class="co">#&gt; p[w]: 504.6</span></span></code></pre>
 <p>This representation does not rely on gridding to fill in spots
 between the data, but it can be subject to problems with overpainting of
 colours from later yos obscuring colours from earlier rows. One way
@@ -355,7 +350,7 @@ the problem through, because this is quite a useful method.)</p>
 <p>As noted at the outset, CRAN rules dictate that the downloaded
 material be deleted. In actual analysis, though, it is unlikely that
 such material would be deleted, so don’t just copy this line!</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">fileNC</span><span class="op">)</span> <span class="co"># where the binary (NetCDF) file went</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">tmpdir</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># where the raw files went</span></span></code></pre></div>
 <p><strong>Exercises.</strong></p>
@@ -392,7 +387,7 @@ Accessed September 2, 2024. <a href="https://cproof.uvic.ca/gliderdata/deploymen
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

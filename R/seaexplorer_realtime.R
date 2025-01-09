@@ -37,16 +37,10 @@
 #'     only included for similarity with
 #'     [read.glider.seaexplorer.delayed()].
 #'
-#' @param progressBar either a logical or character value that controls
-#'     whether/how to indicate the progress made in reading and interpreting
-#'     the data.  This can be useful, since the work can be slow.  If `progressBar`
-#'     is a logical value, then it indicates whether to show textual progress
-#'     with [txtProgressBar()].  If `progressBar` is the character value `"shiny"`,
-#'     then [shiny::setProgress()] and [shiny::incProgress()] will be used,
-#'     on the assumption that the call to `read.glider.seaexplorer.realtime()`
-#'     was made within the context of a call to [shiny::withProgress()].
-#'     The default is to use the value returned by [interactive()], i.e.
-#'     to use a textual progress indicator, but only in interactive mode.
+#' @param progressBar a logical value that controls whether to indicate the
+#' progress made in reading and interpreting the data.  This can be useful,
+#' since the work can be slow. The default is to show progress in
+#' interactive sessions, but not in scripts.
 #'
 #' @param missingValue A value that indicates missing data; all
 #'     values that match this are set to `NA`.
@@ -77,25 +71,21 @@
 #' @importFrom utils read.delim
 #' @importFrom methods new
 #' @importFrom oce swSCTp processingLogAppend
-#' @importFrom shiny incProgress setProgress
 #'
 #' @author Dan Kelley and Clark Richards
 #'
 #' @md
 #'
 #' @export
-read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressBar = interactive, missingValue = 9999, debug) {
+read.glider.seaexplorer.realtime <- function(directory, yo, level = 1,
+                                             progressBar = interactive(), missingValue = 9999, debug) {
     if (missing(debug)) {
         debug <- getOption("gliderDebug", default = 0)
     }
     if (missing(directory)) {
         stop("must provide 'directory', in which glider files reside")
     }
-    if (is.character(progressBar) && progressBar == "shiny") {
-        if (!requireNamespace("shiny", quietly = TRUE)) {
-            stop("cannot have progressBar=\"shiny\" unless the \"shiny\" package is installed")
-        }
-    }
+    showProgressBar <- identical(progressBar, TRUE)
     gliderDebug(debug, "read.glider.seaexplorer.realtime(\"", directory, "\", ...) START\n", sep = "", unindent = 1)
     yoGiven <- !missing(yo)
     glifiles <- dir(directory, pattern = "*gli*", full.names = TRUE)
@@ -137,12 +127,12 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
     # cat("glifiles:\n");print(glifiles)
     gliderDebug(debug, "about to look for gli files for yos: ", oce::vectorShow(yo))
     for (y in yo) {
-        #message("y=", y)
+        # message("y=", y)
         # pattern <- paste0("^.*\\.", y, "\\.{0,1}(.gz){0,1}$")
         pattern <- paste0("^.*\\.", y, "\\..*$")
-        #message("pattern ='", pattern, "'")
+        # message("pattern ='", pattern, "'")
         found <- grep(pattern, glifiles)
-        #message("found='", found, "'")
+        # message("found='", found, "'")
         if (length(found) == 1L) {
             keepglifiles <- c(keepglifiles, glifiles[found])
         }
@@ -180,18 +170,14 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
     }
     # gli files
     nfiles <- length(glifiles)
-    if (is.logical(progressBar) && progressBar) {
+    if (showProgressBar) {
         cat("* Reading", nfiles, ifelse(nfiles == 1, "gli file\n", "gli files...\n"))
         pb <- txtProgressBar(0, nfiles, 0, style = 3) # start at 0 to allow for a single yo
-    } else if (is.character(progressBar) && progressBar == "shiny") {
-        shiny::setProgress(0, paste("reading", nfiles, "files"))
     }
     gli <- list()
     for (i in seq_len(nfiles)) {
-        if (is.logical(progressBar) && progressBar) {
+        if (showProgressBar) {
             setTxtProgressBar(pb, i)
-        } else if (is.character(progressBar) && progressBar == "shiny") {
-            shiny::incProgress(1 / nfiles)
         }
         gliderDebug(debug, "reading gli file:  ", glifiles[i], "\n")
         gliData <- utils::read.delim(glifiles[i], sep = ";")
@@ -202,20 +188,16 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
     gliData$X <- NULL
     # pld1 files
     nfiles <- length(pld1files)
-    if (is.logical(progressBar) && progressBar) {
+    if (showProgressBar) {
         cat("\n")
         flush.console()
         cat("* Reading", nfiles, ifelse(nfiles == 1, "pld1 file\n", "pld1 files...\n"))
         pb <- txtProgressBar(0, nfiles, 0, style = 3)
-    } else if (is.character(progressBar) && progressBar == "shiny") {
-        shiny::setProgress(0, paste("reading", nfiles, "files"))
     }
     pld1 <- list()
     for (i in seq_len(nfiles)) {
-        if (is.logical(progressBar) && progressBar) {
+        if (showProgressBar) {
             setTxtProgressBar(pb, i)
-        } else if (is.character(progressBar) && progressBar == "shiny") {
-            shiny::incProgress(1 / nfiles)
         }
         gliderDebug(debug, "reading pld1 file: ", pld1files[i], "?\n")
         pld1Data <- utils::read.delim(pld1files[i], sep = ";")
@@ -224,7 +206,7 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1, progressB
     }
     pld1Data <- do.call(rbind.data.frame, pld1)
     pld1Data$X <- NULL
-    if (is.logical(progressBar) && progressBar) {
+    if (showProgressBar) {
         cat("\n")
     }
     # change missingValue to NA

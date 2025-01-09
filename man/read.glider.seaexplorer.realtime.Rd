@@ -8,7 +8,7 @@ read.glider.seaexplorer.realtime(
   directory,
   yo,
   level = 1,
-  progressBar = interactive,
+  progressBar = interactive(),
   missingValue = 9999,
   debug
 )
@@ -24,16 +24,10 @@ will read all yo numbers for which files are present in \code{dir}.}
 only included for similarity with
 \code{\link[=read.glider.seaexplorer.delayed]{read.glider.seaexplorer.delayed()}}.}
 
-\item{progressBar}{either a logical or character value that controls
-whether/how to indicate the progress made in reading and interpreting
-the data.  This can be useful, since the work can be slow.  If \code{progressBar}
-is a logical value, then it indicates whether to show textual progress
-with \code{\link[=txtProgressBar]{txtProgressBar()}}.  If \code{progressBar} is the character value \code{"shiny"},
-then \code{\link[shiny:withProgress]{shiny::setProgress()}} and \code{\link[shiny:withProgress]{shiny::incProgress()}} will be used,
-on the assumption that the call to \code{read.glider.seaexplorer.realtime()}
-was made within the context of a call to \code{\link[shiny:withProgress]{shiny::withProgress()}}.
-The default is to use the value returned by \code{\link[=interactive]{interactive()}}, i.e.
-to use a textual progress indicator, but only in interactive mode.}
+\item{progressBar}{a logical value that controls whether to indicate the
+progress made in reading and interpreting the data.  This can be useful,
+since the work can be slow. The default is to show progress in
+interactive sessions, but not in scripts.}
 
 \item{missingValue}{A value that indicates missing data; all
 values that match this are set to \code{NA}.}

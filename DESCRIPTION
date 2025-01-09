@@ -12,7 +12,7 @@ Suggests:
     curl,
     rmarkdown,
     testthat
-Imports: methods, shiny
+Imports: methods
 BugReports: https://github.com/dankelley/oceglider/issues
 Description: Provides tools for reading and analysing data from oceanographer gliders.
 License: GPL (>= 2)
