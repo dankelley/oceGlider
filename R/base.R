@@ -747,19 +747,17 @@ read.glider.netcdf <- function(file, saveGlobalAttributes = TRUE,
     capture.output({
         f <- ncdf4::nc_open(file)
     })
-
     # get all global attributes (see https://github.com/dankelley/oceglider/issues/125)
-    #### >>> res@metadata$globalAttributes <- list()
-    #### >>> if (saveGlobalAttributes) {
-    #### >>>     for (name in names(ncatt_get(f, ""))) {
-    #### >>>         newname <- toCamelCase(name)
-    #### >>>         gliderDebug(debug, "global attribute '", name, "' stored as '", newname, "'\n",
-    #### >>>             sep = ""
-    #### >>>         )
-    #### >>>         res@metadata$globalAttributes[[newname]] <- ncatt_get(f, varid = 0, attname = name)
-    #### >>>     }
-    #### >>> }
-
+    res@metadata$globalAttributes <- list()
+    if (saveGlobalAttributes) {
+        for (name in names(ncatt_get(f, ""))) {
+            newname <- toCamelCase(name)
+            gliderDebug(debug, "global attribute '", name, "' stored as '", newname, "'\n",
+                sep = ""
+            )
+            res@metadata$globalAttributes[[newname]] <- ncatt_get(f, varid = 0, attname = name)
+        }
+    }
     # Next demonstrates how to detect this filetype.
     res@metadata$instrument <- getAtt(f, attname = "instrument", default = "?")
     res@metadata$instrumentManufacturer <- getAtt(f, attname = "instrument_manufacturer", default = "?")
