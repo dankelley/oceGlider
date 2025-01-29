@@ -6,7 +6,7 @@
 \usage{
 read.glider.netcdf(
   file,
-  saveGlobalAttributes = FALSE,
+  saveGlobalAttributes = TRUE,
   debug = getOption("gliderDebug", default = 0)
 )
 }

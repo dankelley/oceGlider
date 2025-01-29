@@ -734,7 +734,7 @@ getAtt <- function(f, varid = 0, attname = NULL, default = NULL) {
 #' @md
 #'
 #' @export
-read.glider.netcdf <- function(file, saveGlobalAttributes = FALSE,
+read.glider.netcdf <- function(file, saveGlobalAttributes = TRUE,
                                debug = getOption("gliderDebug", default = 0)) {
     gliderDebug(debug, "read.glider.netcdf(file=\"", file, "\", ...) BEGIN\n", unindent = 1, sep = "")
     if (missing(file)) {
