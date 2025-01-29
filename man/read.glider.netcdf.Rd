@@ -4,10 +4,19 @@
 \alias{read.glider.netcdf}
 \title{Read a glider file in netcdf format}
 \usage{
-read.glider.netcdf(file, debug)
+read.glider.netcdf(
+  file,
+  saveGlobalAttributes = FALSE,
+  debug = getOption("gliderDebug", default = 0)
+)
 }
 \arguments{
-\item{file}{Name of a netcdf file.}
+\item{file}{character value holding the name of a netcdf file
+that holds glider data.}
+
+\item{saveGlobalAttributes}{logical value indicating whether to
+read the entiriety of the global attributes stored within the
+file into the \code{metadata} slot in a list named \code{globalAttributes}.}
 
 \item{debug}{an integer specifying whether debugging information is
 to be printed during processing. If this is not provided, then
@@ -37,9 +46,6 @@ to \code{profileDirection}, although the \code{\link{[[,glider-method}}
 mechanism works with either name, e.g. if \code{g} is a glider object, then
 \code{g[["profileDirection"]]} and
 \code{g[["profile_direction"]]} give the same result.
-
-See the SeaExplorer vignette for examples of using this
-function.
 }
 \seealso{
 Other functions to read glider data: 

@@ -1,3 +1,8 @@
+# oceglider 0.1.14
+
+* Change `read.glider.netcdf()` to handle a new parameter named `saveGlobalAttributes` (issue #125).
+
+
 # oceglider 0.1.12
 
 * Change `plot.glider()` to handle a new parameter named `simplify`.

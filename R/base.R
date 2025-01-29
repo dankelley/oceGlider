@@ -449,9 +449,9 @@ setMethod(
                 gliderDebug(debug, "  returning item from @data\n")
                 return(x@data[[i]])
             } else {
-                #message("DAN FIXME 1")
-                #cat(str(x@metadata$dataNamesOriginal$payload1))
-                #message("DAN FIXME 2")
+                # message("DAN FIXME 1")
+                # cat(str(x@metadata$dataNamesOriginal$payload1))
+                # message("DAN FIXME 2")
                 if (i %in% names(x@data$payload1)) {
                     gliderDebug(debug, "  result in @data$payload1\n")
                     return(x@data$payload1[[i]])
@@ -462,9 +462,9 @@ setMethod(
                     target <- "payload1"
                     gliderDebug(debug, "  result in @data$", target, "inferred from original name\n")
                     w <- which(x@metadata$dataNamesOriginal[[target]] == i)
-                    #print(w)
+                    # print(w)
                     names <- names(x@metadata$dataNamesOriginal[[target]])
-                    #print(names)
+                    # print(names)
                     gliderDebug(debug, "  returning ", names[w], "\n")
                     return(x@data[[target]][[names[w]]])
                 } else if (i %in% names(x@metadata$dataNamesOriginal)) {
@@ -679,10 +679,12 @@ getAtt <- function(f, varid = 0, attname = NULL, default = NULL) {
 #' `g[["profileDirection"]]` and
 #' `g[["profile_direction"]]` give the same result.
 #'
-#' See the SeaExplorer vignette for examples of using this
-#' function.
+#' @param file character value holding the name of a netcdf file
+#' that holds glider data.
 #'
-#' @param file Name of a netcdf file.
+#' @param saveGlobalAttributes logical value indicating whether to
+#' read the entiriety of the global attributes stored within the
+#' file into the `metadata` slot in a list named `globalAttributes`.
 #'
 #' @template debug
 #'
@@ -732,11 +734,9 @@ getAtt <- function(f, varid = 0, attname = NULL, default = NULL) {
 #' @md
 #'
 #' @export
-read.glider.netcdf <- function(file, debug) {
-    if (missing(debug)) {
-        debug <- getOption("gliderDebug", default = 0)
-    }
-    gliderDebug(debug, "read.glider.netcdf(file=\"", file, "\", ...) BEGIN", unindent = 1, sep = "")
+read.glider.netcdf <- function(file, saveGlobalAttributes = FALSE,
+                               debug = getOption("gliderDebug", default = 0)) {
+    gliderDebug(debug, "read.glider.netcdf(file=\"", file, "\", ...) BEGIN\n", unindent = 1, sep = "")
     if (missing(file)) {
         stop("must provide file")
     }
@@ -747,6 +747,18 @@ read.glider.netcdf <- function(file, debug) {
     capture.output({
         f <- ncdf4::nc_open(file)
     })
+
+    # get all global attributes (see https://github.com/dankelley/oceglider/issues/125)
+    #### >>> res@metadata$globalAttributes <- list()
+    #### >>> if (saveGlobalAttributes) {
+    #### >>>     for (name in names(ncatt_get(f, ""))) {
+    #### >>>         newname <- toCamelCase(name)
+    #### >>>         gliderDebug(debug, "global attribute '", name, "' stored as '", newname, "'\n",
+    #### >>>             sep = ""
+    #### >>>         )
+    #### >>>         res@metadata$globalAttributes[[newname]] <- ncatt_get(f, varid = 0, attname = name)
+    #### >>>     }
+    #### >>> }
 
     # Next demonstrates how to detect this filetype.
     res@metadata$instrument <- getAtt(f, attname = "instrument", default = "?")
@@ -773,28 +785,34 @@ read.glider.netcdf <- function(file, debug) {
     for (i in seq_along(dataNames)) {
         oceName <- toCamelCase(dataNames[i])
         dataNamesOriginal[[oceName]] <- dataNames[i]
+        gliderDebug(debug, "preparing to read ", dataNames[i], " into @data$", oceName, "\n", sep = "")
         if (dataNames[i] == "time") {
             data[["time"]] <- numberAsPOSIXct(as.vector(ncdf4::ncvar_get(f, "time")))
             gliderDebug(debug, "i=", i, " ... time converted from integer to POSIXct\n", sep = "")
         } else {
             data[[oceName]] <- as.vector(ncdf4::ncvar_get(f, dataNames[i]))
-            u <- ncdf4::ncatt_get(f, dataNames[i], "units")$value
-            unit <- oce::as.unit(u, default = NULL)
-            # some local unit decoding
-            if (is.null(unit)) {
-                if (u == "Celsius") {
-                    unit <- list(unit = expression(degree * C), scale = "")
-                }
+            # Infer the units, if sufficient information is available
+            tmp <- ncdf4::ncatt_get(f, dataNames[i], "units")
+            unit <- if (tmp$hasatt) {
+                oce::as.unit(tmp$value, default = NULL)
+            } else {
+                list(unit = expression(), scale = "")
             }
-            # as a last resort, don't try to make an expression (this loses superscipts,
-            # for example)
-            if (is.null(unit)) {
-                unit <- list(unit = bquote(.(u)), scale = "")
-            }
+            # ?? # some local unit decoding
+            # ?? if (is.null(unit)) {
+            # ??     if (u == "Celsius") {
+            # ??         unit <- list(unit = expression(degree * C), scale = "")
+            # ??     }
+            # ?? }
+            # ?? # as a last resort, don't try to make an expression (this loses superscipts,
+            # ?? # for example)
+            # ?? if (is.null(unit)) {
+            # ??     unit <- list(unit = bquote(.(u)), scale = "")
+            # ?? }
             if (debug > 0) {
                 cat("  original name = \"", dataNames[i], "\"\n", sep = "")
                 cat("    oce name = \"", oceName, "\"\n", sep = "")
-                cat("    original unit = ", u, "\n", sep = "")
+                #cat("    original unit = ", u, "\n", sep = "")
                 cat("    oce unit = ", as.character(unit$unit), "\n", sep = "")
             }
             units[[oceName]] <- unit
