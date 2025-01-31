@@ -12,7 +12,7 @@ swOxygenSolubility(temperature, salinity)
 \item{salinity}{numeric value holding Practical Salinity.}
 }
 \description{
-This function is a copy of Chantelle Layton's `swOxygen()` function,
+This function is a copy of Chantelle Layton's \code{swOxygen()} function,
 from the \url{https://github.com/DFOglider/pilotingApp}
 repository, renamed to avoid name-resolution conflicts.
 }

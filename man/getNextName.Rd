@@ -13,11 +13,11 @@ getNextName(name, existingNames)
 variable names.}
 }
 \value{
-[getNextName] returns a deconflicted version of `name`.
+\link{getNextName} returns a deconflicted version of \code{name}.
 }
 \description{
-This is used to name the first temperature found as `temperature`,
-the second as `temperature2`, etc.
+This is used to name the first temperature found as \code{temperature},
+the second as \code{temperature2}, etc.
 }
 \examples{
 library(oceglider)

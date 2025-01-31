@@ -6,10 +6,6 @@
 [![GitHub last commit](https://img.shields.io/github/last-commit/dankelley/oceglider)](https://img.shields.io/github/last-commit/dankelley/oceglider)
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 
-
-<!-- badges: end -->
-
-
 `oceglider` is an R package for processing ocean glider data, with
 support for Slocum and SeaExplorer devices.
 
@@ -21,9 +17,9 @@ to install if you want the latest features.  Use
 
     remotes::install_github("dankelley/oceglider", ref = "develop")
 
-to install "develop".  You may also want to consider installing the
-"main" branch, which is updated less frequently than "develop".  This
-may be installed with
+to install the "develop" branch.  You may also want to consider installing the
+"main" branch, which is updated less frequently than "develop".  This may be
+installed with
 
     remotes::install_github("dankelley/oceglider", ref = "main")
 

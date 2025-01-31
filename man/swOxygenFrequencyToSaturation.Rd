@@ -24,36 +24,37 @@ swOxygenFrequencyToSaturation(
 system, in Hz.}
 
 \item{cal}{list or data frame holding calibration parameters named
-`Soc`, `Foffset`, `A`, `B`, `C`, `D` and `Enom`.  The last of these
+\code{Soc}, \code{Foffset}, \code{A}, \code{B}, \code{C}, \code{D} and \code{Enom}.  The last of these
 is called "E nominal" in the calibration sheets.}
 
 \item{unit}{character value indicating the desired unit. The
-default is `ml/l` but `umol/kg` is also accepted, the latter being
-computed by multiplying the former by `44.6591*1000/(1000+sigma0)`,
-where `sigma0` is seawater potential density anomaly in kg/m^3
+default is \code{ml/l} but \code{umol/kg} is also accepted, the latter being
+computed by multiplying the former by \code{44.6591*1000/(1000+sigma0)},
+where \code{sigma0} is seawater potential density anomaly in kg/m^3
 (see Reference 1, which uses the mole fraction stated in Reference 2).}
 }
 \description{
 The calibration formula comes from SBE calibration sheets. This
-code is based on `sbeO2Hz2Sat()` in
+code is based on \code{sbeO2Hz2Sat()} in
 \url{https://github.com/DFOglider/pilotingApp}, with minor
 modifications: (1) it has a new name to avoid conflicts, (2) the
 calibration coefficients are collected into a single parameter,
-`cal`, (3) `oxygenFrequency` is renamed `frequency`, (3) `unit`
+\code{cal}, (3) \code{oxygenFrequency} is renamed \code{frequency}, (3) \code{unit}
 is added, to permit specifying the unit of the return value,
 and (5) the conversion to umol/kg takes into account the density,
 as indicated in Reference 1.
 }
 \references{
-1. Thierry, Virginie, Henry Bittig, Denis Gilbert, Taiyo Kobayashi,
+\enumerate{
+\item Thierry, Virginie, Henry Bittig, Denis Gilbert, Taiyo Kobayashi,
 Sato Kanako, and Claudia Schmid. "Processing Argo Oxygen Data at the
 DAC Level (version 2.3.3)". Ifremer, 2022.
 \doi{10.13155/39795}
-
-2. Garcia, Herncin E., and Louis I. Gordon. "Oxygen Solubility in
+\item Garcia, Herncin E., and Louis I. Gordon. "Oxygen Solubility in
 Seawater: Better Fitting Equations." Limnology and Oceanography 37,
 no. 6 (September 1992): 1307–12.
 \doi{10.4319/lo.1992.37.6.1307}
+}
 }
 \author{
 Chantelle Layton and Dan Kelley

@@ -112,10 +112,10 @@ point in the development of this package.)
 
 Data in the \code{pld1} files are stored in the \code{payload1} item within
 the \code{data} slot of the returned object, renamed as follows. Where possible,
-the corresponding IOOS NetCDF file variable names are also listed [see
+the corresponding IOOS NetCDF file variable names are also listed \link[=see
 Integrated Ocean Observing System (U.S.). “NGDAC NetCDF File Format Version
 2,” March 27, 2019.
-https://github.com/ioos/ioosngdac/wiki/NGDAC-NetCDF-File-Format-Version-2].
+https://github.com/ioos/ioosngdac/wiki/NGDAC-NetCDF-File-Format-Version-2]{see Integrated Ocean Observing System (U.S.). “NGDAC NetCDF File Format Version 2,” March 27, 2019. https://github.com/ioos/ioosngdac/wiki/NGDAC-NetCDF-File-Format-Version-2}.
 
 \tabular{llll}{
 \strong{OriginalName}       \tab \strong{Name}              \tab \strong{IOOS name} \tab \strong{Notes}\cr
@@ -134,7 +134,13 @@ https://github.com/ioos/ioosngdac/wiki/NGDAC-NetCDF-File-Format-Version-2].
 \code{GPCTD_TEMPERATURE}    \tab \code{temperature}         \tab \code{temperature} \tab degC \cr
 \code{GPCTD_PRESSURE}       \tab \code{pressure}            \tab \code{pressure}    \tab dbar \cr
 \code{GPCTD_DOF}            \tab \code{oxygenFrequency}     \tab -                  \tab - \cr
--                           \tab \code{salinity}            \tab \code{salinity}    \tab Practical Salinity (computed)\cr
+\itemize{
+\item 
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{                      \\tab \code{salinity}            \\tab \code{salinity}    \\tab Practical Salinity (computed)\\cr
+}\if{html}{\out{</div>}}
+}
+
 }
 
 Data in the \code{pld2} files (or others for additional payloads)
