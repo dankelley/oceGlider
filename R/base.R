@@ -755,7 +755,7 @@ read.glider.netcdf <- function(file, saveGlobalAttributes = TRUE,
             gliderDebug(debug, "global attribute '", name, "' stored as '", newname, "'\n",
                 sep = ""
             )
-            res@metadata$globalAttributes[[newname]] <- ncatt_get(f, varid = 0, attname = name)
+            res@metadata$globalAttributes[[newname]] <- ncatt_get(f, varid = 0, attname = name)$value
         }
     }
     # Next demonstrates how to detect this filetype.
