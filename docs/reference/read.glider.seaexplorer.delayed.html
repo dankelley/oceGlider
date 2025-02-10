@@ -19,7 +19,7 @@ it is in the field.)'></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">oceglider</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.12</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -132,11 +132,12 @@ of debugging, but also the depth.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>This function can output either "Level 0" or "Level 1" type
-data. Level 0 is simply the raw data as written in the CSV files
-with no processing done, other than to remove longitude and
-latitude for samples where the glider wasn't actually communicating
-with satellites and then interpolate between surface values.</p>
+    <p>This function can output either "Level 0" or "Level 1" type data. Level 0 is
+simply the raw data as written in the CSV files with no processing done.
+(Historical note: until package varsion 0.1-14, released on 2025-02-10,
+longitude and latitude were interpolated between surface values for level =
+0. This behaviour was changed for issue 127, at
+https://github.com/dankelley/oceglider/issues/127).</p>
 <p>Level 1 processing performs a number of steps to give an
 "analysis ready" dataset, including</p>
 <ol><li><p>Interpolation of the surface longitude and latitude to give

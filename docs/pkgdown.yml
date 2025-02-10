@@ -1,11 +1,11 @@
-pandoc: 3.6.1
+pandoc: 3.6.2
 pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   oceglider: oceglider.html
   sea_explorer: sea_explorer.html
   slocum_glider: slocum_glider.html
-last_built: 2025-01-09T20:06Z
+last_built: 2025-02-10T18:37Z
 urls:
   reference: https://dankelley.github.io/oceglider/reference
   article: https://dankelley.github.io/oceglider/articles
