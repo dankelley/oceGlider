@@ -67,7 +67,11 @@ This function can output either "Level 0" or "Level 1" type
 data. Level 0 is simply the raw data as written in the CSV files
 with no processing done, other than to remove longitude and
 latitude for samples where the glider wasn't actually communicating
-with satellites and then interpolate between surface values.
+with satellites.  (Historical note: until package varsion
+0.1-14, released on 2025-02-10, longitude and latitude
+were interpolated between surface values for level = 0.
+This behaviour was changed for issue 127, at
+https://github.com/dankelley/oceglider/issues/127).
 
 Level 1 processing performs a number of steps to give an
 "analysis ready" dataset, including

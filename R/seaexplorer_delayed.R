@@ -14,7 +14,11 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #' data. Level 0 is simply the raw data as written in the CSV files
 #' with no processing done, other than to remove longitude and
 #' latitude for samples where the glider wasn't actually communicating
-#' with satellites and then interpolate between surface values.
+#' with satellites.  (Historical note: until package varsion
+#' 0.1-14, released on 2025-02-10, longitude and latitude
+#' were interpolated between surface values for level = 0.
+#' This behaviour was changed for issue 127, at
+#' https://github.com/dankelley/oceglider/issues/127).
 #'
 #' Level 1 processing performs a number of steps to give an
 #' "analysis ready" dataset, including
@@ -325,9 +329,11 @@ read.glider.seaexplorer.delayed <- function(directory, yo,
     trans <- df$navState == 116
     df$longitude[!trans] <- NA
     df$latitude[!trans] <- NA
-    # Now interpolate lon/lat
-    df$longitude <- approx(df$time, df$longitude, df$time)$y
-    df$latitude <- approx(df$time, df$latitude, df$time)$y
+    # Now interpolate lon/lat if level > 0
+    if (level > 0) {
+        df$longitude <- approx(df$time, df$longitude, df$time)$y
+        df$latitude <- approx(df$time, df$latitude, df$time)$y
+    }
     # Trim out any empty rows (no data at all)
     sub <- df[, which(!(names(df) %in% c("time", "navState", "longitude", "latitude", "pressureNav", "yoNumber")))]
     naRows <- apply(sub, 1, function(x) sum(is.na(x)))

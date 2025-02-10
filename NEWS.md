@@ -1,5 +1,10 @@
 # oceglider 0.1.14
 
+* Change `read.glider.seaexplorer.delayed()` to not interpolate longitude
+and latitude between surfacing events for `level=0` usage (issue #127).
+
+# oceglider 0.1.13
+
 * Change `read.glider.netcdf()` to handle a new parameter named `saveGlobalAttributes` (issue #125).
 
 
