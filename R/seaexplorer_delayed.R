@@ -10,14 +10,11 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #' of this, to read data as transmitted by the glider while
 #' it is in the field.)
 #'
-#' This function can output either "Level 0" or "Level 1" type
-#' data. Level 0 is simply the raw data as written in the CSV files
-#' with no processing done, other than to remove longitude and
-#' latitude for samples where the glider wasn't actually communicating
-#' with satellites.  (Historical note: until package varsion
-#' 0.1-14, released on 2025-02-10, longitude and latitude
-#' were interpolated between surface values for level = 0.
-#' This behaviour was changed for issue 127, at
+#' This function can output either "Level 0" or "Level 1" type data. Level 0 is
+#' simply the raw data as written in the CSV files with no processing done.
+#' (Historical note: until package varsion 0.1-14, released on 2025-02-10,
+#' longitude and latitude were interpolated between surface values for level =
+#' 0. This behaviour was changed for issue 127, at
 #' https://github.com/dankelley/oceglider/issues/127).
 #'
 #' Level 1 processing performs a number of steps to give an
@@ -325,12 +322,12 @@ read.glider.seaexplorer.delayed <- function(directory, yo,
     # First remove all duplicated lon/lat
     df$longitude[which(duplicated(df$longitude))] <- NA
     df$latitude[which(duplicated(df$latitude))] <- NA
-    # Then remove all lon/lat that aren't from when navState is 116
-    trans <- df$navState == 116
-    df$longitude[!trans] <- NA
-    df$latitude[!trans] <- NA
-    # Now interpolate lon/lat if level > 0
+    # Change behaviour for level=0, according to issue
+    # https://github.com/dankelley/oceglider/issues/127
     if (level > 0) {
+        trans <- df$navState == 116
+        df$longitude[!trans] <- NA
+        df$latitude[!trans] <- NA
         df$longitude <- approx(df$time, df$longitude, df$time)$y
         df$latitude <- approx(df$time, df$latitude, df$time)$y
     }
