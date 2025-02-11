@@ -1,3 +1,7 @@
+# oceglider 0.1.15
+
+* Change `read.glider.seaexplorer.delayed()` to read data streams separately (issue #128).
+
 # oceglider 0.1.14
 
 * Change `read.glider.seaexplorer.delayed()` to not interpolate longitude

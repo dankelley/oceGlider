@@ -7,27 +7,40 @@
 read.glider.seaexplorer.delayed(
   directory,
   yo,
+  pattern = "pld1.raw",
   level = 1,
   interpolateToCTD = TRUE,
   removeTimeSincePowerOn = 0,
   progressBar = interactive(),
+  missingValue = 9999,
   debug = getOption("gliderDebug", default = 0)
 )
 }
 \arguments{
 \item{directory}{The directory in which the delayed-mode SeaExplorer files are located.}
 
-\item{yo}{A numeric value (or vector) specifying the yo numbers to
-read. If this is not provided, \code{\link[=read.glider.seaexplorer.delayed]{read.glider.seaexplorer.delayed()}}
-will read all yo numbers for which files are present in \code{dir}.}
+\item{yo}{A numeric value (or vector) specifying the yo numbers to read. If
+this is not provided, \code{\link[=read.glider.seaexplorer.delayed]{read.glider.seaexplorer.delayed()}} will read all yo
+numbers for which files are present in \code{dir}.}
+
+\item{pattern}{a character value used to find files to read. The
+default, \code{"pld1"}, will match files with that string in the name. The
+best choices for this depends on the setup of files. The search
+for files is done with \code{list.files(directory, pattern)}, and so
+it can be a good idea to try that first, to learn how to specify
+the desired files.  Also, try calling with \code{debug=1} to get some
+indication of the files that get read or with \code{debug=2} to get
+a full listing.}
 
 \item{level}{A numeric value specifying the processing level, 0 or
-1. See Details.}
+\enumerate{
+\item See Details.
+}}
 
-\item{interpolateToCTD}{A logical indicating whether all sensors should
-be interpolated to the CTD times to obtain a common time base,
-or whether all sensors should simply be interpolated for all
-time stamps (which was the default behaviour before 2019-12-08)}
+\item{interpolateToCTD}{A logical indicating whether all sensors should be
+interpolated to the CTD times to obtain a common time base, or whether all
+sensors should simply be interpolated for all time stamps (which was the
+default behaviour before 2019-12-08)}
 
 \item{removeTimeSincePowerOn}{numeric value indicating the number of
 seconds of data to trim, after the glider sensors are powered on.
@@ -41,6 +54,10 @@ rapid ramp-up to values that seem more oceanographic.}
 progress made in reading and interpreting the data.  This can be useful,
 since the work can be slow. The default is to show progress in
 interactive sessions, but not in scripts.}
+
+\item{missingValue}{numeric value that indicates bad data. Any data items
+equalling this value are converted to NA. The default is 9999. To avoid
+changing values to NA, call the function with \code{missingValue=NULL}.}
 
 \item{debug}{an integer specifying whether debugging information is
 to be printed during processing. If this is not provided, then
@@ -210,7 +227,7 @@ Other functions to read glider data:
 \code{\link{read.glider.slocum.netcdf}()}
 }
 \author{
-Clark Richards and Dan Kelley
+Clark Richards, Chantelle Layton and Dan Kelley
 }
 \concept{functions for seaexplorer gliders}
 \concept{functions to read glider data}

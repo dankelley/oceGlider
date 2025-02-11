@@ -40,6 +40,12 @@ setMethod(
         if ("subtype" %in% metadataNames) {
             cat("* Subtype: ", object@metadata[["subtype"]], "\n", sep = "")
         }
+        if (type == "seaexplorer") {
+            if (2 == sum(c("directory", "pattern") %in% metadataNames)) {
+                cat("* Directory:  \"", object@metadata$directory, "\"\n", sep = "")
+                cat("* Pattern:  \"", object@metadata$pattern, "\"\n", sep = "")
+            }
+        }
         # 44 https://github.com/dankelley/oceglider/issues/44
         # 44 nyo <- length(object@metadata$yo)
         # 44 if (nyo == 1)
@@ -48,8 +54,8 @@ setMethod(
         # 44     cat(sprintf("* Yo:      %d values, between %d and %d\n",
         # 44                 nyo, object@metadata$yo[1], object@metadata$yo[nyo]))
         payload1Exists <- "payload1" %in% names(object@data)
-        #stream <- if (object[["type"]] == "seaexplorer") object@data$payload1 else object@data
-        if (payload1Exists) {
+        # stream <- if (object[["type"]] == "seaexplorer") object@data$payload1 else object@data
+        if (payload1Exists) { # FIXME: this is likely unhelpful now
             odataName <- "payload1"
             odata <- object@data[[odataName]]
         } else {
@@ -70,11 +76,13 @@ setMethod(
             if (is.na(deltat)) {
                 cat("* Time:               ", format(from), "\n")
             } else {
-                cat("* Time:   ",
-                    format(from, format="%Y-%m-%d %H:%M:%S"),
+                cat(
+                    "* Time:   ",
+                    format(from, format = "%Y-%m-%d %H:%M:%S"),
                     "to",
-                    format(to, format="%Y-%m-%d %H:%M:%S"),
-                    " (mean increment", round(deltat, 4), "s)\n")
+                    format(to, format = "%Y-%m-%d %H:%M:%S"),
+                    " (mean increment", round(deltat, 4), "s)\n"
+                )
             }
         }
         for (i in 1:ndata) {
@@ -83,7 +91,7 @@ setMethod(
         if ("units" %in% metadataNames) {
             units <- object@metadata$units
             unitsNames <- names(object@metadata$units)
-            #cat("DAN 1 units follow\n");print(units)
+            # cat("DAN 1 units follow\n");print(units)
             units <- unlist(lapply(
                 seq_along(units),
                 function(i) {
@@ -121,7 +129,7 @@ setMethod(
                     res
                 }
             ))
-            #cat("DAN 2 units follow\n");print(units)
+            # cat("DAN 2 units follow\n");print(units)
             names(units) <- unitsNames
             rownames(threes) <- paste("    ", oce::dataLabel(names(odata), units), sep = "")
         } else {
