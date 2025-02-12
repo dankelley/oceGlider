@@ -324,7 +324,7 @@ handleGliderFlagsInternal <- function(object, flags, actions, where = NULL, debu
 #' @export
 setGliderFlags <- function(object, name = NULL, i = NULL, value = NULL, debug = getOption("gliderDebug", 0)) {
     gliderDebug(debug, "setGliderFlags(object, name=\"", name, "\", value=", value,
-        ", i=c(", paste(head(i), collapse = ","), "...), debug=", debug, ") {\n",
+        ", i=c(", paste(head(i), collapse = ","), "...), debug=", debug, ") START\n",
         sep = "",
         unindent = 1
     )
@@ -381,11 +381,11 @@ setGliderFlags <- function(object, name = NULL, i = NULL, value = NULL, debug = 
         res@processingLog,
         paste("setGliderFlags(object, name=\"", name, "\",",
             "i=c(", paste(head(i, collapse = ",")), "...),",
-            "value=", valueOrig, ")",
+            "value=", value, ")",
             collapse = "", sep = ""
         )
     )
-    gliderDebug(debug, "} # setGliderFlags\n", sep = "", unindent = 1)
+    gliderDebug(debug, "# setGliderFlags END\n", sep = "", unindent = 1)
     res
 }
 

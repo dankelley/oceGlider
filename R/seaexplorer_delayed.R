@@ -68,7 +68,7 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #' @param directory The directory in which the delayed-mode SeaExplorer files are located.
 #'
 #' @param yo A numeric value (or vector) specifying the yo numbers to read. If
-#' this is not provided, [read.glider.seaexplorer.delayed()] will read all yo
+#' this is not provided, [read.glider.seaexplorer.raw()] will read all yo
 #' numbers for which files are present in `dir`.
 #'
 #' @param pattern a character value used to find files to read. The
@@ -105,6 +105,12 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #' equalling this value are converted to NA. The default is 9999. To avoid
 #' changing values to NA, call the function with `missingValue=NULL`.
 #'
+## @param rename optional logical value indicating whether to rename variables
+## from the values in the file to the oce convention, using [cnvName2oceName()]
+## for the translation. This is done by default, but setting `rename=FALSE` can
+## be helpful if there is a wish to control the renaming, either using a
+## built-in dictionary or using a dictionary set up by the user.
+#'
 #' @template debug
 #'
 #' @template seaexplorer_names
@@ -112,7 +118,7 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #' @examples
 #' library(oceglider)
 #' directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
-#' g <- read.glider.seaexplorer.delayed(directory, progressBar = FALSE)
+#' g <- read.glider.seaexplorer.raw(directory, progressBar = FALSE)
 #' plot(g, which = "p")
 #'
 #' @family functions for seaexplorer gliders
@@ -128,16 +134,17 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #' @md
 #'
 #' @export
-read.glider.seaexplorer.delayed <- function(directory, yo, pattern = "pld1.raw",
-                                            level = 1, interpolateToCTD = TRUE,
-                                            removeTimeSincePowerOn = 0,
-                                            progressBar = interactive(),
-                                            missingValue = 9999,
-                                            debug = getOption("gliderDebug", default = 0)) {
+read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
+                                        yo, level = 1, interpolateToCTD = TRUE,
+                                        removeTimeSincePowerOn = 0,
+                                        progressBar = interactive(),
+                                        missingValue = 9999,
+                                        # rename = TRUE,
+                                        debug = getOption("gliderDebug", default = 0)) {
     if (missing(directory)) {
         stop("must provide 'directory', in which glider files reside")
     }
-    gliderDebug(debug, "read.glider.seaexplorer.delayed(\"", directory, "\", ...) START\n", sep = "", unindent = 1)
+    gliderDebug(debug, "read.glider.seaexplorer.raw(\"", directory, "\", ...) START\n", sep = "", unindent = 1)
     if (level != 0 && level != 1) {
         stop("Level must be either 0 or 1")
     }
@@ -149,15 +156,16 @@ read.glider.seaexplorer.delayed <- function(directory, yo, pattern = "pld1.raw",
     if (0L == nfiles) {
         stop("no files found in directory \"", directory, "\" that match the pattern \"", pattern, "\")")
     }
-    # Note the removal of .gz at the end of filenames. This is to permit both compressed
-    # and uncompressed files.  (For example, the files stored within inst/extdata/ in the
-    # present package have been gzipped to save space, even though the original files were
-    # not gzipped.)
+    # Note the removal of .gz at the end of filenames. This is so we can find yo numbers
+    # as the last period-separated item in the filename.
     yoNumbers <- gsub(".gz$", "", filenames) |>
         strsplit(".", fixed = TRUE) |>
         lapply(tail, 1) |>
         unlist() |>
         as.integer()
+    # Put the files into yo order. We must do this because the filenames
+    # recovered by list.files() will not be in yo order (e.g. 100 will come
+    # before 99), owing to insufficient use of leading zeros in the filenames.
     o <- order(yoNumbers)
     yoNumbers <- yoNumbers[o]
     filenames <- filenames[o]
@@ -169,8 +177,13 @@ read.glider.seaexplorer.delayed <- function(directory, yo, pattern = "pld1.raw",
     if (missing(yo)) {
         yo <- yoNumbers
     }
+    #cat(oce::vectorShow(filenames))
+    #cat(oce::vectorShow(yo))
+    #cat(oce::vectorShow(yoNumbers))
     y <- yoNumbers %in% yo
+    #cat(oce::vectorShow(y))
     files <- filenames[y]
+    #cat(oce::vectorShow(files))
     if (length(files) == 0) {
         stop("no files in directory '", directory, "'", sep = "")
     }
@@ -185,7 +198,7 @@ read.glider.seaexplorer.delayed <- function(directory, yo, pattern = "pld1.raw",
     res@metadata$filename <- directory
     ## 44 https://github.com/dankelley/oceglider/issues/44
     ## 44 res@metadata$yo <- yo
-    res@metadata$dataNamesOriginal <- list(glider = list(), payload1 = list())
+    res@metadata$dataNamesOriginal <- list()
 
     showProgressBar <- identical(progressBar, TRUE)
     if (showProgressBar) {
@@ -193,10 +206,11 @@ read.glider.seaexplorer.delayed <- function(directory, yo, pattern = "pld1.raw",
         pb <- txtProgressBar(0, length(files), 0, style = 3) # start at 0 to allow for a single yo
     }
     ds <- list() # stores one entry per file. FIXME: aren't we stringing them together later?
-    for (i in seq_len(nfiles)) {
+    for (i in seq_along(files)) {
         if (showProgressBar) {
             setTxtProgressBar(pb, i)
         }
+        gliderDebug(debug, "i=", i, ", file=\"", files[i], "\"\n", sep = "")
         d <- utils::read.delim(files[i], sep = ";", stringsAsFactors = FALSE, row.names = NULL)
         d$yoNumber <- rep(yo[i], dim(d)[1])
         # Rename items in payload1 data.
@@ -273,7 +287,7 @@ read.glider.seaexplorer.delayed <- function(directory, yo, pattern = "pld1.raw",
             if (oname %in% namesTmp) {
                 gname <- getNextName(nname, namesTmp)
                 names(d) <- gsub(oname, gname, namesTmp)
-                res@metadata$dataNamesOriginal$payload1[[gname]] <- oname
+                res@metadata$dataNamesOriginal[[gname]] <- oname
             }
         }
         gliderDebug(debug > 1, "  finished renaming\n")
@@ -367,9 +381,8 @@ read.glider.seaexplorer.delayed <- function(directory, yo, pattern = "pld1.raw",
         res@data <- dall
         res@processingLog <- processingLogAppend(
             res@processingLog,
-            paste("read.glider.seaexplorer.delayed(directory=", directory, ", yo=", head(yo, 1), ":", tail(yo, 1), ", level=", level, ")", sep = "")
+            paste("read.glider.seaexplorer.raw(directory=", directory, ", yo=", head(yo, 1), ":", tail(yo, 1), ", level=", level, ")", sep = "")
         )
-        return(res)
     } else if (level == 1) {
         if (removeTimeSincePowerOn > 0) {
             starts <- c(1, which(diff(dall$time) > 60) + 1) # FIXME: should 60s be an argument?
@@ -418,49 +431,46 @@ read.glider.seaexplorer.delayed <- function(directory, yo, pattern = "pld1.raw",
         res@data <- dall
     }
     # BOOKMARK START assure that this is echoed in read.glider.seaexplorer.realtime()
-    # insert units
-    message("FIXME: skipping lots of work")
-    return(res)
-    stop("DAN 2")
-    for (stream in names(res@data)) {
-        # FIXME: add more units here, if any of them are certain to be known
-        res@metadata$units[[stream]] <- list()
-        dataNames <- names(res@data[[stream]])
-        if ("salinity" %in% dataNames) {
-            res@metadata$units[[stream]]$salinity <- list(unit = expression(), scale = "PSS-78")
-        } # FIXME: is this modern?
-        if ("temperature" %in% dataNames) {
-            res@metadata$units[[stream]]$temperature <- list(unit = expression(degree * C), scale = "ITS-90")
-        }
-        if ("pressure" %in% dataNames) {
-            res@metadata$units[[stream]]$pressure <- list(unit = expression(dbar), scale = "")
-        }
-        if ("longitude" %in% dataNames) {
-            res@metadata$units[[stream]]$longitude <- list(unit = expression(degree * E), scale = "")
-        }
-        if ("latitude" %in% dataNames) {
-            res@metadata$units[[stream]]$latitude <- list(unit = expression(degree * N), scale = "")
-        }
-        if ("heading" %in% dataNames) {
-            res@metadata$units[[stream]]$heading <- list(unit = expression(degree), scale = "")
-        }
-        if ("pitch" %in% dataNames) {
-            res@metadata$units[[stream]]$pitch <- list(unit = expression(degree), scale = "")
-        }
-        if ("roll" %in% dataNames) {
-            res@metadata$units[[stream]]$roll <- list(unit = expression(degree), scale = "")
-        }
-        # set up flags to value 2, which means not-checked
-        len <- length(res@data[[stream]][[1]]) # all have same length
-        for (name in dataNames) {
-            res@metadata$flags[[stream]][[name]] <- rep(2, len)
-        }
+    # Insert units
+    res@metadata$units <- list()
+    dataNames <- names(res@data)
+    if ("salinity" %in% dataNames) {
+        res@metadata$units$salinity <- list(unit = expression(), scale = "PSS-78")
+    } # FIXME: is this modern?
+    if ("temperature" %in% dataNames) {
+        res@metadata$units$temperature <- list(unit = expression(degree * C), scale = "ITS-90")
+    }
+    if ("pressure" %in% dataNames) {
+        res@metadata$units$pressure <- list(unit = expression(dbar), scale = "")
+    }
+    if ("longitude" %in% dataNames) {
+        res@metadata$units$longitude <- list(unit = expression(degree * E), scale = "")
+    }
+    if ("latitude" %in% dataNames) {
+        res@metadata$units$latitude <- list(unit = expression(degree * N), scale = "")
+    }
+    if ("heading" %in% dataNames) {
+        res@metadata$units$heading <- list(unit = expression(degree), scale = "")
+    }
+    if ("pitch" %in% dataNames) {
+        res@metadata$units$pitch <- list(unit = expression(degree), scale = "")
+    }
+    if ("roll" %in% dataNames) {
+        res@metadata$units$roll <- list(unit = expression(degree), scale = "")
+    }
+    # set up flags to value 2, which means not-checked
+    len <- length(res@data[[1]]) # all have same length
+    for (name in dataNames) {
+        res@metadata$flags[[name]] <- rep(2, len)
     }
     # BOOKMARK END
     res@processingLog <- processingLogAppend(
         res@processingLog,
-        paste("read.glider.seaexplorer.delayed(directory=\"", directory, "\", yo=", head(yo, 1), ":", tail(yo, 1), ", level=", level, ")", sep = "")
+        paste0(
+            "read.glider.seaexplorer.raw(directory=\"", directory, "\", pattern=\"", pattern, "\"\", yo=", head(yo, 1),
+            ":", tail(yo, 1), ", level=", level, ")"
+        )
     )
-    gliderDebug(debug, "read.glider.seaexplorer.delayed() END")
+    gliderDebug(debug, "read.glider.seaexplorer.raw() END")
     res
 }

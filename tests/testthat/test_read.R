@@ -33,9 +33,11 @@ test_that("read.glider.seaexplorer.realtime raw", {
 
 test_that("read.glider.seaexplorer.delayed raw", {
     directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
-    expect_silent(g <- read.glider.seaexplorer.realtime(directory = directory, progressBar = FALSE))
-    expect_equal(names(g@data), c("glider", "payload1"))
-    sort(names(g[["payload1"]]))
+    expect_silent(g <- read.glider.seaexplorer.realtime(
+        directory = directory,
+        pattern = "pld1.raw",
+        progressBar = FALSE
+    ))
     payloadNamesExpected <- sort(c(
         "backscatter", "backscatterCount", "cdom",
         "cdomCount", "chlorophyll", "chlorophyllCount",
@@ -45,7 +47,5 @@ test_that("read.glider.seaexplorer.delayed raw", {
         "salinity", "temperature", "time",
         "yoNumber"
     ))
-    expect_equal(sort(names(g@data$payload1)), payloadNamesExpected)
-    expect_equal(sort(names(g[["payload1"]])), payloadNamesExpected)
-    expect_equal(sort(names(g[["payload"]])), payloadNamesExpected)
+    expect_equal(sort(names(g@data)), payloadNamesExpected)
 })

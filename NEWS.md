@@ -1,6 +1,7 @@
 # oceglider 0.1.15
 
-* Change `read.glider.seaexplorer.delayed()` to read data streams separately (issue #128).
+* Change `read.glider.seaexplorer.raw()` to read data streams separately (issue #128).
+* Rename `read.glider.seaexplorer.delayed()` to `read.glider.seaexplorer.raw()` (decided during discussion of issue #128).
 
 # oceglider 0.1.14
 

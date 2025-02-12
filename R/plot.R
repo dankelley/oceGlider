@@ -266,13 +266,13 @@ setMethod(
             par(mar = omar)
         } else if (which == 4 || which == "TS") {
             gliderDebug(debug, "TS plot\n", sep = "")
-            gliderDebug(debug, "salinity time-series plot\n", sep = "")
-            S <- x[["salinity"]]
-            TT <- x[["temperature"]]
-            p <- x[["pressure"]]
+            salinity <- x[["salinity"]]
+            temperature <- x[["temperature"]]
+            pressure <- x[["pressure"]]
             longitude <- x[["longitude"]]
             latitude <- x[["latitude"]]
-            ctd <- oce::as.ctd(S, TT, p, longitude = longitude, latitude = latitude)
+            ctd <- oce::as.ctd(salinity, temperature, pressure, longitude = longitude, latitude = latitude)
+            # FIXME for issue https://github.com/dankelley/oce/issues/2295
             args <- list(x = ctd)
             omar <- par("mar")
             if (!is.null(colorby)) { # we know 'col' cannot be in dots, from earlier tests

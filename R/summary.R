@@ -18,32 +18,32 @@ setMethod(
     definition = function(object, ...) {
         # mnames <- names(object@metadata)
         cat("Glider Summary\n--------------\n\n")
-        nfiles <- length(object@metadata$filename)
-        if (nfiles == 0) {
-            cat("* Input file: (none)\n")
-        } else if (nfiles == 1) {
-            cat("* Input file:\n")
-            cat("    ", object@metadata$filename[1], "\n", sep = "")
-        } else if (nfiles == 2) {
-            cat("* Input files:\n")
-            cat("    ", object@metadata$filename[1], "\n", sep = "")
-            cat("    ", object@metadata$filename[2], "\n", sep = "")
+        metadata <- object@metadata
+        mnames <- names(metadata)
+        type <- metadata$type
+        cat("* Type:       ", type, "\n", sep = "")
+        if ("subtype" %in% mnames) {
+            cat("* Subtype:    ", metadata$subtype, "\n", sep = "")
+        }
+        if (type == "seaexplorer" && 2L == sum(c("directory", "pattern") %in% mnames)) {
+            cat("* Directory:  \"", metadata$directory, "\"\n", sep = "")
+            cat("* Pattern:    \"", metadata$pattern, "\"\n", sep = "")
         } else {
-            cat("* Input files:\n")
-            cat("    ", object@metadata$filename[1], "\n", sep = "")
-            cat("    ", object@metadata$filename[2], "\n", sep = "")
-            cat("    (and ", nfiles - 2, " others)\n", sep = "")
-        }
-        metadataNames <- names(object@metadata)
-        type <- object@metadata[["type"]]
-        cat("* Type:    ", type, "\n", sep = "")
-        if ("subtype" %in% metadataNames) {
-            cat("* Subtype: ", object@metadata[["subtype"]], "\n", sep = "")
-        }
-        if (type == "seaexplorer") {
-            if (2 == sum(c("directory", "pattern") %in% metadataNames)) {
-                cat("* Directory:  \"", object@metadata$directory, "\"\n", sep = "")
-                cat("* Pattern:  \"", object@metadata$pattern, "\"\n", sep = "")
+            nfiles <- length(metadata$filename)
+            if (nfiles == 0) {
+                cat("* Input file: (none)\n")
+            } else if (nfiles == 1) {
+                cat("* Input file:\n")
+                cat("    ", metadata$filename[1], "\n", sep = "")
+            } else if (nfiles == 2) {
+                cat("* Input files:\n")
+                cat("    ", metadata$filename[1], "\n", sep = "")
+                cat("    ", metadata$filename[2], "\n", sep = "")
+            } else {
+                cat("* Input files:\n")
+                cat("    ", metadata$filename[1], "\n", sep = "")
+                cat("    ", metadata$filename[2], "\n", sep = "")
+                cat("    (and ", nfiles - 2, " others)\n", sep = "")
             }
         }
         # 44 https://github.com/dankelley/oceglider/issues/44
@@ -77,18 +77,18 @@ setMethod(
                 cat("* Time:               ", format(from), "\n")
             } else {
                 cat(
-                    "* Time:   ",
+                    "* Time:      ",
                     format(from, format = "%Y-%m-%d %H:%M:%S"),
                     "to",
                     format(to, format = "%Y-%m-%d %H:%M:%S"),
-                    " (mean increment", round(deltat, 4), "s)\n"
+                    "(mean increment", round(deltat, 4), "s)\n"
                 )
             }
         }
         for (i in 1:ndata) {
             threes[i, ] <- oce::threenum(odata[[i]])
         }
-        if ("units" %in% metadataNames) {
+        if ("units" %in% mnames) {
             units <- object@metadata$units
             unitsNames <- names(object@metadata$units)
             # cat("DAN 1 units follow\n");print(units)
@@ -161,7 +161,7 @@ setMethod(
             threes <- cbind(threes, dim, OriginalName)
             colnames(threes) <- c("Min.", "Mean", "Max.", "Dim.", "OriginalName")
             if (object[["type"]] == "seaexplorer") {
-                cat("* Data Overview (of the \"payload1\" stream):\n", sep = "")
+                cat("* Data Overview\n", sep = "")
             } else {
                 cat("* Data Overview:\n", sep = "")
             }
