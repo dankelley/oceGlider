@@ -1,5 +1,6 @@
 # vim:textwidth=80:expandtab:shiftwidth=4:softtabstop=4
 
+
 #' Read a glider file in a Slocum netcdf format
 #'
 #' This is a provisional function, written to handle a particular
@@ -89,7 +90,7 @@ read.glider.slocum.netcdf <- function(
     if (length(file) != 1) {
         stop("file must have length 1")
     }
-    gliderDebug(debug, "read.glider.slocum.netcdf(file=\"", file, "\", ...) {\n", unindent = 1, sep = "")
+    gliderDebug(debug, "read.glider.slocum.netcdf(file=\"", file, "\", ...) START\n", unindent = 1, sep = "")
     if (!requireNamespace("ncdf4", quietly = TRUE)) {
         stop("must install.packages(\"ncdf4\") to read this data type")
     }
@@ -249,7 +250,8 @@ read.glider.slocum.netcdf <- function(
     res@data <- as.data.frame(data) # FIXME: only do if items in list are same length
     res@metadata$filename <- file
     res@metadata$dataNamesOriginal <- dataNamesOriginal[inData]
-    gliderDebug(debug, "} # read.glider.slocum.netcdf\n", unindent = 1, sep = "")
+    res@metadata$dataAreStreamed <- FALSE
+    gliderDebug(debug, "read.glider.slocum.netcdf() END\n", unindent = 1, sep = "")
     ncdf4::nc_close(f)
     res@metadata$type <- "slocum"
     res

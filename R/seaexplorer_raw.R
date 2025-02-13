@@ -401,12 +401,12 @@ read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
             pb <- txtProgressBar(1, n, 1, style = 3)
         }
         i <- 1
-        for (var in names(df)) {
+        for (var in names(dall)) {
             if (!(var %in% c("time", "navState", "longitude", "latitude", "pressureNav", "yoNumber"))) {
                 if (showProgressBar) {
                     setTxtProgressBar(pb, i)
                 }
-                if (!all(is.na(df[[var]]))) { # in case the entire field is missing, e.g. oxygenFrequency
+                if (!all(is.na(dall[[var]]))) { # in case the entire field is missing, e.g. oxygenFrequency
                     dall[[var]] <- approx(dall[["time"]], dall[[var]], dall[["time"]])$y
                 }
                 i <- i + 1
@@ -463,6 +463,7 @@ read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
     for (name in dataNames) {
         res@metadata$flags[[name]] <- rep(2, len)
     }
+    res@metadata$dataAreStreamed <- FALSE
     # BOOKMARK END
     res@processingLog <- processingLogAppend(
         res@processingLog,

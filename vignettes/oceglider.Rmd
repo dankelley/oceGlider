@@ -28,7 +28,7 @@ glider data.
 The package started with code to read SeaExplorer data in what is called "raw"
 form.  Functions are provided to work with both data telemetered back to base
 as the glider is en-route, and with data downloaded after it is recovered.
-These functions are named `read.glider.seaexplorer.delayed()` and
+These functions are named `read.glider.seaexplorer.raw()` and
 `read.glider.seaexplorer.realtime(),` respectively.
 
 In addition to functions for reading such data, some specialized variants of

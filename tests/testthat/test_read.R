@@ -29,7 +29,7 @@ test_that("read.glider.seaexplorer.realtime raw", {
     expect_equal(sort(names(g[["payload1"]])), payloadNamesExpected)
 })
 
-test_that("read.glider.seaexplorer.delayed raw", {
+test_that("read.glider.seaexplorer.realtime", {
     directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
     expect_silent(g <- read.glider.seaexplorer.realtime(
         directory = directory,

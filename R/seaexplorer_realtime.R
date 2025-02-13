@@ -400,6 +400,7 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1,
             sep = ""
         )
     )
-    gliderDebug(debug, "# END read.glider.seaexplorer.realtime()\n", unindent = 1)
+    res@metadata$dataAreStreamed <- TRUE
+    gliderDebug(debug, "read.glider.seaexplorer.realtime() END\n", unindent = 1)
     res
 }

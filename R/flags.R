@@ -1,76 +1,69 @@
 #' Handle Flags in glider Objects
 #'
-#' This function may be used to set suspicious data to `NA`,
-#' or some other value, based on the values of corresponding data-quality
-#' flags.
+#' This function may be used to set suspicious data to `NA`, or some other
+#' value, based on the values of corresponding data-quality flags.
 #'
-#' The flags are stored within the object as a [list]
-#' named `payload1`, which is stored within a list named `flags`
-#' that is stored in the object's `metadata` slot. Both
-#' `flags` and `flags$payload1` are set up when the object is
-#' created, but values are inserted into `flags$payload1` are
+#' The flags are stored within the object as a [list] named `payload1`, which
+#' is stored within a list named `flags` that is stored in the object's
+#' `metadata` slot. Both `flags` and `flags$payload1` are set up when the
+#' object is created, but values are inserted into `flags$payload1` are
 #' inserted later, when the data are read by one of the `read.glider*`
 #' functions.
 #'
-#' For example, [read.glider.seaexplorer.delayed()]
-#' sets `flags$payload1$salinity` to be a vector of length
-#' matching the data stored in `data$payload1$salinity`, and
-#' does the same for temperature and some other things that are typically
-#' assessed as part of quality-assessment procedures.  When these
-#' things are set up, they are also assigned numerical values, one for
-#' each element in the data set.  The initial value is set to
-#' value 2, which means `not_evaluated`
-#' in the IOOS 2017 quality-control scheme (see table 2 of reference 1).
+#' For example, [read.glider.seaexplorer.raw()] sets `flags$payload1$salinity`
+#' to be a vector of length matching the data stored in
+#' `data$payload1$salinity`, and does the same for temperature and some other
+#' things that are typically assessed as part of quality-assessment procedures.
+#' When these things are set up, they are also assigned numerical values, one
+#' for each element in the data set.  The initial value is set to value 2,
+#' which means `not_evaluated` in the IOOS 2017 quality-control scheme (see
+#' table 2 of reference 1).
 #'
-#' These numerical values provide a way to edit a dataset in an
-#' convenient and traceable way, through the appropriate setting
-#' of the `flags` and `actions` arguments. Flag values
-#' may be altered with [setGliderFlags()], as
+#' These numerical values provide a way to edit a dataset in an convenient and
+#' traceable way, through the appropriate setting of the `flags` and `actions`
+#' arguments. Flag values may be altered with [setGliderFlags()], as
 #' illustrated in the \dQuote{Examples} section.
 #'
 #' @param object An object of [glider-class].
 #'
-#' @param flags A `list` specifying flag values upon which
-#' actions will be taken. This can take two forms. In the first, the
-#' list has named elements each containing a vector of integers. For example,
-#' salinities flagged with values of 3 ("suspect"), 4 ("fail")
-#' or 9 ("missing") would be specified by `flags=list(salinity=c(3,4,9))`.
-#' Several data items can be specified,
-#' e.g. `flags=list(salinity=c(3,4,9),temperature=c(3,4,9))` indicates
-#' that the actions are to take place for both salinity and temperature.
-#' In the second form, `flags` is a list with unnamed vectors, and
-#' this means to apply the actions to all the data entries; thus,
-#' `flags=list(c(3,4,9))` means to apply not just to salinity and temperature,
-#' but also to everything else for which flags have been set up. If `flags`
-#' is not provided, then an attempt is made to set up a
-#' useful default.
+#' @param flags A `list` specifying flag values upon which actions will be
+#' taken. This can take two forms. In the first, the list has named elements
+#' each containing a vector of integers. For example, salinities flagged with
+#' values of 3 ("suspect"), 4 ("fail") or 9 ("missing") would be specified by
+#' `flags=list(salinity=c(3,4,9))`. Several data items can be specified, e.g.
+#' `flags=list(salinity=c(3,4,9),temperature=c(3,4,9))` indicates that the
+#' actions are to take place for both salinity and temperature. In the second
+#' form, `flags` is a list with unnamed vectors, and this means to apply the
+#' actions to all the data entries; thus, `flags=list(c(3,4,9))` means to apply
+#' not just to salinity and temperature, but also to everything else for which
+#' flags have been set up. If `flags` is not provided, then an attempt is made
+#' to set up a useful default.
 #'
-#' @param actions An optional `list` that contains items with
-#' names that match those in the `flags` argument.  If `actions`
-#' is not supplied, the default will be to set all values identified by
-#' `flags` to `NA`; this can also be specified by
-#' specifying `actions=list("NA")`. It is also possible to specify
-#' functions that calculate replacement values. These are provided
-#' with `object` as the single argument, and must return a
-#' replacement for the data item in question.
+#' @param actions An optional `list` that contains items with names that match
+#' those in the `flags` argument.  If `actions` is not supplied, the default
+#' will be to set all values identified by `flags` to `NA`; this can also be
+#' specified by specifying `actions=list("NA")`. It is also possible to specify
+#' functions that calculate replacement values. These are provided with
+#' `object` as the single argument, and must return a replacement for the data
+#' item in question.
 #'
 #' @param where An optional string that permits data and flags to be stored
-#' indirectly, e.g. with data in `object@data[[where]]` instead of
-#' in `object@data`, and flags in `object@metadata$flags[[where]]` instead of in
+#' indirectly, e.g. with data in `object@data[[where]]` instead of in
+#' `object@data`, and flags in `object@metadata$flags[[where]]` instead of in
 #' `object@metadata$flags`. If `where` is NULL, the second forms are used. This
 #' scheme is needed because SeaExplorer data are stored in this manner.
 #'
 #' @param debug An optional integer specifying the degree of debugging, with
 #' value 0 meaning to skip debugging and 1 or higher meaning to print some
-#' information about the arguments and the data. It is usually a good idea to set
-#' this to 1 for initial work with a dataset, to see which flags are being
+#' information about the arguments and the data. It is usually a good idea to
+#' set this to 1 for initial work with a dataset, to see which flags are being
 #' handled for each data item. If not supplied, this defaults to the value of
 #' `\link{getOption}("gliderDebug",0)`.
 #'
 #' @examples
 #' library(oceglider)
 #' directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
-#' g <- read.glider.seaexplorer.delayed(directory, progressBar = FALSE)
+#' g <- read.glider.seaexplorer.raw(directory, "pld1.raw", progressBar = FALSE)
 #'
 #' # The histogram motivates a crude limit for anomalously low salinity.
 #' par(mfrow = c(1, 2), mar = c(3, 3, 1, 1), mgp = c(2, 0.75, 0))
@@ -95,9 +88,9 @@
 #' @export
 #'
 #' @md
-handleGliderFlags <- function(object, flags = NULL, actions = NULL, where = "payload1", debug = getOption("gliderDebug", 0)) {
-    # DEVELOPER 1: alter the next comment to explain your setup
-    gliderDebug(debug, "handleGliderFlags()function\n", sep = "", unindent = 1)
+handleGliderFlags <- function(object, flags = NULL, actions = NULL,
+                              where = "payload1", debug = getOption("gliderDebug", 0)) {
+    gliderDebug(debug, "handleGliderFlags() START\n", sep = "", unindent = 1)
     if (is.null(flags)) {
         flags <- c(3, 4, 9)
         if (is.null(flags)) {
@@ -105,13 +98,15 @@ handleGliderFlags <- function(object, flags = NULL, actions = NULL, where = "pay
         }
     }
     if (is.null(actions)) {
-        actions <- list("NA") # DEVELOPER 3: alter this line to suit a new data class
+        actions <- list("NA")
         names(actions) <- names(flags)
     }
     if (any(names(actions) != names(flags))) {
         stop("names of flags and actions must match")
     }
-    handleGliderFlagsInternal(object = object, flags = flags, actions = actions, where = where, debug = debug)
+    res <- handleGliderFlagsInternal(object = object, flags = flags, actions = actions, where = where, debug = debug)
+    gliderDebug(debug, "handleGliderFlags() END\n", sep = "", unindent = 1)
+    res
 }
 
 
@@ -143,7 +138,7 @@ handleGliderFlags <- function(object, flags = NULL, actions = NULL, where = "pay
 ## NOT EXPORTED #' @export
 ## NOT EXPORTED #' @md
 handleGliderFlagsInternal <- function(object, flags, actions, where = NULL, debug = 0) {
-    gliderDebug(debug, "handleGliderFlagsInternal()\n", sep = "", unindent = 1)
+    gliderDebug(debug, "handleGliderFlagsInternal() START\n", sep = "", unindent = 1)
     if (missing(flags)) {
         warning("no flags supplied (internal error; report to developer)")
         return(object)
@@ -165,8 +160,21 @@ handleGliderFlagsInternal <- function(object, flags, actions, where = NULL, debu
         stop("names of flags must match those of actions")
     }
     gliderDebug(debug, "flags=", paste(as.vector(flags), collapse = ","), "\n", sep = "")
-    oflags <- if (is.null(where)) object@metadata$flags else object@metadata$flags[[where]]
-    odata <- if (is.null(where)) object@data else object@data[[where]]
+    existingFlags <- object@metadata$flags
+    if (is.null(existingFlags)) {
+        stop("the object does not have any flags set up")
+    }
+    dataAreStreamed <- object@metadata$dataAreStreamed
+    if (is.null(dataAreStreamed)) {
+        stop("the object does not have an entry in @metadata$dataAreStreamed; please report an issue")
+    }
+    if (dataAreStreamed) {
+        oflags <- object@metadata$flags[[where]]
+        odata <- object@data[[where]]
+    } else {
+        oflags <- object@metadata$flags
+        odata <- object@data
+    }
     if (length(oflags)) {
         singleFlag <- is.null(names(oflags)) # TRUE if there is just one flag for all data fields
         gliderDebug(debug, "singleFlag=", singleFlag, "\n", sep = "")
@@ -269,10 +277,10 @@ handleGliderFlagsInternal <- function(object, flags, actions, where = NULL, debu
     } else {
         gliderDebug(debug, "object has no flags in metadata\n")
     }
-    if (is.null(where)) {
-        object@data <- odata
-    } else {
+    if (dataAreStreamed) {
         object@data[[where]] <- odata
+    } else {
+        object@data <- odata
     }
     object@processingLog <- processingLogAppend(
         object@processingLog,
@@ -284,7 +292,7 @@ handleGliderFlagsInternal <- function(object, flags, actions, where = NULL, debu
             collapse = " ", sep = ""
         )
     )
-    gliderDebug(debug, "  returning from handleFlagsInternal()\n", sep = "", unindent = 1)
+    gliderDebug(debug, "handleFlagsInternal() END\n", sep = "", unindent = 1)
     object
 }
 
@@ -324,10 +332,15 @@ handleGliderFlagsInternal <- function(object, flags, actions, where = NULL, debu
 #' @export
 setGliderFlags <- function(object, name = NULL, i = NULL, value = NULL, debug = getOption("gliderDebug", 0)) {
     gliderDebug(debug, "setGliderFlags(object, name=\"", name, "\", value=", value,
-        ", i=c(", paste(head(i), collapse = ","), "...), debug=", debug, ") START\n",
+        ", i=c(", paste(head(i, 2), collapse = ","), "...", paste(tail(i, 2), collapse = " "),
+        ") START\n",
         sep = "",
         unindent = 1
     )
+    if (debug > 1) {
+        cat("next is table(i):\n")
+        print(table(i))
+    }
     res <- object
     # Ensure proper argument setup.
     if (is.null(name)) {
@@ -343,39 +356,51 @@ setGliderFlags <- function(object, name = NULL, i = NULL, value = NULL, debug = 
     if (length(name) > 1) {
         stop("must specify one 'name' at a time")
     }
-    where <- "payload1"
-    if ("flags" %in% names(object@metadata) && where %in% names(object@metadata$flags)) {
-        if (!(name %in% names(object@metadata$flags[[where]]))) {
-            stop("object has no flag for \"", name, "\"; try one of: \"", paste(names(object@metadata$flags[[where]]), collapse = " "), "\"")
-        }
-        if (is.logical(i) && length(i) != length(res@metadata$flags[[where]][[1]])) {
-            stop(
-                "length of 'i' (", length(i), ") does not match length of object@data$payload1[[1]] (",
-                length(res@metadata$flags[[where]][[1]])
-            )
-        }
-        if (setAll) {
-            i <- seq_along(object@data[[where]][[1]])
-        }
-        # Permit 'value' to be a character string, if a scheme already
-        # exists and 'value' is one of the stated flag names.
-        valueOrig <- value
-        if (is.character(value)) {
-            if (is.null(res@metadata$flagScheme)) {
-                stop("cannot have character 'value' because initializeGliderFlagScheme() has not been called on object")
+    existingFlags <- object@metadata$flags
+    if (is.null(existingFlags)) {
+        stop("this object has no flags set up yet")
+    }
+    defaultStream <- "payload1" # FIXME make this an arg?
+    flagsAreStreamed <- identical(sort(names(existingFlags)), c("glider", "payload1"))
+    if (flagsAreStreamed) {
+        existingFlags <- object@metadata$flags[[defaultStream]]
+    }
+    # flags may be split into streams (FIXME: this was rewritten 2025-02-13 and may be wrong+brittle)
+    knownNames <- names(existingFlags)
+    if (!(name %in% knownNames)) {
+        stop("object has no \"", name, "\" flag; try one of: \"", paste(knownNames, collapse = " "), "\"")
+    }
+    if (is.logical(i) && length(i) != length(existingFlags[[1]])) {
+        stop(
+            "length of 'i' (", length(i), ") does not match existing flag length (",
+            length(existingFlags[[1]]), ")"
+        )
+    }
+    if (setAll) {
+        i <- seq_along(existingFlags[[1]])
+    }
+    # Permit 'value' to be a character string, if a scheme already
+    # exists and 'value' is one of the stated flag names.
+    valueOrig <- value
+    if (is.character(value)) {
+        if (is.null(res@metadata$flagScheme)) {
+            stop("cannot have character 'value' because initializeGliderFlagScheme() has not been called on object")
+        } else {
+            if (value %in% names(res@metadata$flagScheme$mapping)) {
+                value <- res@metadata$flagScheme$mapping[[value]]
             } else {
-                if (value %in% names(res@metadata$flagScheme$mapping)) {
-                    value <- res@metadata$flagScheme$mapping[[value]]
-                } else {
-                    stop("value=\"", value, "\" is not defined in the object's flagScheme; try one of: \"",
-                        paste(names(res@metadata$flagScheme$mapping), "\", \""), "\"",
-                        sep = ""
-                    )
-                }
+                stop("value=\"", value, "\" is not defined in the object's flagScheme; try one of: \"",
+                    paste(names(res@metadata$flagScheme$mapping), "\", \""), "\"",
+                    sep = ""
+                )
             }
         }
-        # Finally, apply the value
-        res@metadata$flags[[where]][[name]][i] <- value
+    }
+    # Finally, apply the value
+    if (flagsAreStreamed) {
+        res@metadata$flags[[defaultStream]][[name]][i] <- value
+    } else {
+        res@metadata$flags[[name]][i] <- value
     }
     res@processingLog <- processingLogAppend(
         res@processingLog,
@@ -390,7 +415,7 @@ setGliderFlags <- function(object, name = NULL, i = NULL, value = NULL, debug = 
 }
 
 initializeGliderFlagScheme <- function(object, name = "IOOS", mapping = NULL, default = NULL, update = NULL, debug = 0) {
-    gliderDebug(debug, "initializeGliderFlagScheme(object, name=\"", name, "\", debug=", debug, ") {", sep = "", unindent = 1)
+    gliderDebug(debug, "initializeGliderFlagScheme(object, name=\"", name, "\", debug=", debug, ") START", sep = "", unindent = 1)
     res <- object
     if (!is.null(object@metadata$flagScheme) && !(is.logical(update) && update)) {
         warning("cannot alter a flagScheme that is already is place")
@@ -493,6 +518,6 @@ initializeGliderFlagScheme <- function(object, name = "IOOS", mapping = NULL, de
             sep = ""
         )
     )
-    gliderDebug(debug, "} # initializeGliderFlagScheme", sep = "", unindent = 1)
+    gliderDebug(debug, "initializeGliderFlagScheme() END", sep = "", unindent = 1)
     res
 }

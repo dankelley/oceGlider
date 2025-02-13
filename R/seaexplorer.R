@@ -47,14 +47,14 @@
 #' @examples
 #' # Use codes to identify upcasts, at least roughly (note the stray points)
 #' directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
-#' g <- read.glider.seaexplorer.delayed(directory, progressBar = FALSE)
+#' g <- read.glider.seaexplorer.raw(directory, "pld1.raw", progressBar = FALSE)
 #' ns <- navStateCodes(g)
 #' plot(g, which = "p")
-#' ga <- subset(g, navState == ns$ascending)
-#' points(ga[["time"]], ga[["pressure"]], col = 3, pch = 20)
-#' giu <- subset(g, navState == ns$inflecting_upwards)
-#' points(giu[["time"]], giu[["pressure"]], col = 2, pch = 20)
-#' mtext(" red=inflecting_upwards; green=ascending", side = 3, line = -1, adj = 0)
+#' gd <- subset(g, navState == ns$descending)
+#' points(gd[["time"]], gd[["pressure"]], col = 2)
+#' ga <- subset(g, navState == ns$asscending)
+#' points(ga[["time"]], ga[["pressure"]], col = 3)
+#' mtext(" red=descending; green=ascending", side = 3, line = -1)
 #'
 #' @references
 #' 1.Teledyne Webb Research. \emph{Slocum G2 Glider Operators Manual}, January 2012.
