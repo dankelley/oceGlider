@@ -15,9 +15,13 @@ test_that("read.glider.seaexplorer.realtime flag names", {
     )
 })
 
-test_that("read.glider.seaexplorer.delayed flag names", {
+test_that("read.glider.seaexplorer.raw flag names", {
     directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
-    expect_silent(g <- read.glider.seaexplorer.delayed(directory = directory, progressBar = FALSE))
+    expect_silent(g <- read.glider.seaexplorer.raw(
+        directory = directory,
+        pattern = "pld1.raw",
+        progressBar = FALSE
+    ))
     expect_equal(
         g@metadata$flagScheme,
         list(
@@ -31,35 +35,39 @@ test_that("read.glider.seaexplorer.delayed flag names", {
 test_that("read.glider.seaexplorer.realtime flag setting and handling", {
     # This is based on the example given by ?"handleFlags,glider-method"
     directory <- system.file("extdata/sea_explorer/realtime_raw", package = "oceglider")
-    expect_silent(g <- read.glider.seaexplorer.realtime(directory))
+    expect_silent(g <- read.glider.seaexplorer.realtime(directory, progressBar = FALSE))
     # NOTE: this test was more hard-wired before issue40, e.g. it
     # demanded that the number of data read be 2784, but that number
-    # became 3435 when read.glider.seaexplorer.delayed() was changed to
+    # became 3435 when read.glider.seaexplorer.raw() was changed to
     # address issue40.
     n <- length(g[["salinity"]])
     expect_equal(n, sum(g[["salinityFlag"]] == 2))
-    lowSalinity <- which(g[["salinity"]] < 31)
-    g2 <- setGliderFlags(g, "salinity", g[["salinity"]] < 31, 3)
-    expect_true(all(g2[["salinityFlag"]][lowSalinity] == 3))
-    g3 <- handleGliderFlags(g2)# , c(3, 4, 9)) # use default action, which is "NA"
-    expect_true(all(g3[["salinityFlag"]][lowSalinity] == 3))
-    expect_true(all(is.na(g3[["salinity"]][lowSalinity])))
+    S <- g[["salinity"]]
+    badS <- is.na(S) | S < 31
+    g2 <- setGliderFlags(g, "salinity", badS, 3)
+    expect_true(all(g2[["salinityFlag"]][badS] == 3))
+    g3 <- handleGliderFlags(g2) # , c(3, 4, 9)) # use default action, which is "NA"
+    expect_true(all(g3[["salinityFlag"]][badS] == 3))
+    expect_true(all(is.na(g3[["salinity"]][badS])))
 })
 
-test_that("read.glider.seaexplorer.delayed flag setting and handling", {
+test_that("read.glider.seaexplorer.raw flag setting and handling", {
     # This is based on the example given by ?"handleFlags,glider-method"
     directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
-    expect_silent(g <- read.glider.seaexplorer.delayed(directory, progressBar = FALSE))
+    expect_silent(g <- read.glider.seaexplorer.raw(directory, "pld1.raw",
+        progressBar = FALSE
+    ))
     # NOTE: this test was more hard-wired before issue40, e.g. it
     # demanded that the number of data read be 2784, but that number
-    # became 3435 when read.glider.seaexplorer.delayed() was changed to
+    # became 3435 when read.glider.seaexplorer.raw() was changed to
     # address issue40.
     n <- length(g[["salinity"]])
     expect_equal(n, sum(g[["salinityFlag"]] == 2))
-    lowSalinity <- which(g[["salinity"]] < 31)
-    g2 <- setGliderFlags(g, "salinity", g[["salinity"]] < 31, 3)
-    expect_true(all(g2[["salinityFlag"]][lowSalinity] == 3))
+    S <- g[["salinity"]]
+    badS <- is.na(S) | S < 31
+    g2 <- setGliderFlags(g, "salinity", badS, 3)
+    expect_true(all(g2[["salinityFlag"]][badS] == 3))
     g3 <- handleGliderFlags(g2, c(3, 4, 9)) # use default action, which is "NA"
-    expect_true(all(g3[["salinityFlag"]][lowSalinity] == 3))
-    expect_true(all(is.na(g3[["salinity"]][lowSalinity])))
+    expect_true(all(g3[["salinityFlag"]][badS] == 3))
+    expect_true(all(is.na(g3[["salinity"]][badS])))
 })

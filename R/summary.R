@@ -18,27 +18,33 @@ setMethod(
     definition = function(object, ...) {
         # mnames <- names(object@metadata)
         cat("Glider Summary\n--------------\n\n")
-        nfiles <- length(object@metadata$filename)
-        if (nfiles == 0) {
-            cat("* Input file: (none)\n")
-        } else if (nfiles == 1) {
-            cat("* Input file:\n")
-            cat("    ", object@metadata$filename[1], "\n", sep = "")
-        } else if (nfiles == 2) {
-            cat("* Input files:\n")
-            cat("    ", object@metadata$filename[1], "\n", sep = "")
-            cat("    ", object@metadata$filename[2], "\n", sep = "")
-        } else {
-            cat("* Input files:\n")
-            cat("    ", object@metadata$filename[1], "\n", sep = "")
-            cat("    ", object@metadata$filename[2], "\n", sep = "")
-            cat("    (and ", nfiles - 2, " others)\n", sep = "")
+        metadata <- object@metadata
+        mnames <- names(metadata)
+        type <- metadata$type
+        cat("* Type:       ", type, "\n", sep = "")
+        if ("subtype" %in% mnames) {
+            cat("* Subtype:    ", metadata$subtype, "\n", sep = "")
         }
-        metadataNames <- names(object@metadata)
-        type <- object@metadata[["type"]]
-        cat("* Type:    ", type, "\n", sep = "")
-        if ("subtype" %in% metadataNames) {
-            cat("* Subtype: ", object@metadata[["subtype"]], "\n", sep = "")
+        if (type == "seaexplorer" && 2L == sum(c("directory", "pattern") %in% mnames)) {
+            cat("* Directory:  \"", metadata$directory, "\"\n", sep = "")
+            cat("* Pattern:    \"", metadata$pattern, "\"\n", sep = "")
+        } else {
+            nfiles <- length(metadata$filename)
+            if (nfiles == 0) {
+                cat("* Input file: (none)\n")
+            } else if (nfiles == 1) {
+                cat("* Input file:\n")
+                cat("    ", metadata$filename[1], "\n", sep = "")
+            } else if (nfiles == 2) {
+                cat("* Input files:\n")
+                cat("    ", metadata$filename[1], "\n", sep = "")
+                cat("    ", metadata$filename[2], "\n", sep = "")
+            } else {
+                cat("* Input files:\n")
+                cat("    ", metadata$filename[1], "\n", sep = "")
+                cat("    ", metadata$filename[2], "\n", sep = "")
+                cat("    (and ", nfiles - 2, " others)\n", sep = "")
+            }
         }
         # 44 https://github.com/dankelley/oceglider/issues/44
         # 44 nyo <- length(object@metadata$yo)
@@ -48,8 +54,8 @@ setMethod(
         # 44     cat(sprintf("* Yo:      %d values, between %d and %d\n",
         # 44                 nyo, object@metadata$yo[1], object@metadata$yo[nyo]))
         payload1Exists <- "payload1" %in% names(object@data)
-        #stream <- if (object[["type"]] == "seaexplorer") object@data$payload1 else object@data
-        if (payload1Exists) {
+        # stream <- if (object[["type"]] == "seaexplorer") object@data$payload1 else object@data
+        if (payload1Exists) { # FIXME: this is likely unhelpful now
             odataName <- "payload1"
             odata <- object@data[[odataName]]
         } else {
@@ -70,20 +76,22 @@ setMethod(
             if (is.na(deltat)) {
                 cat("* Time:               ", format(from), "\n")
             } else {
-                cat("* Time:   ",
-                    format(from, format="%Y-%m-%d %H:%M:%S"),
+                cat(
+                    "* Time:      ",
+                    format(from, format = "%Y-%m-%d %H:%M:%S"),
                     "to",
-                    format(to, format="%Y-%m-%d %H:%M:%S"),
-                    " (mean increment", round(deltat, 4), "s)\n")
+                    format(to, format = "%Y-%m-%d %H:%M:%S"),
+                    "(mean increment", round(deltat, 4), "s)\n"
+                )
             }
         }
         for (i in 1:ndata) {
             threes[i, ] <- oce::threenum(odata[[i]])
         }
-        if ("units" %in% metadataNames) {
+        if ("units" %in% mnames) {
             units <- object@metadata$units
             unitsNames <- names(object@metadata$units)
-            #cat("DAN 1 units follow\n");print(units)
+            # cat("DAN 1 units follow\n");print(units)
             units <- unlist(lapply(
                 seq_along(units),
                 function(i) {
@@ -121,7 +129,7 @@ setMethod(
                     res
                 }
             ))
-            #cat("DAN 2 units follow\n");print(units)
+            # cat("DAN 2 units follow\n");print(units)
             names(units) <- unitsNames
             rownames(threes) <- paste("    ", oce::dataLabel(names(odata), units), sep = "")
         } else {
@@ -153,7 +161,7 @@ setMethod(
             threes <- cbind(threes, dim, OriginalName)
             colnames(threes) <- c("Min.", "Mean", "Max.", "Dim.", "OriginalName")
             if (object[["type"]] == "seaexplorer") {
-                cat("* Data Overview (of the \"payload1\" stream):\n", sep = "")
+                cat("* Data Overview\n", sep = "")
             } else {
                 cat("* Data Overview:\n", sep = "")
             }

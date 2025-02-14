@@ -6,7 +6,7 @@
 #' detected by the presence of `".sub."` in their names.
 #' Such real-time data are decimated before transmission, and thus do not
 #' represent the full data collected by the glider sensors.
-#' (Use [read.glider.seaexplorer.delayed)] instead of
+#' (Use [read.glider.seaexplorer.raw)] instead of
 #' this, to read delayed-mode data, as downloaded from the glider
 #' after recovery.)
 #'
@@ -30,12 +30,12 @@
 #' @param directory The directory in which the realtime SeaExplorer files are located.
 #'
 #' @param yo A numeric value (or vector) specifying the yo numbers to
-#'     read. If this is not provided, [read.glider.seaexplorer.delayed()]
+#'     read. If this is not provided, [read.glider.seaexplorer.raw()]
 #'     will read all yo numbers for which files are present in `dir`.
 #'
 #' @param level Ignored by [read.glider.seaexplorer.realtime] and
 #'     only included for similarity with
-#'     [read.glider.seaexplorer.delayed()].
+#'     [read.glider.seaexplorer.raw()].
 #'
 #' @param progressBar a logical value that controls whether to indicate the
 #' progress made in reading and interpreting the data.  This can be useful,
@@ -258,7 +258,7 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1,
 
 
     # FIXME: add more conversions here, and also to the corresponding
-    # spot in the .delayed() function. When both are added, adjust
+    # spot in the .raw() function. When both are added, adjust
     # ../man-roxygen/seaexplorer_names.R accordingly.
     if ("Timestamp" %in% names(gliData)) {
         # FIXME(DK): reading fractional seconds changes some hard-wired numbers in test_flags.R
@@ -392,7 +392,6 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1,
         }
     }
     # BOOKMARK END
-    gliderDebug(debug, "read.glider.seaexplorer.delayed(\"", directory, "\", ...) {\n", unindent = 1)
     res@processingLog <- processingLogAppend(
         res@processingLog,
         paste("read.glider.seaexplorer.realtime(directory=\"", directory, "\",",
@@ -401,6 +400,7 @@ read.glider.seaexplorer.realtime <- function(directory, yo, level = 1,
             sep = ""
         )
     )
-    gliderDebug(debug, "# END read.glider.seaexplorer.realtime()\n", unindent = 1)
+    res@metadata$dataAreStreamed <- TRUE
+    gliderDebug(debug, "read.glider.seaexplorer.realtime() END\n", unindent = 1)
     res
 }

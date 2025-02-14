@@ -17,12 +17,12 @@ read.glider.seaexplorer.realtime(
 \item{directory}{The directory in which the realtime SeaExplorer files are located.}
 
 \item{yo}{A numeric value (or vector) specifying the yo numbers to
-read. If this is not provided, \code{\link[=read.glider.seaexplorer.delayed]{read.glider.seaexplorer.delayed()}}
+read. If this is not provided, \code{\link[=read.glider.seaexplorer.raw]{read.glider.seaexplorer.raw()}}
 will read all yo numbers for which files are present in \code{dir}.}
 
 \item{level}{Ignored by \link{read.glider.seaexplorer.realtime} and
 only included for similarity with
-\code{\link[=read.glider.seaexplorer.delayed]{read.glider.seaexplorer.delayed()}}.}
+\code{\link[=read.glider.seaexplorer.raw]{read.glider.seaexplorer.raw()}}.}
 
 \item{progressBar}{a logical value that controls whether to indicate the
 progress made in reading and interpreting the data.  This can be useful,
@@ -48,11 +48,11 @@ Reads real-time CSV files produced by a SeaExplorer glider, as
 detected by the presence of \code{".sub."} in their names.
 Such real-time data are decimated before transmission, and thus do not
 represent the full data collected by the glider sensors.
-(Use [read.glider.seaexplorer.delayed)] instead of
+(Use [read.glider.seaexplorer.raw)] instead of
 this, to read delayed-mode data, as downloaded from the glider
 after recovery.)
 
-[read.glider.seaexplorer.delayed)]: R:read.glider.seaexplorer.delayed)
+[read.glider.seaexplorer.raw)]: R:read.glider.seaexplorer.raw)
 }
 \section{Flag Scheme}{
 
@@ -159,12 +159,12 @@ https://cdn.ioos.noaa.gov/media/2017/12/QARTOD-Data-Flags-Manual_Final_version1.
 }
 \seealso{
 Other functions for seaexplorer gliders: 
-\code{\link{read.glider.seaexplorer.delayed}()}
+\code{\link{read.glider.seaexplorer.raw}()}
 
 Other functions to read glider data: 
 \code{\link{read.glider.netcdf}()},
 \code{\link{read.glider.netcdf.ioos}()},
-\code{\link{read.glider.seaexplorer.delayed}()},
+\code{\link{read.glider.seaexplorer.raw}()},
 \code{\link{read.glider.slocum.csv}()},
 \code{\link{read.glider.slocum.netcdf}()}
 }

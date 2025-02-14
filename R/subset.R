@@ -80,7 +80,12 @@ setMethod(
         }
         dots <- list(...)
         debug <- if ("debug" %in% names(dots)) dots$debug else getOption("gliderDebug", 0)
-        gliderDebug(debug, "subset,glider-method() {\n", unindent = 1)
+        gliderDebug(debug, "subset,glider-method() START\n", unindent = 1)
+        dataAreStreamed <- x@metadata$dataAreStreamed
+        if (is.null(dataAreStreamed)) {
+            stop("the object does not have an entry in @metadata$dataAreStreamed; please report an issue")
+        }
+        gliderDebug(debug, "dataAreStreamed: ", dataAreStreamed, "\n")
         subsetString <- paste(deparse(substitute(subset)), collapse = " ")
         gliderDebug(debug, "subsetString: \"", subsetString, "\"\n", sep = "")
         xtype <- x@metadata$type # direct lookup, to guard against 'type' being in data
@@ -88,29 +93,25 @@ setMethod(
         if (is.character(substitute(subset))) {
             gliderDebug(debug, "handling a character-valued subset\n")
             # subset is a character string
-            if (subset == "ascending") {
+            if (subset %in% c("ascending", "descending")) {
                 if (xtype == "seaexplorer") {
                     res <- x
-                    keep <- res@data$glider$navState == 117
-                    res@data$glider <- subset(res@data$glider, keep)
-                    res@data$payload1 <- subset(res@data$payload1, keep)
-                    for (i in seq_along(x@metadata$flags[["payload1"]])) {
-                        res@metadata$flags[["payload1"]][[i]] <- res@metadata$flag[["payload1"]][[i]][keep]
+                    if (dataAreStreamed) {
+                        keep <- res@data$glider$navState == if (subset == "ascending") 117 else 100
+                        for (i in seq_along(x@metadata$flags[["payload1"]])) {
+                            res@metadata$flags[["payload1"]][[i]] <- res@metadata$flag[["payload1"]][[i]][keep]
+                        }
+                        res@data$glider <- subset(res@data$glider, keep)
+                        res@data$payload1 <- subset(res@data$payload1, keep)
+                    } else {
+                        keep <- res@data$navState == 117
+                        for (i in seq_along(x@metadata$flags[["payload1"]])) {
+                            res@metadata$flags[[i]] <- res@metadata$flag[[i]][keep]
+                        }
+                        res@data <- res@data[keep, ]
                     }
                 } else {
-                    stop("subset to 'ascending' only works for seaexplorer objects (please report)")
-                }
-            } else if (subset == "descending") {
-                if (xtype == "seaexplorer") {
-                    res <- x
-                    keep <- res@data$glider$navState == 100
-                    res@data$glider <- subset(res@data$glider, keep)
-                    res@data$payload1 <- subset(res@data$payload1, keep)
-                    for (i in seq_along(x@metadata$flags[["payload1"]])) {
-                        res@metadata$flags[["payload1"]][[i]] <- res@metadata$flag[["payload1"]][[i]][keep]
-                    }
-                } else {
-                    stop("subset to 'desscending' only works for seaexplorer objects (please report)")
+                    stop("subset to 'ascending' and 'descending' only work for seaexplorer objects (please report)")
                 }
             }
         } else {
@@ -146,17 +147,29 @@ setMethod(
             } else {
                 gliderDebug(debug, "subset does not relate to yolength\n")
                 if (xtype == "seaexplorer") {
-                    keep <- eval(substitute(subset), x@data[["payload1"]], parent.frame())
+                    if (dataAreStreamed) {
+                        keep <- eval(substitute(subset), x@data[["payload1"]], parent.frame())
+                    } else {
+                        keep <- eval(substitute(subset), x@data, parent.frame())
+                    }
                     keep[is.na(keep)] <- FALSE
-                    gliderDebug(debug, "keeping", sum(keep), "of", length(keep), "elements\n")
                     res <- x
-                    res@data[["payload1"]] <- x@data[["payload1"]][keep, ]
-                    for (i in seq_along(x@metadata$flags[["payload1"]])) {
-                        res@metadata$flags[["payload1"]][[i]] <- res@metadata$flag[["payload1"]][[i]][keep]
+                    if (dataAreStreamed) {
+                        gliderDebug(debug, "keeping", sum(keep), "of", length(keep), "elements (streamed-data case)\n")
+                        res@data[["payload1"]] <- x@data[["payload1"]][keep, ]
+                        for (i in seq_along(x@metadata$flags[["payload1"]])) {
+                            res@metadata$flags[["payload1"]][[i]] <- res@metadata$flag[["payload1"]][[i]][keep]
+                        }
+                    } else {
+                        gliderDebug(debug, "keeping", sum(keep), "of", length(keep), "elements (non streamed-data case)\n")
+                        res@data <- x@data[keep, ]
+                        for (i in seq_along(x@metadata$flags[["payload1"]])) {
+                            res@metadata$flags[[i]] <- res@metadata$flag[[i]][keep]
+                        }
                     }
                 } else {
                     where <- "payload1"
-                    gliderDebug(debug, "doing subset with respect to @data$", where, "\n", sep="")
+                    gliderDebug(debug, "doing subset with respect to @data$", where, "\n", sep = "")
                     keep <- eval(substitute(subset), x@data[[where]], parent.frame())
                     keep[is.na(keep)] <- FALSE
                     gliderDebug(debug, "keeping", sum(keep), "of", length(keep), "elements\n")
@@ -171,7 +184,7 @@ setMethod(
                 sep = "", collapse = ""
             )
         )
-        gliderDebug(debug, "} # subset,glider-method\n", sep = "", unindent = 1)
+        gliderDebug(debug, "subset,glider-method() END\n", sep = "", unindent = 1)
         res
     }
 )

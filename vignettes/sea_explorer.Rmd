@@ -87,7 +87,7 @@ format that is quite useful for an initial look at the data.
 ```{r fig.height=4, fig.width=7, fig.cap="**Figure 1. An overview of the raw data. Note the spurious values in the time-series plots for the first hour or two.**", dev.args=list(pointsize=12)}
 library(oce)
 library(oceglider)
-g <- read.glider.seaexplorer.delayed(tmpdir)
+g <- read.glider.seaexplorer.raw(tmpdir)
 layout(matrix(c(2, 1, 3, 1, 4, 1), byrow = TRUE, nrow = 3), widths = c(0.6, 0.4))
 plot(g, which = "TS")
 plot(g, which = "p", type = "p", cex = 0.3)
@@ -103,7 +103,8 @@ This can be done with the `subset()` function, e.g. as follows, where 2.5
 hours was chosen as the cutoff after some experimentation.
 
 ```{r fig.height=4, fig.width=7, fig.cap="**Figure 2. Raw data, after trimming spurious data in the 1.5 hours following power-on events.**", dev.args=list(pointsize=12)}
-g2 <- subset(g, time > g[["time"]][1] + 2.5 * 3600)
+keep <- g[["time"]] > g[["time"]][1] + 2.5 * 3600
+g2 <- subset(g, keep)
 layout(matrix(c(2, 1, 3, 1, 4, 1), byrow = TRUE, nrow = 3), widths = c(0.6, 0.4))
 plot(g2, which = "TS")
 plot(g2, which = "p", type = "p", cex = 0.3)
@@ -139,8 +140,8 @@ Another useful operation is to look at individual yos, which can be done as
 follows, for the first three of the remaining yos.
 
 ```{r}
-payload <- g2[["payload"]]
-s <- split(payload, payload$yoNumber)
+data <- g2[["data"]]
+s <- split(data, data$yoNumber)
 par(mfrow = c(1, 3))
 for (i in 1:3) {
     ss <- s[[i]]
@@ -219,7 +220,8 @@ G <- read.glider.netcdf(fileNC)
 As was done for the raw data, we ought to drop the data before a certain time.
 
 ```{r}
-G2 <- subset(G, time > G[["time"]][1] + 2.5 * 3600)
+keep <- G[["time"]] > G[["time"]][1] + 2.5 * 3600
+G2 <- subset(G, keep)
 ```
 
 Typically, the next step will be to see the trajectory in time-depth space, as

@@ -127,6 +127,7 @@ read.glider.slocum.csv <- function(
     data$time <- oce::numberAsPOSIXct(data$unix_timestamp, "unix")
     rval@data$payload1 <- as.data.frame(data)
     rval@metadata$filename <- filename
+    res@metadata$dataAreStreamed <- TRUE
     gliderDebug(debug, "END read.glider.slocum.csv\n")
     rval
 }

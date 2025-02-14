@@ -32,8 +32,8 @@ be written with units fully specified.
 \examples{
 library(oceglider)
 directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
-g <- read.glider.seaexplorer.delayed(directory)
-data <- g[["payload"]]
+g <- read.glider.seaexplorer.raw(directory, "pld1.raw", progressBar = FALSE)
+data <- g[["data"]]
 units <- list(
     temperature = list(unit = expression(degree * C), scale = "ITS-90"),
     salinity = list(unit = expression(), scale = "PSS-78"),
