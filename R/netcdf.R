@@ -263,7 +263,7 @@ getAtt <- function(f, varid = 0, attname = NULL, default = NULL) {
 #' @family functions to read netcdf glider data
 #'
 #' @importFrom oce as.unit
-#' @importFrom ncdf4 nc_open ncatt_get ncatt_get ncvar_get
+#' @importFrom ncdf4 nc_close nc_open ncatt_get ncatt_get ncvar_get
 #'
 #' @md
 #'
