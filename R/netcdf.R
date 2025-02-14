@@ -281,6 +281,7 @@ read.glider.netcdf <- function(file, saveGlobalAttributes = TRUE,
     capture.output({
         f <- ncdf4::nc_open(file)
     })
+    on.exit(ncdf4::nc_close(file))
     # get all global attributes (see https://github.com/dankelley/oceglider/issues/125)
     res@metadata$globalAttributes <- list()
     if (saveGlobalAttributes) {
