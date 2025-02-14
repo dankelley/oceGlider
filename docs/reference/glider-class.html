@@ -6,7 +6,23 @@ here, but it seems to cause problems (e.g. inability to build
 vignettes in the standard way) that I have trouble understanding.
 We ran into similar problems in the argoFloats package too, and
 there we decided to define the object fully in the new package. For
+now, that's the approach used here also.
+As of 2024-06-23, it is not clear whether the best policy is for
+this to inherit from 'oce' or to define itself here.  Doing the
+former might seem sensible, since it might reduce the need for code
+here, but it seems to cause problems (e.g. inability to build
+vignettes in the standard way) that I have trouble understanding.
+We ran into similar problems in the argoFloats package too, and
+there we decided to define the object fully in the new package. For
 now, that's the approach used here also."><meta property="og:description" content="As of 2024-06-23, it is not clear whether the best policy is for
+this to inherit from 'oce' or to define itself here.  Doing the
+former might seem sensible, since it might reduce the need for code
+here, but it seems to cause problems (e.g. inability to build
+vignettes in the standard way) that I have trouble understanding.
+We ran into similar problems in the argoFloats package too, and
+there we decided to define the object fully in the new package. For
+now, that's the approach used here also.
+As of 2024-06-23, it is not clear whether the best policy is for
 this to inherit from 'oce' or to define itself here.  Doing the
 former might seem sensible, since it might reduce the need for code
 here, but it seems to cause problems (e.g. inability to build
@@ -21,7 +37,7 @@ now, that's the approach used here also."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">oceglider</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.14</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.15</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,12 +65,20 @@ now, that's the approach used here also."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>A class to hold glider information</h1>
-      <small class="dont-index">Source: <a href="https://github.com/dankelley/oceglider/blob/HEAD/R/base.R" class="external-link"><code>R/base.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/dankelley/oceglider/blob/HEAD/R/base.R" class="external-link"><code>R/base.R</code></a>, <a href="https://github.com/dankelley/oceglider/blob/HEAD/R/netcdf.R" class="external-link"><code>R/netcdf.R</code></a></small>
       <div class="d-none name"><code>glider-class.Rd</code></div>
     </div>
 
     <div class="ref-description section level2">
     <p>As of 2024-06-23, it is not clear whether the best policy is for
+this to inherit from 'oce' or to define itself here.  Doing the
+former might seem sensible, since it might reduce the need for code
+here, but it seems to cause problems (e.g. inability to build
+vignettes in the standard way) that I have trouble understanding.
+We ran into similar problems in the argoFloats package too, and
+there we decided to define the object fully in the new package. For
+now, that's the approach used here also.</p>
+<p>As of 2024-06-23, it is not clear whether the best policy is for
 this to inherit from 'oce' or to define itself here.  Doing the
 former might seem sensible, since it might reduce the need for code
 here, but it seems to cause problems (e.g. inability to build

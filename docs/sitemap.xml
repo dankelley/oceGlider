@@ -18,11 +18,13 @@
 <url><loc>https://dankelley.github.io/oceglider/reference/navStateCodes.html</loc></url>
 <url><loc>https://dankelley.github.io/oceglider/reference/oceGlider-class.html</loc></url>
 <url><loc>https://dankelley.github.io/oceglider/reference/oceGlider.html</loc></url>
+<url><loc>https://dankelley.github.io/oceglider/reference/oceglider-package.html</loc></url>
 <url><loc>https://dankelley.github.io/oceglider/reference/plot-glider-method.html</loc></url>
 <url><loc>https://dankelley.github.io/oceglider/reference/read.glider.html</loc></url>
 <url><loc>https://dankelley.github.io/oceglider/reference/read.glider.netcdf.html</loc></url>
 <url><loc>https://dankelley.github.io/oceglider/reference/read.glider.netcdf.ioos.html</loc></url>
 <url><loc>https://dankelley.github.io/oceglider/reference/read.glider.seaexplorer.delayed.html</loc></url>
+<url><loc>https://dankelley.github.io/oceglider/reference/read.glider.seaexplorer.raw.html</loc></url>
 <url><loc>https://dankelley.github.io/oceglider/reference/read.glider.seaexplorer.realtime.html</loc></url>
 <url><loc>https://dankelley.github.io/oceglider/reference/read.glider.slocum.csv.html</loc></url>
 <url><loc>https://dankelley.github.io/oceglider/reference/read.glider.slocum.html</loc></url>
