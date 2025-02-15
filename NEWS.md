@@ -1,16 +1,22 @@
 # oceglider 0.1.16
 
-* Remove `read.glider.seaexplorer.realtime()` because it is supplanted by `read.glider.seaexplorer.raw()` (decided during discussion of issue #130).
+* Add `deleteStartupData()`, and remove the `removeTimeSincePowerOn` parameter
+  from `read.glider.seaexplorer.raw()`, in accordance with issue #132.
+
+* Remove `read.glider.seaexplorer.realtime()` because it is supplanted by
+  `read.glider.seaexplorer.raw()` (decided during discussion of issue #130).
 
 # oceglider 0.1.15
 
-* Change `read.glider.seaexplorer.raw()` to read data streams separately (issue #128).
-* Rename `read.glider.seaexplorer.delayed()` to `read.glider.seaexplorer.raw()` (decided during discussion of issue #128).
+* Change `read.glider.seaexplorer.raw()` to read data streams separately (issue
+  #128).
+* Rename `read.glider.seaexplorer.delayed()` to `read.glider.seaexplorer.raw()`
+  (decided during discussion of issue #128).
 
 # oceglider 0.1.14
 
-* Change `read.glider.seaexplorer.delayed()` to not interpolate longitude
-and latitude between surfacing events for `level=0` usage (issue #127).
+* Change `read.glider.seaexplorer.delayed()` to not interpolate longitude and
+  latitude between surfacing events for `level=0` usage (issue #127).
 
 # oceglider 0.1.13
 

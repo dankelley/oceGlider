@@ -10,7 +10,6 @@ read.glider.seaexplorer.raw(
   yo,
   level = 1,
   interpolateToCTD = TRUE,
-  removeTimeSincePowerOn = 0,
   progressBar = interactive(),
   missingValue = 9999,
   debug = getOption("gliderDebug", default = 0)
@@ -41,14 +40,6 @@ numbers for which files are present in \code{dir}.}
 interpolated to the CTD times to obtain a common time base, or whether all
 sensors should simply be interpolated for all time stamps (which was the
 default behaviour before 2019-12-08)}
-
-\item{removeTimeSincePowerOn}{numeric value indicating the number of
-seconds of data to trim, after the glider sensors are powered on.
-One way to determine this is to read the whole sequence,
-and then plot say the first 10 minutes of salinity and temperature
-data, looking for a transition between aphysical values, which
-might take the form of zero salinity, followed by a relatively
-rapid ramp-up to values that seem more oceanographic.}
 
 \item{progressBar}{a logical value that controls whether to indicate the
 progress made in reading and interpreting the data.  This can be useful,
@@ -199,6 +190,15 @@ https://github.com/ioos/ioosngdac/wiki/NGDAC-NetCDF-File-Format-Version-2].
 Data in the \code{pld2} files (or others for additional payloads)
 are ignored in this version of the package. Please contact the
 authors, if you need to handle such files.
+}
+
+\section{History of changes to this function}{
+
+\itemize{
+\item In version 0.1.16, the \code{removeTimeSincePowerOn} parameter was removed. The
+new scheme is for the user to call \code{deleteStartupData()} on the return
+value, to accomplish a similar thing.
+}
 }
 
 \examples{

@@ -2,6 +2,7 @@
 
 export(as.glider)
 export(degreeMinute)
+export(deleteStartupData)
 export(getNextName)
 export(glider)
 export(gliderDebug)

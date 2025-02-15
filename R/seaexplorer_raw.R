@@ -81,13 +81,13 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #' sensors should simply be interpolated for all time stamps (which was the
 #' default behaviour before 2019-12-08)
 #'
-#' @param removeTimeSincePowerOn numeric value indicating the number of
-#' seconds of data to trim, after the glider sensors are powered on.
-#' One way to determine this is to read the whole sequence,
-#' and then plot say the first 10 minutes of salinity and temperature
-#' data, looking for a transition between aphysical values, which
-#' might take the form of zero salinity, followed by a relatively
-#' rapid ramp-up to values that seem more oceanographic.
+## @param removeTimeSincePowerOn numeric value indicating the number of
+## seconds of data to trim, after the glider sensors are powered on.
+## One way to determine this is to read the whole sequence,
+## and then plot say the first 10 minutes of salinity and temperature
+## data, looking for a transition between aphysical values, which
+## might take the form of zero salinity, followed by a relatively
+## rapid ramp-up to values that seem more oceanographic.
 #'
 #' @param progressBar a logical value that controls whether to indicate the
 #' progress made in reading and interpreting the data.  This can be useful,
@@ -122,6 +122,12 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #' @importFrom stats approx median
 #' @importFrom utils read.delim flush.console head setTxtProgressBar tail txtProgressBar
 #'
+#' @section History of changes to this function:
+#'
+#' * In version 0.1.16, the `removeTimeSincePowerOn` parameter was removed. The
+#' new scheme is for the user to call `deleteStartupData()` on the return
+#' value, to accomplish a similar thing.
+#'
 #' @author Clark Richards, Chantelle Layton and Dan Kelley
 #'
 #' @md
@@ -129,7 +135,7 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #' @export
 read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
                                         yo, level = 1, interpolateToCTD = TRUE,
-                                        removeTimeSincePowerOn = 0,
+                                        #removeTimeSincePowerOn = 0,
                                         progressBar = interactive(),
                                         missingValue = 9999,
                                         # rename = TRUE,
@@ -377,15 +383,15 @@ read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
             paste("read.glider.seaexplorer.raw(directory=", directory, ", yo=", head(yo, 1), ":", tail(yo, 1), ", level=", level, ")", sep = "")
         )
     } else if (level == 1) {
-        if (removeTimeSincePowerOn > 0) {
-            starts <- c(1, which(diff(dall$time) > 60) + 1) # FIXME: should 60s be an argument?
-            dt <- median(diff(as.numeric(dall$time)))
-            ok <- rep(TRUE, length(dall$time))
-            n <- round(removeTimeSincePowerOn / dt)
-            gliderDebug(debug, sprintf("  for trimming after power on: dt=%.3fs n=%d\n", dt, n))
-            for (s in starts) ok[s:(s + n)] <- FALSE
-            dall <- dall[ok, ]
-        }
+        #if (removeTimeSincePowerOn > 0) {
+        #    starts <- c(1, which(diff(dall$time) > 60) + 1) # FIXME: should 60s be an argument?
+        #    dt <- median(diff(as.numeric(dall$time)))
+        #    ok <- rep(TRUE, length(dall$time))
+        #    n <- round(removeTimeSincePowerOn / dt)
+        #    gliderDebug(debug, sprintf("  for trimming after power on: dt=%.3fs n=%d\n", dt, n))
+        #    for (s in starts) ok[s:(s + n)] <- FALSE
+        #    dall <- dall[ok, ]
+        #}
         # Interpolate NAs
         ctd <- which(!is.na(dall$temperature)) # indices of measure CTD points
         n <- length(names(dall)) - length(c("time", "navState", "longitude", "latitude", "pressureNav", "yoNumber"))
