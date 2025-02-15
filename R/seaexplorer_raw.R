@@ -2,20 +2,13 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 
 #' Read Delayed-Mode SeaExplorer Glider Data
 #'
-#' Reads delayed-mode CSV files produced by a SeaExplorer glider,
-#' as detected by the presence of `".raw."` in their names.
-#' Such delayed-mode data are the full resolution data stored on
-#' the glider and downloaded after recovery.
-#' (Use [read.glider.seaexplorer.realtime()] instead
-#' of this, to read data as transmitted by the glider while
-#' it is in the field.)
-#'
-#' This function can output either "Level 0" or "Level 1" type data. Level 0 is
-#' simply the raw data as written in the CSV files with no processing done.
-#' (Historical note: until package varsion 0.1-14, released on 2025-02-10,
-#' longitude and latitude were interpolated between surface values for level =
+#' Reads raw CSV files produced by a SeaExplorer glider. This function can
+#' output either "Level 0" or "Level 1" type data. Level 0 is simply the raw
+#' data as written in the CSV files with no processing done. (Historical note:
+#' until package varsion 0.1-14, released on 2025-02-10, longitude and latitude
+#' were interpolated between surface values for level =
 #' 0. This behaviour was changed for issue 127, at
-#' https://github.com/dankelley/oceglider/issues/127).
+#'    https://github.com/dankelley/oceglider/issues/127).
 #'
 #' Level 1 processing performs a number of steps to give an
 #' "analysis ready" dataset, including
@@ -430,7 +423,6 @@ read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
         dall$salinity[dall$salinity > 40] <- NA
         res@data <- dall
     }
-    # BOOKMARK START assure that this is echoed in read.glider.seaexplorer.realtime()
     # Insert units
     res@metadata$units <- list()
     dataNames <- names(res@data)

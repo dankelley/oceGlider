@@ -71,22 +71,15 @@ that the value of \code{debug} controls not just the breadth
 of debugging, but also the depth.}
 }
 \description{
-Reads delayed-mode CSV files produced by a SeaExplorer glider,
-as detected by the presence of \code{".raw."} in their names.
-Such delayed-mode data are the full resolution data stored on
-the glider and downloaded after recovery.
-(Use \code{\link[=read.glider.seaexplorer.realtime]{read.glider.seaexplorer.realtime()}} instead
-of this, to read data as transmitted by the glider while
-it is in the field.)
-}
-\details{
-This function can output either "Level 0" or "Level 1" type data. Level 0 is
-simply the raw data as written in the CSV files with no processing done.
-(Historical note: until package varsion 0.1-14, released on 2025-02-10,
-longitude and latitude were interpolated between surface values for level =
+Reads raw CSV files produced by a SeaExplorer glider. This function can
+output either "Level 0" or "Level 1" type data. Level 0 is simply the raw
+data as written in the CSV files with no processing done. (Historical note:
+until package varsion 0.1-14, released on 2025-02-10, longitude and latitude
+were interpolated between surface values for level =
 0. This behaviour was changed for issue 127, at
 https://github.com/dankelley/oceglider/issues/127).
-
+}
+\details{
 Level 1 processing performs a number of steps to give an
 "analysis ready" dataset, including
 
@@ -216,13 +209,9 @@ plot(g, which = "p")
 
 }
 \seealso{
-Other functions for seaexplorer gliders: 
-\code{\link{read.glider.seaexplorer.realtime}()}
-
 Other functions to read glider data: 
 \code{\link{read.glider.netcdf}()},
 \code{\link{read.glider.netcdf.ioos}()},
-\code{\link{read.glider.seaexplorer.realtime}()},
 \code{\link{read.glider.slocum.csv}()},
 \code{\link{read.glider.slocum.netcdf}()}
 }

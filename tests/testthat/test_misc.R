@@ -10,14 +10,14 @@ test_that("degreeMinute() works as expected", {
 
 test_that("subset seaexplorer by 'ascending' and descending", {
     directory <- system.file("extdata/sea_explorer/realtime_raw", package = "oceglider")
-    expect_silent(g <- read.glider.seaexplorer.realtime(directory = directory, progressBar = FALSE))
+    expect_silent(g <- read.glider.seaexplorer.raw(directory = directory, pattern = "pld1.sub", progressBar = FALSE))
     expect_silent(ga <- subset(g, "ascending"))
     expect_silent(gd <- subset(g, "descending"))
 })
 
 test_that("subset seaexplorer by pressure", {
     directory <- system.file("extdata/sea_explorer/realtime_raw", package = "oceglider")
-    expect_silent(d <- read.glider.seaexplorer.realtime(directory = directory, progressBar = FALSE))
+    expect_silent(d <- read.glider.seaexplorer.raw(directory = directory, pattern = "pld1.sub", progressBar = FALSE))
     deep <- d[["pressure"]] > 20
     deep[is.na(deep)] <- FALSE
     expect_silent(gdeep <- subset(d, pressure > 20))

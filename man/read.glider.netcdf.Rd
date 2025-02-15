@@ -51,7 +51,6 @@ mechanism works with either name, e.g. if \code{g} is a glider object, then
 Other functions to read glider data: 
 \code{\link{read.glider.netcdf.ioos}()},
 \code{\link{read.glider.seaexplorer.raw}()},
-\code{\link{read.glider.seaexplorer.realtime}()},
 \code{\link{read.glider.slocum.csv}()},
 \code{\link{read.glider.slocum.netcdf}()}
 

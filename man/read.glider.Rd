@@ -9,7 +9,7 @@ read.glider(file, debug = getOption("gliderDebug", default = 0), ...)
 read.glider(file, debug = getOption("gliderDebug", default = 0), ...)
 }
 \arguments{
-\item{file}{Character value giving the name of the file.}
+\item{file}{character value giving the name of the file.}
 
 \item{debug}{an integer specifying whether debugging information is
 to be printed during processing. If this is not provided, then
@@ -22,7 +22,7 @@ passes the value of \code{debug} but decreased by 1, which means
 that the value of \code{debug} controls not just the breadth
 of debugging, but also the depth.}
 
-\item{...}{Extra parameters passed to more specific \verb{read.*} functions.}
+\item{...}{extra parameters passed to more specific \verb{read.*} functions.}
 }
 \value{
 A \code{glider} object, i.e. one inheriting from \linkS4class{glider}.
@@ -31,18 +31,13 @@ A \code{glider} object, i.e. one inheriting from \linkS4class{glider}.
 }
 \description{
 This is a high-level function that passes control to \code{\link[=read.glider.netcdf]{read.glider.netcdf()}}
-if the first argument is a string ending with \code{".nc"}, to
-\code{\link[=read.glider.seaexplorer.realtime]{read.glider.seaexplorer.realtime()}} if it is a vector of strings, any
-of which contains the text \code{"pld1.sub."} followed by one or more digits, or to
-\code{\link[=read.glider.seaexplorer.raw]{read.glider.seaexplorer.raw()}} if it is a vector of strings, any
-contains the text \code{"pld1.raw."} followed by one or more digits.
+if the first argument is a string ending with \code{".nc"} or to
+\code{\link[=read.glider.seaexplorer.raw]{read.glider.seaexplorer.raw()}} if it is a vector of strings, any contains
+the text \code{"pld1.raw."} followed by one or more digits.
 
 This is a high-level function that passes control to \code{\link[=read.glider.netcdf]{read.glider.netcdf()}}
-if the first argument is a string ending with \code{".nc"}, to
-\code{\link[=read.glider.seaexplorer.realtime]{read.glider.seaexplorer.realtime()}} if it is a vector of strings, any
-of which contains the text \code{"pld1.sub."} followed by one or more digits, or to
-\code{\link[=read.glider.seaexplorer.raw]{read.glider.seaexplorer.raw()}} if it is a vector of strings, any
-contains the text \code{"pld1.raw."} followed by one or more digits.
+if the first argument is a string ending with \code{".nc"} or to
+\code{\link[=read.glider.seaexplorer.raw]{read.glider.seaexplorer.raw()}}.
 }
 \author{
 Dan Kelley

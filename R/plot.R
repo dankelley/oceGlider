@@ -106,7 +106,7 @@
 #'
 #' # Example 1: various plot types, using defaults
 #' directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
-#' g <- read.glider.seaexplorer.realtime(directory, progressBar = FALSE)
+#' g <- read.glider.seaexplorer.raw(directory, "pld1.raw", progressBar = FALSE)
 #' plot(g, which = "p")
 #' plot(g, which = "S")
 #' plot(g, which = "T")

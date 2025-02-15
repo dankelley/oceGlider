@@ -1,3 +1,7 @@
+# oceglider 0.1.16
+
+* Remove `read.glider.seaexplorer.realtime()` because it is supplanted by `read.glider.seaexplorer.raw()` (decided during discussion of issue #130).
+
 # oceglider 0.1.15
 
 * Change `read.glider.seaexplorer.raw()` to read data streams separately (issue #128).
