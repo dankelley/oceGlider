@@ -30,7 +30,6 @@ NULL
 #'
 #' @export
 glider <- setClass("glider", slots = c(metadata = "list", data = "list", processingLog = "list"))
-# glider <- setClass("glider", contains = "oce")
 
 setMethod(
     f = "initialize",
@@ -44,6 +43,7 @@ setMethod(
         .Object@metadata$level <- NA # unknown at start
         .Object@processingLog$time <- as.POSIXct(Sys.time())
         .Object@processingLog$value <- "create 'glider' object"
+        .Object@metadata$dataAreStreamed <- FALSE
         return(.Object)
     }
 )
