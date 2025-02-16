@@ -2,7 +2,7 @@
 % Please edit documentation in R/seaexplorer_raw.R
 \name{read.glider.seaexplorer.raw}
 \alias{read.glider.seaexplorer.raw}
-\title{Read Delayed-Mode SeaExplorer Glider Data}
+\title{Read Raw SeaExplorer Data}
 \usage{
 read.glider.seaexplorer.raw(
   directory,
@@ -64,11 +64,9 @@ of debugging, but also the depth.}
 \description{
 Reads raw CSV files produced by a SeaExplorer glider. This function can
 output either "Level 0" or "Level 1" type data. Level 0 is simply the raw
-data as written in the CSV files with no processing done. (Historical note:
-until package varsion 0.1-14, released on 2025-02-10, longitude and latitude
-were interpolated between surface values for level =
-0. This behaviour was changed for issue 127, at
-https://github.com/dankelley/oceglider/issues/127).
+data as written in the CSV files with no processing done except
+renaming variables to the oce convention (e.g. \code{"GPCTD_CONDUCTIVITY"}
+is renamed as \code{"conductivity"}).
 }
 \details{
 Level 1 processing performs a number of steps to give an
@@ -119,6 +117,21 @@ Table 2 of reference 1), as follows.
 \code{missing}       \tab 9              \tab Missing Data                \tab Data are missing; using a placeholder\cr
 }
 }
+\section{Historical notes}{
+
+\enumerate{
+\item Until package varsion 0.1-14, released on 2025-02-10, longitude and
+latitude were interpolated between surface values for the case where
+\code{level} is given as 0. This behaviour was changed for issue 127, at
+https://github.com/dankelley/oceglider/issues/127).
+\item Until package varsion 0.1-16, released on 2025-02-15, data could be
+erased for a while after power-on events, as controlled by a parameter
+named \code{removeTimeSincePowerOn}. Now, a similar action may be accomplished
+by calling \code{deleteStartupData()} on the return object from the present
+function.
+}
+}
+
 \section{Renaming of data in seaexplorer files}{
 
 
@@ -203,7 +216,9 @@ value, to accomplish a similar thing.
 
 \examples{
 library(oceglider)
-directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
+
+directory <- system.file("extdata/sea_explorer/delayed_raw", package =
+                         "oceglider")
 g <- read.glider.seaexplorer.raw(directory, progressBar = FALSE)
 plot(g, which = "p")
 
