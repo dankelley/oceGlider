@@ -27,8 +27,38 @@ nameDictLegato <- data.frame(
         "pressure", "salinity", "temperature"
     )
 )
-seaexplorerDict <- rbind(nameDictDefault, nameDictLegato)
-head(seaexplorerDict)
+
+# Next from seaexplorer files that CL sent me in early Feb, 2025
+feb2025 <- "
+gliderName,oceName
+Altitude,altitude
+AngCmd,angleCmd
+AngPos,anglePos
+BallastCmd,ballastCmd
+BallastPos,ballastPos
+DeadReckoning,deadReckoning
+Declination,declination
+Depth,depth
+DesiredH,desiredHeading
+Heading,heading
+Lat,latitude
+LinCmd,lineCmd
+LinPos,linePos
+Lon,longitude
+NavState,navState
+Pa,pressureAir
+Pitch,pitch
+Roll,roll
+SecurityLevel,securityLevel
+Temperature,temperature
+Timestamp,timestamp
+Voltage,voltage
+X,X"
+
+feb2025Dict <- read.csv(text = feb2025)
+
+seaexplorerDict <- rbind(nameDictDefault, nameDictLegato, feb2025Dict)
+#head(seaexplorerDict)
 o <- order(seaexplorerDict$gliderName)
 seaexplorerDict <- seaexplorerDict[o, ]
 write.csv(seaexplorerDict, "seaexplorerDict.csv", row.names = FALSE)
