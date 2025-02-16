@@ -93,7 +93,11 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #' the file
 #' `system.file("extdata/dictionaries/seaexplorerDict.csv",package="oceglider")`
 #' and a future version of `read.glider.seaexplorer.raw()` will permit users to
-#' specify alternative schemes.
+#' specify alternative schemes.  It is not recommended to use `rename=FALSE`
+#' because doing so will disable some of the other actions of
+#' `read.glider.seaexplorer.raw()`, such as the computation of salinity from
+#' temperature, conductivity and pressure, simply because the code to do that
+#' relies on the variables having known names.
 #'
 #' @param progressBar a logical value that controls whether to indicate the
 #' progress made in reading and interpreting the data.  This can be useful,
@@ -237,8 +241,8 @@ read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
         d <- utils::read.delim(files[i], sep = ";", stringsAsFactors = FALSE, row.names = NULL)
         d$yoNumber <- rep(yo[i], dim(d)[1])
         gliderDebug(debug > 3, "i=", i, "  (position 1) \n")
-        #cat("is next sensible\n")
-        #print(head(nameDict))
+        # cat("is next sensible\n")
+        # print(head(nameDict))
         if (rename) {
             gliderDebug(debug, "renaming variables\n")
             for (row in seq_len(nrow(nameDict))) {
@@ -257,8 +261,8 @@ read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
                     d$NAV_LONGITUDE <- degreeMinute(d$NAV_LONGITUDE)
                 }
                 namesTmp <- names(d)
-                #message(oce::vectorShow(namesTmp, n = -1))
-                #message(oce::vectorShow(gliderName, n = -1))
+                # message(oce::vectorShow(namesTmp, n = -1))
+                # message(oce::vectorShow(gliderName, n = -1))
                 if (gliderName %in% namesTmp) {
                     gname <- getNextName(oceName, namesTmp)
                     names(d) <- gsub(gliderName, gname, namesTmp)
@@ -271,29 +275,31 @@ read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
         gliderDebug(debug, "  first stage completed for file", i, "of", nfiles, "\n")
     }
     dall <- do.call(rbind.data.frame, ds)
-    #dall[["x"]] <- NULL # get rid of the weird last column
+    # dall[["x"]] <- NULL # get rid of the weird last column
     if (showProgressBar) {
         cat("\n")
         flush.console()
     }
-    gliderDebug(debug, "  data cleanup\n")
-    # First remove all duplicated lon/lat
-    dall$longitude[which(duplicated(dall$longitude))] <- NA
-    dall$latitude[which(duplicated(dall$latitude))] <- NA
-    # Change behaviour for level=0, according to issue
-    # https://github.com/dankelley/oceglider/issues/127
-    if (level > 0) {
-        trans <- dall$navState == 116
-        dall$longitude[!trans] <- NA
-        dall$latitude[!trans] <- NA
-        dall$longitude <- approx(dall$time, dall$longitude, dall$time)$y
-        dall$latitude <- approx(dall$time, dall$latitude, dall$time)$y
+    if (rename) { # cannot do things in this block without renaming, because we do not know what e.g. holds lon and lat
+        gliderDebug(debug, "  data cleanup\n")
+        # First remove all duplicated lon/lat
+        dall$longitude[which(duplicated(dall$longitude))] <- NA
+        dall$latitude[which(duplicated(dall$latitude))] <- NA
+        # Change behaviour for level=0, according to issue
+        # https://github.com/dankelley/oceglider/issues/127
+        if (level > 0) {
+            trans <- dall$navState == 116
+            dall$longitude[!trans] <- NA
+            dall$latitude[!trans] <- NA
+            dall$longitude <- approx(dall$time, dall$longitude, dall$time)$y
+            dall$latitude <- approx(dall$time, dall$latitude, dall$time)$y
+        }
+        # Trim out any empty rows (no data at all)
+        sub <- dall[, which(!(names(dall) %in% c("time", "navState", "longitude", "latitude", "pressureNav", "yoNumber")))]
+        naRows <- apply(sub, 1, function(x) sum(is.na(x)))
+        ok <- naRows < dim(sub)[2]
+        dall <- dall[ok, ]
     }
-    # Trim out any empty rows (no data at all)
-    sub <- dall[, which(!(names(dall) %in% c("time", "navState", "longitude", "latitude", "pressureNav", "yoNumber")))]
-    naRows <- apply(sub, 1, function(x) sum(is.na(x)))
-    ok <- naRows < dim(sub)[2]
-    dall <- dall[ok, ]
     if (!is.null(missingValue)) {
         dall[dall == missingValue] <- NA
     }
@@ -305,30 +311,32 @@ read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
         )
     } else if (level == 1) {
         # Interpolate NAs
-        ctd <- which(!is.na(dall$temperature)) # indices of measure CTD points
-        n <- length(names(dall)) - length(c("time", "navState", "longitude", "latitude", "pressureNav", "yoNumber"))
-        if (showProgressBar) {
-            cat("* Interpolating NAs...\n")
-            pb <- txtProgressBar(1, n, 1, style = 3)
-        }
-        i <- 1
-        for (var in names(dall)) {
-            if (!(var %in% c("time", "navState", "longitude", "latitude", "pressureNav", "yoNumber"))) {
-                if (showProgressBar) {
-                    setTxtProgressBar(pb, i)
-                }
-                if (!all(is.na(dall[[var]]))) { # in case the entire field is missing, e.g. oxygenFrequency
-                    dall[[var]] <- approx(dall[["time"]], dall[[var]], dall[["time"]])$y
-                }
-                i <- i + 1
+        if (rename) {
+            ctd <- which(!is.na(dall$temperature)) # indices of measure CTD points
+            n <- length(names(dall)) - length(c("time", "navState", "longitude", "latitude", "pressureNav", "yoNumber"))
+            if (showProgressBar) {
+                cat("* Interpolating NAs...\n")
+                pb <- txtProgressBar(1, n, 1, style = 3)
             }
-        }
-        # We want to interpolate non-CTD fields to the time stamps
-        # for which there is actual measured CTD data. Since we've
-        # already interpolated to all existing time stamps, we can
-        # just remove the ones that were *not* from the CTD
-        if (interpolateToCTD) {
-            dall <- dall[ctd, ]
+            i <- 1
+            for (var in names(dall)) {
+                if (!(var %in% c("time", "navState", "longitude", "latitude", "pressureNav", "yoNumber"))) {
+                    if (showProgressBar) {
+                        setTxtProgressBar(pb, i)
+                    }
+                    if (!all(is.na(dall[[var]]))) { # in case the entire field is missing, e.g. oxygenFrequency
+                        dall[[var]] <- approx(dall[["time"]], dall[[var]], dall[["time"]])$y
+                    }
+                    i <- i + 1
+                }
+            }
+            # We want to interpolate non-CTD fields to the time stamps
+            # for which there is actual measured CTD data. Since we've
+            # already interpolated to all existing time stamps, we can
+            # just remove the ones that were *not* from the CTD
+            if (interpolateToCTD) {
+                dall <- dall[ctd, ]
+            }
         }
         if (showProgressBar) {
             cat("\n")
@@ -337,8 +345,10 @@ read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
         # Remove duplicated times
         dall <- dall[!duplicated(dall), ]
         # Calculate salinity
-        dall$salinity <- with(dall, swSCTp(conductivity, temperature, pressure, conductivityUnit = "S/m"))
-        dall$salinity[dall$salinity > 40] <- NA
+        if (rename) {
+            dall$salinity <- with(dall, swSCTp(conductivity, temperature, pressure, conductivityUnit = "S/m"))
+            dall$salinity[dall$salinity > 40] <- NA
+        }
         res@data <- dall
     }
     # Insert units

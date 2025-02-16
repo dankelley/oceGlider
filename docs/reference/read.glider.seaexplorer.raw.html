@@ -113,7 +113,11 @@ to a more oce-like scheme. This name mapping is defined by
 the file
 <code>system.file("extdata/dictionaries/seaexplorerDict.csv",package="oceglider")</code>
 and a future version of <code>read.glider.seaexplorer.raw()</code> will permit users to
-specify alternative schemes.</p></dd>
+specify alternative schemes.  It is not recommended to use <code>rename=FALSE</code>
+because doing so will disable some of the other actions of
+<code>read.glider.seaexplorer.raw()</code>, such as the computation of salinity from
+temperature, conductivity and pressure, simply because the code to do that
+relies on the variables having known names.</p></dd>
 
 
 <dt id="arg-progressbar">progressBar<a class="anchor" aria-label="anchor" href="#arg-progressbar"></a></dt>

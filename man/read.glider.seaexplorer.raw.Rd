@@ -47,7 +47,11 @@ to a more oce-like scheme. This name mapping is defined by
 the file
 \code{system.file("extdata/dictionaries/seaexplorerDict.csv",package="oceglider")}
 and a future version of \code{read.glider.seaexplorer.raw()} will permit users to
-specify alternative schemes.}
+specify alternative schemes.  It is not recommended to use \code{rename=FALSE}
+because doing so will disable some of the other actions of
+\code{read.glider.seaexplorer.raw()}, such as the computation of salinity from
+temperature, conductivity and pressure, simply because the code to do that
+relies on the variables having known names.}
 
 \item{progressBar}{a logical value that controls whether to indicate the
 progress made in reading and interpreting the data.  This can be useful,
