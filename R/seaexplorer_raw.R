@@ -1,14 +1,13 @@
 issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglider/issues/40)
 
-#' Read Delayed-Mode SeaExplorer Glider Data
+#' Read Raw SeaExplorer Data
 #'
 #' Reads raw CSV files produced by a SeaExplorer glider. This function can
 #' output either "Level 0" or "Level 1" type data. Level 0 is simply the raw
-#' data as written in the CSV files with no processing done. (Historical note:
-#' until package varsion 0.1-14, released on 2025-02-10, longitude and latitude
-#' were interpolated between surface values for level =
-#' 0. This behaviour was changed for issue 127, at
-#'    https://github.com/dankelley/oceglider/issues/127).
+#' data as written in the CSV files with no processing done except
+#' renaming variables to the oce convention (e.g. `"GPCTD_CONDUCTIVITY"`
+#' is renamed as `"conductivity"`).
+#'
 #'
 #' Level 1 processing performs a number of steps to give an
 #' "analysis ready" dataset, including
@@ -106,11 +105,26 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #'
 #' @template debug
 #'
+#' @section Historical notes:
+#'
+#' 1. Until package varsion 0.1-14, released on 2025-02-10, longitude and
+#'    latitude were interpolated between surface values for the case where
+#'    `level` is given as 0. This behaviour was changed for issue 127, at
+#'    https://github.com/dankelley/oceglider/issues/127).
+#'
+#' 2. Until package varsion 0.1-16, released on 2025-02-15, data could be
+#'    erased for a while after power-on events, as controlled by a parameter
+#'    named `removeTimeSincePowerOn`. Now, a similar action may be accomplished
+#'    by calling `deleteStartupData()` on the return object from the present
+#'    function.
+#'
 #' @template seaexplorer_names
 #'
 #' @examples
 #' library(oceglider)
-#' directory <- system.file("extdata/sea_explorer/delayed_raw", package = "oceglider")
+#'
+#' directory <- system.file("extdata/sea_explorer/delayed_raw", package =
+#'                          "oceglider")
 #' g <- read.glider.seaexplorer.raw(directory, progressBar = FALSE)
 #' plot(g, which = "p")
 #'
@@ -204,7 +218,7 @@ read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
         cat("* Reading", length(files), "files...\n")
         pb <- txtProgressBar(0, length(files), 0, style = 3) # start at 0 to allow for a single yo
     }
-    ds <- list() # stores one entry per file. FIXME: aren't we stringing them together later?
+    ds <- list() # stores one entry per file; we expand this at the bottom of the loop
     for (i in seq_along(files)) {
         if (showProgressBar) {
             setTxtProgressBar(pb, i)
