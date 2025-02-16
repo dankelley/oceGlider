@@ -3,7 +3,7 @@ OBJECTS=$(SOURCES:.R=.out)
 all: $(OBJECTS)
 %.out: %.R
 	Rscript $< > $@
-publish: force
+install: force
 	cp *.csv ../inst/extdata/dictionaries
 clean: force
 	-rm *.out *~

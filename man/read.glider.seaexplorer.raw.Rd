@@ -10,6 +10,7 @@ read.glider.seaexplorer.raw(
   yo,
   level = 1,
   interpolateToCTD = TRUE,
+  rename = TRUE,
   progressBar = interactive(),
   missingValue = 9999,
   debug = getOption("gliderDebug", default = 0)
@@ -40,6 +41,13 @@ numbers for which files are present in \code{dir}.}
 interpolated to the CTD times to obtain a common time base, or whether all
 sensors should simply be interpolated for all time stamps (which was the
 default behaviour before 2019-12-08)}
+
+\item{rename}{a logical value indicating whether to rename variables
+to a more oce-like scheme. This name mapping is defined by
+the file
+\code{system.file("extdata/dictionaries/seaexplorerDict.csv",package="oceglider")}
+and a future version of \code{read.glider.seaexplorer.raw()} will permit users to
+specify alternative schemes.}
 
 \item{progressBar}{a logical value that controls whether to indicate the
 progress made in reading and interpreting the data.  This can be useful,
@@ -217,8 +225,10 @@ value, to accomplish a similar thing.
 \examples{
 library(oceglider)
 
-directory <- system.file("extdata/sea_explorer/delayed_raw", package =
-                         "oceglider")
+directory <- system.file("extdata/sea_explorer/delayed_raw",
+    package =
+        "oceglider"
+)
 g <- read.glider.seaexplorer.raw(directory, progressBar = FALSE)
 plot(g, which = "p")
 

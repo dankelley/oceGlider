@@ -53,7 +53,7 @@ SecurityLevel,securityLevel
 Temperature,temperature
 Timestamp,timestamp
 Voltage,voltage
-X,X"
+X,x"
 
 feb2025Dict <- read.csv(text = feb2025)
 

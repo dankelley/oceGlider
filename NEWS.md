@@ -1,3 +1,7 @@
+# oceglider 0.1.17
+
+* Change `read.glider.seaexplorer.raw()` to accept new parameter `rename`, in accordance with issue #126.
+
 # oceglider 0.1.16
 
 * Add `deleteStartupData()`, and remove the `removeTimeSincePowerOn` parameter
