@@ -15,7 +15,7 @@ is renamed as "conductivity").'></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">oceglider</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.17</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.18</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -108,16 +108,15 @@ default behaviour before 2019-12-08)</p></dd>
 
 
 <dt id="arg-rename">rename<a class="anchor" aria-label="anchor" href="#arg-rename"></a></dt>
-<dd><p>a logical value indicating whether to rename variables
-to a more oce-like scheme. This name mapping is defined by
-the file
+<dd><p>an indication of how (or if) to rename variables. This is
+needed for most practical work in the oce package, which expects
+standardized names, such as <code>"temperature"</code>, as opposed to the names stored
+in glider files. There are three choices for <code>rename</code>. (a) It can be
+logical, with TRUE (the default) meaning to use names as defined in
 <code>system.file("extdata/dictionaries/seaexplorerDict.csv",package="oceglider")</code>
-and a future version of <code>read.glider.seaexplorer.raw()</code> will permit users to
-specify alternative schemes.  It is not recommended to use <code>rename=FALSE</code>
-because doing so will disable some of the other actions of
-<code>read.glider.seaexplorer.raw()</code>, such as the computation of salinity from
-temperature, conductivity and pressure, simply because the code to do that
-relies on the variables having known names.</p></dd>
+or FALSE, meaning not to rename variables. (b) It can be the name of a CSV
+file that is in the same format as the file above-named file.  (c)
+It can be a data frame with columns named <code>gliderName</code> and <code>oceName</code>.</p></dd>
 
 
 <dt id="arg-progressbar">progressBar<a class="anchor" aria-label="anchor" href="#arg-progressbar"></a></dt>
