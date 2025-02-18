@@ -88,16 +88,15 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 ## might take the form of zero salinity, followed by a relatively
 ## rapid ramp-up to values that seem more oceanographic.
 #'
-#' @param rename a logical value indicating whether to rename variables
-#' to a more oce-like scheme. This name mapping is defined by
-#' the file
+#' @param rename an indication of how (or if) to rename variables. This is
+#' needed for most practical work in the oce package, which expects
+#' standardized names, such as `"temperature"`, as opposed to the names stored
+#' in glider files. There are three choices for `rename`. (a) It can be
+#' logical, with TRUE (the default) meaning to use names as defined in
 #' `system.file("extdata/dictionaries/seaexplorerDict.csv",package="oceglider")`
-#' and a future version of `read.glider.seaexplorer.raw()` will permit users to
-#' specify alternative schemes.  It is not recommended to use `rename=FALSE`
-#' because doing so will disable some of the other actions of
-#' `read.glider.seaexplorer.raw()`, such as the computation of salinity from
-#' temperature, conductivity and pressure, simply because the code to do that
-#' relies on the variables having known names.
+#' or FALSE, meaning not to rename variables. (b) It can be the name of a CSV
+#' file that is in the same format as the file above-named file.  (c)
+#' It can be a data frame with columns named `gliderName` and `oceName`.
 #'
 #' @param progressBar a logical value that controls whether to indicate the
 #' progress made in reading and interpreting the data.  This can be useful,
@@ -232,7 +231,27 @@ read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
         pb <- txtProgressBar(0, length(files), 0, style = 3) # start at 0 to allow for a single yo
     }
     ds <- list() # stores one entry per file; we expand this at the bottom of the loop
-    nameDict <- read.csv(system.file("extdata/dictionaries/seaexplorerDict.csv", package = "oceglider"))
+    # FIXME: in next, set up to read another csv file, or handle a data.frame;
+    # document the latter, which might be handy for users
+    if (is.character(rename)) {
+        if (!file.exists(rename)) {
+            stop("there is no file named '", rename, "'")
+        }
+        nameDict <- read.csv(rename)
+        # discard user's name (why make them learn that)
+        names(nameDict) <- c("gliderName", "oceName")
+        rename <- TRUE
+    } else if (is.data.frame(rename)) {
+        nameDict <- rename
+        names(nameDict) <- c("gliderName", "oceName")
+        rename <- TRUE
+    } else if (is.logical(rename)) {
+        nameDict <- read.csv(system.file("extdata/dictionaries/seaexplorerDict.csv", package = "oceglider"))
+    }
+    if (debug > 0 && rename) {
+        cat("next is head(nameDict):\n")
+        print(head(nameDict))
+    }
     for (i in seq_along(files)) {
         if (showProgressBar) {
             setTxtProgressBar(pb, i)
@@ -244,11 +263,11 @@ read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
         # cat("is next sensible\n")
         # print(head(nameDict))
         if (rename) {
-            gliderDebug(debug, "renaming variables\n")
+            gliderDebug(debug && i == 1L, "renaming variables for first file (others not reported)\n")
             for (row in seq_len(nrow(nameDict))) {
                 gliderName <- nameDict$gliderName[row]
                 oceName <- nameDict$oceName[row]
-                gliderDebug(debug, "  ", gliderName, "->", oceName, "\n")
+                gliderDebug(debug && i == 1L, "  ", gliderName, "->", oceName, "\n")
                 if (identical(gliderName, "PLD_REALTIMECLOCK")) {
                     d$PLD_REALTIMECLOCK <- as.POSIXct(d$PLD_REALTIMECLOCK,
                         format = "%d/%m/%Y %H:%M:%OS", tz = "UTC"
@@ -269,7 +288,7 @@ read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
                     res@metadata$dataNamesOriginal[[gname]] <- gliderName
                 }
             }
-            gliderDebug(debug, "  finished renaming\n")
+            gliderDebug(debug && i == 1L, "  finished renaming for first file (others not reported)\n")
         }
         ds[[i]] <- d
         gliderDebug(debug, "  first stage completed for file", i, "of", nfiles, "\n")
@@ -283,16 +302,18 @@ read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
     if (rename) { # cannot do things in this block without renaming, because we do not know what e.g. holds lon and lat
         gliderDebug(debug, "  data cleanup\n")
         # First remove all duplicated lon/lat
-        dall$longitude[which(duplicated(dall$longitude))] <- NA
-        dall$latitude[which(duplicated(dall$latitude))] <- NA
         # Change behaviour for level=0, according to issue
         # https://github.com/dankelley/oceglider/issues/127
         if (level > 0) {
-            trans <- dall$navState == 116
-            dall$longitude[!trans] <- NA
-            dall$latitude[!trans] <- NA
-            dall$longitude <- approx(dall$time, dall$longitude, dall$time)$y
-            dall$latitude <- approx(dall$time, dall$latitude, dall$time)$y
+            if (2 == sum(c("longitude", "latitude") %in% names(dall))) {
+                dall$longitude[which(duplicated(dall$longitude))] <- NA
+                dall$latitude[which(duplicated(dall$latitude))] <- NA
+                trans <- dall$navState == 116
+                dall$longitude[!trans] <- NA
+                dall$latitude[!trans] <- NA
+                dall$longitude <- approx(dall$time, dall$longitude, dall$time)$y
+                dall$latitude <- approx(dall$time, dall$latitude, dall$time)$y
+            }
         }
         # Trim out any empty rows (no data at all)
         sub <- dall[, which(!(names(dall) %in% c("time", "navState", "longitude", "latitude", "pressureNav", "yoNumber")))]

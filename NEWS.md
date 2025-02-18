@@ -1,3 +1,8 @@
+# oceglider 0.1.18
+
+* Change `read.glider.seaexplorer.raw()` to handle filename and data-frame
+values for the `rename` parameter.
+
 # oceglider 0.1.17
 
 * Change `read.glider.seaexplorer.raw()` to accept new parameter `rename`, in accordance with issue #126.
