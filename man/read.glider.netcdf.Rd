@@ -15,7 +15,7 @@ read.glider.netcdf(
 that holds glider data.}
 
 \item{saveGlobalAttributes}{logical value indicating whether to
-read the entiriety of the global attributes stored within the
+read the entirety of the global attributes stored within the
 file into the \code{metadata} slot in a list named \code{globalAttributes}.}
 
 \item{debug}{an integer specifying whether debugging information is

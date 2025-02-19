@@ -217,7 +217,7 @@ getAtt <- function(f, varid = 0, attname = NULL, default = NULL) {
 #' that holds glider data.
 #'
 #' @param saveGlobalAttributes logical value indicating whether to
-#' read the entiriety of the global attributes stored within the
+#' read the entirety of the global attributes stored within the
 #' file into the `metadata` slot in a list named `globalAttributes`.
 #'
 #' @template debug

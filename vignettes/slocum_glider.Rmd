@@ -88,7 +88,7 @@ This is because the dataset has time values in that interval, but all the
 pressure values are NA. The `subset()` function could be used to trim
 the dataset, but that is not necessarily wise because there could be other
 valuable data (even just longitude and latitude are valuable, in case the
-hydrographic sensors provide nothing useable).
+hydrographic sensors provide nothing usable).
 
 We can show temperature on a similar plot, by switching from lines to points,
 and colour-coding by temperature.

@@ -104,7 +104,7 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #' interactive sessions, but not in scripts.
 #'
 #' @param missingValue numeric value that indicates bad data. Any data items
-#' equalling this value are converted to NA. The default is 9999. To avoid
+#' equaling this value are converted to NA. The default is 9999. To avoid
 #' changing values to NA, call the function with `missingValue=NULL`.
 #'
 ## @param rename optional logical value indicating whether to rename variables
@@ -117,12 +117,12 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #'
 #' @section Historical notes:
 #'
-#' 1. Until package varsion 0.1-14, released on 2025-02-10, longitude and
+#' 1. Until package version 0.1-14, released on 2025-02-10, longitude and
 #'    latitude were interpolated between surface values for the case where
 #'    `level` is given as 0. This behaviour was changed for issue 127, at
-#'    https://github.com/dankelley/oceglider/issues/127).
+#'    <https://github.com/dankelley/oceglider/issues/127>).
 #'
-#' 2. Until package varsion 0.1-16, released on 2025-02-15, data could be
+#' 2. Until package version 0.1-16, released on 2025-02-15, data could be
 #'    erased for a while after power-on events, as controlled by a parameter
 #'    named `removeTimeSincePowerOn`. Now, a similar action may be accomplished
 #'    by calling `deleteStartupData()` on the return object from the present

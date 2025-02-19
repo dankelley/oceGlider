@@ -58,7 +58,7 @@ since the work can be slow. The default is to show progress in
 interactive sessions, but not in scripts.}
 
 \item{missingValue}{numeric value that indicates bad data. Any data items
-equalling this value are converted to NA. The default is 9999. To avoid
+equaling this value are converted to NA. The default is 9999. To avoid
 changing values to NA, call the function with \code{missingValue=NULL}.}
 
 \item{debug}{an integer specifying whether debugging information is
@@ -131,11 +131,11 @@ Table 2 of reference 1), as follows.
 \section{Historical notes}{
 
 \enumerate{
-\item Until package varsion 0.1-14, released on 2025-02-10, longitude and
+\item Until package version 0.1-14, released on 2025-02-10, longitude and
 latitude were interpolated between surface values for the case where
 \code{level} is given as 0. This behaviour was changed for issue 127, at
-https://github.com/dankelley/oceglider/issues/127).
-\item Until package varsion 0.1-16, released on 2025-02-15, data could be
+\url{https://github.com/dankelley/oceglider/issues/127}).
+\item Until package version 0.1-16, released on 2025-02-15, data could be
 erased for a while after power-on events, as controlled by a parameter
 named \code{removeTimeSincePowerOn}. Now, a similar action may be accomplished
 by calling \code{deleteStartupData()} on the return object from the present

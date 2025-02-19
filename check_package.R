@@ -1,5 +1,7 @@
 # for a checklist see e.g. https://github.com/dankelley/oce/issues/2068
-requireNamespace(c("codemetar", "devtools", "urlchecker", "rhub", "revdepcheck"))
+if (!requireNamespace(c("codemetar", "devtools", "urlchecker", "rhub", "revdepcheck"))) {
+    install.packages(c("codemetar", "devtools", "urlchecker", "rhub", "revdepcheck"))
+}
 # codemeta changes a timestamp, so requiring a commit after every call. That is
 # senseless, so I only run the false part of the following conditional in the
 # run-up to a release.

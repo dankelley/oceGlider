@@ -9,3 +9,4 @@
 ^meetings$
 ^sandbox$
 ^.github$
+^codemeta\.json$

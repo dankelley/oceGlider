@@ -2,18 +2,18 @@
   "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
   "@type": "SoftwareSourceCode",
   "identifier": "oceglider",
-  "description": "Provides tools for reading and analysing data from oceanographer gliders.",
+  "description": "Tools for reading and analysing data from oceanographer gliders.",
   "name": "oceglider: Analysis of Oceanographic Glider Data",
   "codeRepository": "https://github.com/dankelley/oceglider",
-  "issueTracker": "https://github.com/dankelley/oceglider",
+  "issueTracker": "https://github.com/dankelley/oceglider/issues",
   "license": "https://spdx.org/licenses/GPL-2.0",
-  "version": "0.1.10",
+  "version": "0.1.18",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.4.1 (2024-06-14)",
+  "runtimePlatform": "R version 4.4.2 (2024-10-31)",
   "author": [
     {
       "@type": "Person",
@@ -61,15 +61,15 @@
     },
     {
       "@type": "SoftwareApplication",
-      "identifier": "RCurl",
-      "name": "RCurl",
+      "identifier": "curl",
+      "name": "curl",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
         "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
       },
-      "sameAs": "https://CRAN.R-project.org/package=RCurl"
+      "sameAs": "https://CRAN.R-project.org/package=curl"
     },
     {
       "@type": "SoftwareApplication",
@@ -124,6 +124,7 @@
       "@type": "SoftwareApplication",
       "identifier": "oce",
       "name": "oce",
+      "version": ">= 1.8.3",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -149,23 +150,12 @@
       "identifier": "methods",
       "name": "methods"
     },
-    "7": {
-      "@type": "SoftwareApplication",
-      "identifier": "shiny",
-      "name": "shiny",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=shiny"
-    },
     "SystemRequirements": null
   },
-  "fileSize": "3392.085KB",
+  "fileSize": "46431.401KB",
   "relatedLink": "https://dankelley.github.io/oceglider/",
   "releaseNotes": "https://github.com/dankelley/oceglider/blob/master/NEWS.md",
   "readme": "https://github.com/dankelley/oceglider/blob/develop/README.md",
-  "contIntegration": "https://github.com/dankelley/oceglider/actions/workflows/R-CMD-check.yaml"
+  "contIntegration": "https://github.com/dankelley/oce/actions/workflows/R-CMD-check.yaml",
+  "developmentStatus": "https://www.repostatus.org/#wip"
 }
