@@ -75,9 +75,11 @@ of debugging, but also the depth.}
 \description{
 Reads raw CSV files produced by a SeaExplorer glider. This function can
 output either "Level 0" or "Level 1" type data. Level 0 is simply the raw
-data as written in the CSV files with no processing done except
+data as written in the CSV files with very processing done except
 renaming variables to the oce convention (e.g. \code{"GPCTD_CONDUCTIVITY"}
-is renamed as \code{"conductivity"}).
+is renamed as \code{"conductivity"}), converting timestamp strings
+into times, and converting longitude and latitude into decimal
+degrees.
 }
 \details{
 Level 1 processing performs a number of steps to give an
@@ -85,16 +87,9 @@ Level 1 processing performs a number of steps to give an
 
 \enumerate{
 
-\item Interpolation of the surface longitude and latitude to give
-an estimate of the subsurface positions. This is a crude estimate of
-subsurface location and should be taken only as a first guess.
-
-\item Removal of the first few sensor values from when the glider
-is in \code{navState=118} (inflecting up) or \code{navState=110}
-(inflecting down). The reason for this is that when the glider is
-set to sample on alternating profiles, when the CTD is powered up
-the first sample output to the payload computer is the \emph{last}
-sample recorded before power down.
+\item If the dataset lacks a dead-reckoning column, surface longitude and
+latitude readings are interpolated with respect to time, to provide a crude
+estimate subsurface positions.
 
 \item Interpolation, depending on the value of \code{interpolateToCTD}. If
 \code{interpolateToCTD} is \code{TRUE}, then any "extra" sensors are interpolated
@@ -111,7 +106,7 @@ pressures to values measured by sensors not integrated into the CTD
 (e.g. Wetlabs FLBBCD, Rinko O2). Following the interpolation, any
 rows with duplicated times are removed.
 
-\item Calculate Practical salinity from conductivity, temperature
+\item calculation of Practical salinity from conductivity, temperature
 and pressure using \code{\link[oce:swSCTp]{oce::swSCTp()}}.
 
 }

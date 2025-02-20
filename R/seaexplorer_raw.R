@@ -4,9 +4,11 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #'
 #' Reads raw CSV files produced by a SeaExplorer glider. This function can
 #' output either "Level 0" or "Level 1" type data. Level 0 is simply the raw
-#' data as written in the CSV files with no processing done except
+#' data as written in the CSV files with very processing done except
 #' renaming variables to the oce convention (e.g. `"GPCTD_CONDUCTIVITY"`
-#' is renamed as `"conductivity"`).
+#' is renamed as `"conductivity"`), converting timestamp strings
+#' into times, and converting longitude and latitude into decimal
+#' degrees.
 #'
 #'
 #' Level 1 processing performs a number of steps to give an
@@ -14,16 +16,16 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #'
 #' \enumerate{
 #'
-#' \item Interpolation of the surface longitude and latitude to give
-#' an estimate of the subsurface positions. This is a crude estimate of
-#' subsurface location and should be taken only as a first guess.
+#' \item If the dataset lacks a dead-reckoning column, surface longitude and
+#' latitude readings are interpolated with respect to time, to provide a crude
+#' estimate subsurface positions.
 #'
-#' \item Removal of the first few sensor values from when the glider
-#' is in `navState=118` (inflecting up) or `navState=110`
-#' (inflecting down). The reason for this is that when the glider is
-#' set to sample on alternating profiles, when the CTD is powered up
-#' the first sample output to the payload computer is the *last*
-#' sample recorded before power down.
+## \item Removal of the first few sensor values from when the glider
+## is in `navState=118` (inflecting up) or `navState=110`
+## (inflecting down). The reason for this is that when the glider is
+## set to sample on alternating profiles, when the CTD is powered up
+## the first sample output to the payload computer is the *last*
+## sample recorded before power down.
 #'
 #' \item Interpolation, depending on the value of `interpolateToCTD`. If
 #' `interpolateToCTD` is `TRUE`, then any "extra" sensors are interpolated
@@ -40,7 +42,7 @@ issue40 <- TRUE # read fractional seconds? (https://github.com/dankelley/oceglid
 #' (e.g. Wetlabs FLBBCD, Rinko O2). Following the interpolation, any
 #' rows with duplicated times are removed.
 #'
-#' \item Calculate Practical salinity from conductivity, temperature
+#' \item calculation of Practical salinity from conductivity, temperature
 #' and pressure using [oce::swSCTp()].
 #'
 #' }
