@@ -263,22 +263,13 @@ read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
         # cat("is next sensible\n")
         # print(head(nameDict))
         if (rename) {
+            # NB we cannot e.g. convert longitude into decimal degrees if
+            # we don't know which column holds longitude.
             gliderDebug(debug && i == 1L, "renaming variables for first file (others not reported)\n")
             for (row in seq_len(nrow(nameDict))) {
                 gliderName <- nameDict$gliderName[row]
                 oceName <- nameDict$oceName[row]
-                gliderDebug(debug && i == 1L, "  ", gliderName, "->", oceName, "\n")
-                if (identical(gliderName, "PLD_REALTIMECLOCK")) {
-                    d$PLD_REALTIMECLOCK <- as.POSIXct(d$PLD_REALTIMECLOCK,
-                        format = "%d/%m/%Y %H:%M:%OS", tz = "UTC"
-                    )
-                }
-                if (identical(gliderName, "NAV_LATITUDE")) {
-                    d$NAV_LATITUDE <- degreeMinute(d$NAV_LATITUDE)
-                }
-                if (identical(gliderName, "NAV_LONGITUDE")) {
-                    d$NAV_LONGITUDE <- degreeMinute(d$NAV_LONGITUDE)
-                }
+                gliderDebug(debug && i == 1L, "   ", gliderName, "->", oceName, "\n")
                 namesTmp <- names(d)
                 # message(oce::vectorShow(namesTmp, n = -1))
                 # message(oce::vectorShow(gliderName, n = -1))
@@ -291,32 +282,65 @@ read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
             gliderDebug(debug && i == 1L, "  finished renaming for first file (others not reported)\n")
         }
         ds[[i]] <- d
-        gliderDebug(debug, "  first stage completed for file", i, "of", nfiles, "\n")
+        gliderDebug(debug, "first stage completed for file", i, "of", nfiles, "\n")
     }
     dall <- do.call(rbind.data.frame, ds)
+    # convert some weird formats
+    if ("time" %in% names(dall)) {
+        gliderDebug(debug, "convert time to POSIXct object\n")
+        dall$time <- as.POSIXct(dall$time, format = "%d/%m/%Y %H:%M:%OS", tz = "UTC")
+    }
+    if ("latitude" %in% names(dall)) {
+        gliderDebug(debug, "convert latitude to decimal degrees\n")
+        gliderDebug(debug, "before: ", head(dall$latitude, 3) |> paste(collapse = " "), "\n")
+        dall$latitude <- degreeMinute(dall$latitude)
+        gliderDebug(debug, "after: ", head(dall$latitude, 3) |> paste(collapse = " "), "\n")
+    }
+    if ("longitude" %in% names(dall)) {
+        gliderDebug(debug, "convert longitude to decimal degrees\n")
+        gliderDebug(debug, "before: ", head(dall$longitude, 3) |> paste(collapse = " "), "\n")
+        dall$longitude <- degreeMinute(dall$longitude)
+        gliderDebug(debug, "after: ", head(dall$longitude, 3) |> paste(collapse = " "), "\n")
+    }
     # dall[["x"]] <- NULL # get rid of the weird last column
     if (showProgressBar) {
-        cat("\n")
         flush.console()
     }
     if (rename) { # cannot do things in this block without renaming, because we do not know what e.g. holds lon and lat
-        gliderDebug(debug, "  data cleanup\n")
         # First remove all duplicated lon/lat
         # Change behaviour for level=0, according to issue
         # https://github.com/dankelley/oceglider/issues/127
+        dallNames <- names(dall)
         if (level > 0) {
-            if (2 == sum(c("longitude", "latitude") %in% names(dall))) {
-                dall$longitude[which(duplicated(dall$longitude))] <- NA
-                dall$latitude[which(duplicated(dall$latitude))] <- NA
-                trans <- dall$navState == 116
-                dall$longitude[!trans] <- NA
-                dall$latitude[!trans] <- NA
-                dall$longitude <- approx(dall$time, dall$longitude, dall$time)$y
-                dall$latitude <- approx(dall$time, dall$latitude, dall$time)$y
+            if (!"deadReckoning" %in% dallNames) {
+                if (3L == sum(c("time", "longitude", "latitude") %in% dallNames)) {
+                    gliderDebug(debug, "manipulating longitude and latitude, since no deadReckoning data are available...\n")
+                    gliderDebug(debug, "  step 1: set duplicated lon,lat to NA\n")
+                    dall$longitude[which(duplicated(dall$longitude))] <- NA
+                    dall$latitude[which(duplicated(dall$latitude))] <- NA
+                    gliderDebug(debug, "step 2: set lon,lat to NA if not at surface\n")
+                    inRadioContact <- dall$navState == 116L
+                    dall$longitude[!inRadioContact] <- NA
+                    dall$latitude[!inRadioContact] <- NA
+                    gliderDebug(debug, "  step 3: interpolate between at-surface lon and lat values\n")
+                    tmplon <- try(approx(dall$time, dall$longitude, dall$time)$y, silent = TRUE)
+                    tmplat <- try(approx(dall$time, dall$latitude, dall$time)$y, silent = TRUE)
+                    if (!inherits(tmplon, "try-error") && !inherits(tmplat, "try-error")) {
+                        dall$longitude <- tmplon
+                        dall$latitude <- tmplat
+                        gliderDebug(debug, "... finished interpolating lon,lat between surfacings\n")
+                    } else {
+                        warning("insufficient data to interpolate lon,lat between surfacings\n")
+                    }
+                } else {
+                    gliderDebug(debug, "object does not contain 'time', 'longitude' and 'latitude'\n")
+                }
+            } else {
+                gliderDebug(debug, "using dead-reckoning for longitude and latitude values\n")
             }
         }
         # Trim out any empty rows (no data at all)
-        sub <- dall[, which(!(names(dall) %in% c("time", "navState", "longitude", "latitude", "pressureNav", "yoNumber")))]
+        sub <- dall[, which(!dallNames %in% c("time", "navState", "longitude", "latitude", "pressureNav", "yoNumber"))]
         naRows <- apply(sub, 1, function(x) sum(is.na(x)))
         ok <- naRows < dim(sub)[2]
         dall <- dall[ok, ]
@@ -367,8 +391,11 @@ read.glider.seaexplorer.raw <- function(directory, pattern = "pld1.raw",
         dall <- dall[!duplicated(dall), ]
         # Calculate salinity
         if (rename) {
-            dall$salinity <- with(dall, swSCTp(conductivity, temperature, pressure, conductivityUnit = "S/m"))
-            dall$salinity[dall$salinity > 40] <- NA
+            if (3L == sum(c("conductivity", "temperature", "pressure") %in% names(dall))) {
+                gliderDebug(debug, "computing salinity\n")
+                dall$salinity <- with(dall, swSCTp(conductivity, temperature, pressure, conductivityUnit = "S/m"))
+                dall$salinity[dall$salinity > 40] <- NA
+            }
         }
         res@data <- dall
     }
